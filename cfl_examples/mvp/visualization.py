@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
 
-
+# global variables
 N_CLASSES = 4 #TODO: get rid of this 
 X_COORDS_LEN = 9
 Y_COORDS_LEN = 55
@@ -24,12 +24,31 @@ COORDS = {'y': np.linspace(10,-10, X_COORDS_LEN), 'x': np.linspace(142.5, 277.5,
 
 
 def visualize(X, Y, x_lbls, y_lbls):
+    ''' Iterate over each cluster in X and Y to plot the cluster 
+        average's difference from the global mean.
+        Arguments: 
+            X : X dataset of dimensions [# observations, # features] (np.array)
+            Y : Y dataset of dimensions [# observations, # features] (np.array)
+            x_lbls : class label for each observation in X, of dimensions [# observations,] (np.array)
+            y_lbls : class label for each observation in Y, of dimensions [# observations,] (np.array) 
+        Returns: None
+    '''
     fig = plt.figure(figsize=(15,10), facecolor='white') # TODO: make figsize dynamically set
     visualize_helper(0, N_CLASSES, X, x_lbls,  np.linspace(-4,4,30)) #'in subplot 0, draw the x-figure'
     visualize_helper(1, N_CLASSES, Y, y_lbls, np.linspace(-3,5.5,30))# 'in subplot 1, draw the y-figure'
     fig.show()
 
 def visualize_helper(col, n_classes, data, lbls, levels):
+    ''' For a given variable (X or Y), plot each cluster average's difference from
+        the global mean. 
+        Arguments:
+            col : which column in the figure to assign to this variable (int)
+            n_classes : number of clusters in lbls int (TODO: infer this from lbls instead)
+            data : X or Y dataset of dimensions [# observations, # features] (np.array)
+            lbls : cluster labels of dimensions [# observations,] (np.array)
+            levels : what levels to plot on contour plot (TODO: infer this from data)
+        Returns: None
+    '''
     for cluster_id in range(n_classes): 
         ax = plt.subplot2grid((4,2), (cluster_id, col)) 
         # Plot the cluster's mean difference from all frames' mean.
