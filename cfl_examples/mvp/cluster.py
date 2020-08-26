@@ -5,7 +5,7 @@ A module for clustering methods
 Jenna Kahn and Iman Wahle
 Aug 2020
 """
-import sys #write to stdout
+import sys #write to stdout 
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn import metrics
