@@ -80,7 +80,7 @@ class MDN():
         return model
 
 
-    def train_model(self, X_tr, Y_tr, X_ts, Y_ts, n_epochs=1000, save_fname='net_params/net'):
+    def train_model(self, X_tr, Y_tr, X_ts, Y_ts, n_epochs, save_fname='net_params/net'):
         # TODO: documentation
         # TODO: make validation set optional (is this really helpful?)
         # TODO: standardize save path structure
@@ -141,9 +141,8 @@ class MDN():
         return None                        
 
     
-    def predict(self, X, Y):
-        # TODO: implementation
-        pass
+    def predict(self, X):
+        return self.model.predict(X)
 
     def score(self, X, Y): 
         # TODO: implementation
@@ -157,3 +156,8 @@ class MDN():
 
     def get_n_yfeatures(self):
         return self.n_yfeatures
+
+
+    def load_weights(self, weights_path):
+        self.model.load_weights(weights_path)
+        return None
