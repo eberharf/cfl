@@ -18,10 +18,10 @@ def do_clustering(pyx, xData, yData, cluster_method, xnClusters= N_CLASSES, ynCl
     clusters the X and Y state spaces using the selected clustering method, based on a given cond. probability distribution 
 
     Parameters: 
-    pyx - conditional probability distribution P(Y|X) #TODO: is this P(Y|X) or P(Y|X=x)
+    pyx (np array) - conditional probability distribution for each x: P(Y|X=x) for all x dim:(# of observations x # of y features)
     xData, yData - the data sets whose state space is being partitioned (#TODO: xData is NOT explicitly used here)
     cluster_method (str) - the desired clustering method. Options are 'KNN' (Kmeans) 
-    xnClusters, ynClusters - the number of clusters desired for X and Y, respectively (ints)
+    xnClusters, ynClusters (ints) - the number of clusters desired for X and Y, respectively 
 
     Returns:
     x_lbls, y_lbls - the observational partitions 
