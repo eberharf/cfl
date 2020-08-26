@@ -1,7 +1,7 @@
 '''
 Iman Wahle
 Created August 14, 2020
-A class for performing density estimation with MDN
+A class for performing estimating E[P(Y | X)] from X and Y samples.
 '''
 
 import os
@@ -12,7 +12,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 
-class MDN():
+class CondExp():
     ''' A class for training/predicting for a neural network that learns
         P(Y | X) given two coordinated datasets X and Y. 
     '''
