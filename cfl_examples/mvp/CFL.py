@@ -1,5 +1,5 @@
 from sklearn.model_selection import train_test_split #shuffling data 
-from density_estimation import MDN #density estimation      #TODO: add __init__.py file to density_estimation
+from density_estimation import CondExp #density estimation      #TODO: add __init__.py file to density_estimation
 import cluster #creating observational clusters
 import visualization # visualize clusters created
 from sklearn.preprocessing import StandardScaler
@@ -11,7 +11,7 @@ N_EPOCHS = 10
 
 class CFL():
 
-    def __init__(self, X, Y, training_data_size =TRAINING_DATA_SIZE, CDE='MDN', clustering_method='KNN') :
+    def __init__(self, X, Y, training_data_size =TRAINING_DATA_SIZE, CDE='CondExp', clustering_method='KNN') :
         # define training and test sets
         self.X = X
         self.Y = Y
@@ -23,7 +23,7 @@ class CFL():
         
         # construct density estimation model
         # TODO: make it so people can rebuild the model 
-        self.density_model = MDN.MDN(n_xfeatures=X.shape[1], n_yfeatures=Y.shape[1], verbose=True)
+        self.density_model = CondExp.CondExp(n_xfeatures=X.shape[1], n_yfeatures=Y.shape[1], verbose=True)
         
     #TODO: 'normalize data' 
     def normalizeData(self): 
@@ -38,7 +38,7 @@ class CFL():
         return normalized
 
 
-    #wrappers for MDN methods 
+    #wrappers for CondExp methods 
     def train_model(self, n_epochs = N_EPOCHS): 
         '''train the density estimation model''' 
         self.density_model.train_model(self.X_tr, self.Y_tr, self.X_ts, self.Y_ts, n_epochs=n_epochs, save_fname='net_params/net')
