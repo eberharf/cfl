@@ -13,23 +13,45 @@ import matplotlib.pyplot as plt
 
 
 class MDN():
-    
+    ''' A class for training/predicting for a neural network that learns
+        P(Y | X) given two coordinated datasets X and Y. 
+    '''
+
     def __init__(self, n_xfeatures, n_yfeatures, verbose=False):
+        ''' Initialize model and define network. 
+            Arguments: 
+                n_xfeatures : dimensionality of X dataset (int)
+                n_yfeatures : dimensionality of Y dataset (int)
+                verbose : whether to print out model information (boolean)
+            Returns: None
+        '''
         self.n_xfeatures = n_xfeatures
         self.n_yfeatures = n_yfeatures
         self.model = self.build_model()
         self.verbose = verbose
 
     def compute_loss(self, x_true, y_true, training=False):
-        """MDN Loss Function """
-        # TODO: documentation
+        ''' Compute the mean squared error (MSE) between ground truth and prediction.
+            Arguments:
+                x_true : a batch of observations of X (tf.Tensor)
+                y_true : a batch of observations of Y (tf.Tensor)
+                training : whether to backpropagate gradient (boolean)
+            Returns: the average MSE for this batch (float)
+        '''
+        
         y_hat = self.model(x_true, training=training)
         cost = tf.keras.losses.MSE(y_true, y_hat)
         return tf.reduce_mean(cost)    
 
     @tf.function
     def train_step(self, optimizer, train_x, train_y):
-        # TODO: documentation
+        ''' train model with loss function defined in compute_loss and passed-in optimizer.
+            Arguments:
+                optimizer : the optimizer for the model (tf.keras.optimizers object)
+                train_x : a batch of observations of X (tf.Tensor)
+                train_y : a batch of observations of Y (tf.Tensor)
+            Returns: the loss for this batch (float)
+        '''
 
         # GradientTape: Trace operations to compute gradients
         with tf.GradientTape() as tape:
@@ -41,7 +63,11 @@ class MDN():
         return loss
 
     def build_model(self):
-        # TODO: documentation
+        ''' Define the neural network based on dimensions passed in during initialization.
+            Eventually, this architecture will have to become more dynamic (TODO).
+            Arguments: None
+            Returns: the model (tf.keras.models.Model object)
+        '''
 
         # Network
         input_layer = tf.keras.Input(shape=(self.n_xfeatures,), 
@@ -81,9 +107,21 @@ class MDN():
 
 
     def train_model(self, X_tr, Y_tr, X_ts, Y_ts, n_epochs, save_fname='net_params/net'):
-        # TODO: documentation
+        ''' Full training loop. Constructs t.data.Dataset for training and testing, 
+            updates model weights each epoch and evaluates on test set periodically.
+            Saves model weights as checkpoints. 
+            Arguments:
+                X_tr : X training set of dimensions [# training observations, # features] (np.array)
+                Y_tr : Y training set of dimensions [# training observations, # features] (np.array)
+                X_ts : X test set of dimensions [# test observations, # features] (np.array)
+                Y_ts : Y test set of dimensions [# test observations, # features] (np.array)
+                n_epochs : number of epochs to train model for (int)
+                save_fname : file path to save checkpoints to (string)
+            Returns: None
+        '''
         # TODO: make validation set optional (is this really helpful?)
         # TODO: standardize save path structure
+        # TODO: save each checkpoint to different name
 
         # Setup
         self.n_xfeatures = X_tr.shape[1]
@@ -142,6 +180,11 @@ class MDN():
 
     
     def predict(self, X):
+        ''' Given a set of observations X, get neural network output.
+            Arguments:
+                X : model input of dimensions [# observations, # features] (np.array)
+            Returns: model prediction (np.array) (TODO: check if this is really np.array)
+        '''
         return self.model.predict(X)
 
     def score(self, X, Y): 
@@ -149,15 +192,17 @@ class MDN():
         pass
 
     def get_model(self):
+        ''' Return model object.
+            Arguments: None
+            Returns: network model (tf.keras.models.Model object)
+        '''
         return self.model
-    
-    def get_n_xfeatures(self):
-        return self.n_xfeatures
-
-    def get_n_yfeatures(self):
-        return self.n_yfeatures
-
 
     def load_weights(self, weights_path):
+        ''' Load model weights from saved checkpoint into current model.
+            Arguments: 
+                weights_path : path to checkpoint (string)
+            Returns: None
+        '''
         self.model.load_weights(weights_path)
         return None
