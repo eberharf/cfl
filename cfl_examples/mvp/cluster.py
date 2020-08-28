@@ -12,6 +12,7 @@ from sklearn import metrics
 
 N_CLASSES = 4 #TODO: get rid of this
 
+#TODO: add a warning if one of the clusters ends up having 0 members in it (important bc otherwise people might get confused )
 
 def do_clustering(pyx, xData, yData, cluster_method, xnClusters= N_CLASSES, ynClusters=N_CLASSES): #TODO: when we have a clustering method that doesn't take in # of classes - deal with that
     """
