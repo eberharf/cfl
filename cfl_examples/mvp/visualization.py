@@ -14,7 +14,6 @@ import matplotlib.colors as colors
 X_COORDS_LEN = 9 #TODO: get rid of these (el nino specific) constants - pass them in to the Data object from user input
 Y_COORDS_LEN = 55
 
-
 #TODO: option to save plot instead of just showing it 
 
 #TODO: do this 
@@ -22,8 +21,8 @@ Y_COORDS_LEN = 55
 # Y_raw = y_scaler.inverse_transform(np.vstack([Y_tr, Y_ts]))
 
 FIG_KWARGS = {'figsize' : (15,10), 'facecolor' : 'white'} #NOTE: these values are el nino-specific 
-X_KWARGS = {'levels' : np.linspace(-4,4,30), 'cmap' : 'BrBG_r' }
-Y_KWARGS = {'levels' : np.linspace(-3,5.5,30), 'cmap' : 'coolwarm' }
+X_KWARGS = { 'cmap' : 'BrBG_r' }
+Y_KWARGS = {'cmap' : 'coolwarm' }
 
 def visualize(X, Y, x_lbls, y_lbls, fig_kwargs=FIG_KWARGS, X_kwargs=X_KWARGS, Y_kwargs=Y_KWARGS):
     ''' Iterate over each cluster in X and Y to plot the cluster 
@@ -59,5 +58,5 @@ def visualize_helper(col, data, lbls, kwargs):
         ax = plt.subplot2grid((4,2), (cluster_id, col)) 
         # Plot the cluster's mean difference from all frames' mean.
         cluster_mean = (data[lbls==cluster_id].mean(axis=0)-data.mean(axis=0)).reshape((Y_COORDS_LEN, X_COORDS_LEN)).T
-        ax.contourf(range(X_COORDS_LEN), range(Y_COORDS_LEN), cluster_mean, **kwargs)
+        ax.contourf(range(Y_COORDS_LEN), range(X_COORDS_LEN), cluster_mean , **kwargs)
         ax.set_xticks([]); ax.set_yticks([])
