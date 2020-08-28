@@ -18,7 +18,7 @@ def kMeansX(xData, model, n_clusters=N_CLASSES):
     return x_lbls
 
 
-def kMeansY(yData, xlbls, n_clusters=N_CLASSES):
+def kMeansY(yData, x_lbls, n_clusters=N_CLASSES):
     y_ftrs = np.zeros((yData.shape[0], np.unique(x_lbls).size))
     # Loop, not vectorized, to save memory. Can take a while.
     for y_id, y in enumerate(np.vstack([Y_tr, Y_ts])):
