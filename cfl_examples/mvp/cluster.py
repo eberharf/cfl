@@ -16,8 +16,14 @@ N_CLASSES = 4 #TODO: get rid of this
 #TODO: add a warning if one of the clusters ends up having 0 members in it (important bc otherwise people might get confused )
 
 
+def do_kMeans(distribution, n_clusters):
+    """computes and returns the Kmeans clustering for the given distribution"""
+    return KMeans(n_clusters=n_clusters, n_init=10, n_jobs=-1).fit_predict(distribution)
+
+
 #TODO: the structure is a little funky. Better: Not have all_cluster_methods dict, have cluster be parent class and allow specific methods to inherit from it? 
 class Cluster(): 
+
 
     def __init__(self, pyx, xData, yData, cluster_method, xnClusters=N_CLASSES, ynClusters=N_CLASSES): 
         self.all_cluster_methods = {'KNN': do_kMeans} #dictionary that maps the input clustering method to the appropriate function 
@@ -46,10 +52,6 @@ class Cluster():
         self.x_lbls = self.all_cluster_methods[self.cluster_method](self.pyx, self.xnClusters)  
         self.y_distribution = self.getYs(self.x_lbls) #y_distribution = P(y|Xclass)
         self.y_lbls = self.all_cluster_methods[self.cluster_method](self.y_distribution, self.ynClusters) 
-
-    def do_kMeans(self, distribution, n_clusters):
-        """computes and returns the Kmeans clustering for the given distribution"""
-        return KMeans(n_clusters=n_clusters, n_init=10, n_jobs=-1).fit_predict(distribution)
 
     def getYs(self, x_lbls):
         """
