@@ -24,7 +24,7 @@ FIG_KWARGS = {'figsize' : (15,10), 'facecolor' : 'white'} #NOTE: these values ar
 X_KWARGS = { 'cmap' : 'BrBG_r' }
 Y_KWARGS = {'cmap' : 'coolwarm' }
 
-def visualize(X, Y, x_lbls, y_lbls, fig_kwargs=FIG_KWARGS, X_kwargs=X_KWARGS, Y_kwargs=Y_KWARGS):
+def visualize(X, Y, x_lbls, y_lbls, fig_kwargs=None, X_kwargs=None, Y_kwargs=None):
     ''' Iterate over each cluster in X and Y to plot the cluster 
         average's difference from the global mean. Only good for spatially organized data 
         Arguments: 

@@ -11,7 +11,7 @@ N_EPOCHS = 10 #number of epochs to train model on
 
 class CFL():
 
-    def __init__(self, X, Y, training_data_size=TRAINING_DATA_SIZE, CDE='MDN', clustering_method='KNN') :
+    def __init__(self, X, Y, training_data_size=TRAINING_DATA_SIZE, CDE='MDN') :
         """
         creates the CFL object
 
@@ -19,14 +19,12 @@ class CFL():
             X, Y = high dimensional, observational data sets 
             training_data_size (float) = proportion of data to assign for training (vs testing)
             CDE (str) = method to use for Conditional Density Estimation 
-            clustering_method (str) = method to use for partitioning data into obs. classes
         """
         
         # define training and test sets
         self.X = X
         self.Y = Y
         self.CDE = CDE 
-        self.clustering_method = clustering_method
         
         #shuffles and splits data into training and testing sets
         self.X_tr, self.X_ts, self.Y_tr, self.Y_ts = \
@@ -75,30 +73,29 @@ class CFL():
         pass
 
 
-    # wrappers for clustering method
-    def create_clusters(self):
+    # create cluster object and execute the clustering
+    def create_clusters(self, clustering_method='KNN'):
+        '''
+        clustering_method (str) = method to use for partitioning data into obs. classes (default is k means)
+        '''
         pyx = self.predict(self.X)
-        self.x_lbls, self.y_lbls = cluster.do_clustering(pyx, self.X, self.Y, self.clustering_method) #TODO:pass in cluster method 
-        return self.x_lbls, self.y_lbls
-
-    def test_clustering(self):
-        pyx = self.predict(self.X)
-        return cluster.test_clustering(pyx, self.X, self.Y, 2, 5, 1, 4, 7, 1, cluster_method='KNN')
+        self.cluster = cluster.Cluster(pyx, self.X, self.Y, clustering_method)
+        self.cluster.do_clustering()
+        return self.cluster.x_lbls, self.cluster.y_lbls
 
     # TODO: get conditional probability
-    def get_cond_prob(self):
-        """Compute and print P(y_lbl | x_lbl)"""
-        P_CE = np.array([np.bincount(self.y_lbls.astype(int)[self.x_lbls==x_lbl], 
-            minlength=self.y_lbls.max()+1).astype(float) for x_lbl in np.sort(np.unique(self.x_lbls))])
-        P_CE = P_CE/P_CE.sum()
-        P_E_given_C = P_CE/P_CE.sum(axis=1, keepdims=True)
-        print('P(Y | X):')
-        print(P_E_given_C)
-        return P_E_given_C
-
+    #TODO: what is this function for. should it be here or in Cluster? 
+    # def get_cond_prob(self): 
+    #     """Compute and print P(y_lbl | x_lbl)"""
+    #     P_CE = np.array([np.bincount(self.cluster.y_lbls.astype(int)[self.cluster.x_lbls==x_lbl], 
+    #         minlength=self.cluster.y_lbls.max()+1).astype(float) for x_lbl in np.sort(np.unique(self.cluster.x_lbls))])
+    #     P_CE = P_CE/P_CE.sum()
+    #     P_E_given_C = P_CE/P_CE.sum(axis=1, keepdims=True)
+    #     print('P(Y | X):')
+    #     print(P_E_given_C)
+    #     return P_E_given_C
 
     # wrappers for visualization
    # cfl.visualize(visualization_type='1D') #TODO: add types of visualization 
-
     def visualize_clusters(self):
-        visualization.visualize(self.X, self.Y, self.x_lbls, self.y_lbls) 
+        visualization.visualize(self.X, self.Y, self.cluster.x_lbls, self.cluster.y_lbls) 
