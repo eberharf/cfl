@@ -65,8 +65,8 @@ class CFL():
         return pred
     
     def load_weights(self, weights_path):
-        return self.density_model.load_weights(weights_path)
-        
+        self.density_model.load_weights(weights_path)
+        return self.density_model
     
     def evaluate(self):
         """evaluate predictive performance of model"""
