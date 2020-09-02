@@ -72,13 +72,16 @@ class CFL():
         """evaluate predictive performance of model"""
         pass
 
+    
 
+    #TODO: split up this function? (from Jenna call w dave) bc it would be nice to be able to test the clustering separately from the prediction step (and they don't logically need to be paired)
     # create cluster object and execute the clustering
     def create_clusters(self, clustering_method='KNN'):
         '''
         clustering_method (str) = method to use for partitioning data into obs. classes (default is k means)
         '''
-        pyx = self.predict(self.X)
+        pyx = self.predict(self.X) # What is called pyx here is actually E[P(Y|X)] - the expectation of P(Y|X) 
+        # instead of being the whole distribution (collection of mius, sigmas, and alphas) - it's just the expectation (a bunch of mius) #TODO: @iman - correct?
         self.cluster = cluster.Cluster(pyx, self.X, self.Y, clustering_method)
         self.cluster.do_clustering()
         return self.cluster.x_lbls, self.cluster.y_lbls
