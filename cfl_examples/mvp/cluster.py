@@ -16,13 +16,13 @@ N_CLASSES = 4 #TODO: get rid of this
 #TODO: add a warning if one of the clusters ends up having 0 members in it (important bc otherwise people might get confused )
 
 
-
+#TODO: the structure is a little funky. Better: Not have all_cluster_methods dict, have cluster be parent class and allow specific methods to inherit from it? 
 class Cluster(): 
 
     def __init__(self, pyx, xData, yData, cluster_method, xnClusters=N_CLASSES, ynClusters=N_CLASSES): 
         self.all_cluster_methods = {'KNN': do_kMeans} #dictionary that maps the input clustering method to the appropriate function 
         #TODO: I wanted to make ^this a classwide variable bc it doesn't need to be an instance? but then i couldn't access inside of methods idk 
-
+        # TODO: add data checking assertions
         self.pyx = pyx #pyx = (np array) = conditional probability distribution for each x (in other words, P(Y|X=x) for all x). dim:(# of observations x # of y features)
         self.xData = xData #xData, yData = the data sets whose state space is being partitioned 
         self.yData = yData
@@ -44,8 +44,8 @@ class Cluster():
         x_lbls, y_lbls - the observational partitions 
         """            
         self.x_lbls = self.all_cluster_methods[self.cluster_method](self.pyx, self.xnClusters)  
-        y_distribution = self.getYs(self.x_lbls) #y_distribution = P(y|Xclass)
-        self.y_lbls = self.all_cluster_methods[self.cluster_method](y_distribution, self.ynClusters) 
+        self.y_distribution = self.getYs(self.x_lbls) #y_distribution = P(y|Xclass)
+        self.y_lbls = self.all_cluster_methods[self.cluster_method](self.y_distribution, self.ynClusters) 
 
     def do_kMeans(self, distribution, n_clusters):
         """computes and returns the Kmeans clustering for the given distribution"""
@@ -106,8 +106,8 @@ class Cluster():
             #make an array to hold the error metric 
             for yni,ynClusters in enumerate(y_range): 
                 print('XCluster: {}, YCluster: {}'.format(xni, yni))
-                x_lbls, y_lbls = do_clustering(xnClusters, ynClusters) #cluster both x and y           
-                y_scores[xni,yni] = metrics.calinski_harabasz_score(self.yData, y_lbls) #calculate the score for the y cluster 
-            x_scores[xni] = metrics.calinski_harabasz_score(self.xData, x_lbls)
+                self.do_clustering() #cluster both x and y           
+                y_scores[xni,yni] = metrics.calinski_harabasz_score(self.yData, self.y_lbls) #calculate the score for the y cluster 
+            x_scores[xni] = metrics.calinski_harabasz_score(self.xData, self.x_lbls) #calculate the score for the x cluster 
         
         return x_scores, y_scores
