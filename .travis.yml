@@ -23,7 +23,7 @@ install:
   - conda info -a
 
   # Create conda environment 
-  - conda env create -f cfl_env.yml
+  - conda env create -f requirements.yml
   - conda activate cfl-environment
   - python setup.py install
 # command to run tests
