@@ -39,6 +39,16 @@ class VisualBarsData():
     def __repr__(self): 
         return str(self.X_topo)
 
+    
+    def getImages(self): 
+        return self.X_topo
+
+    def getGroundTruth(self): 
+        return self.gt_labels
+
+    def getBehavior(self):
+        return self.target_vals
+
     def generate_images(self, n_samples, im_shape, noise_lvl):
         '''
         generates binary images containing some combination of vertical 
