@@ -10,12 +10,17 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn import metrics
 
+from scipy.stats import norm #calculating CDF 
+from scipy.states import entropy #calculate KL divergence
+
 N_CLASSES = 4 #TODO: get rid of this
 
 
 #TODO: add a warning if one of the clusters ends up having 0 members in it (important bc otherwise people might get confused )
 
-def do_epsilon_clustering(data, params):  
+
+################################# EPSILON CLUSTERING STUFF ######################################
+do_epsilon_clustering(data, params):  
     """
     Executes clustering based on the equivalence relation x1 ~ x2 iff P(Y|x1) = P(Y|x2) +- epsilon 
     where epsilon is a small value 
@@ -90,6 +95,72 @@ def epsilon_clustering_one_time(data, epsilon):
     #   move on to next data point 
 
 
+################################   KL Divergence (1D ONLY!) #################################
+
+def calc_KLDiv(pyx1, pyx2, xData, n_bins): 
+    
+    discretized_pyx1, discretized_pyx2 = discretized_pyx(pxy1, pyx2, xData, n_bins)
+    kl = entropy(discretized_pyx1, discretized_pyx2)
+    return kl
+
+def discretized_pyx(pyx1, pyx2, xData, n_bins): 
+    ''' calculates discretized pmf over P(Y|X=x) for each x in xData'''
+   
+    #find min, max of xdata 
+    minX = np.min(xData)
+    maxX = np.max(xData)
+
+    #calculate bin edges 
+    bin_edges = np.linspace(start=minX, stop=maxX, num=n_bins)
+    
+    # calculate pmf
+    discretized_pyx1 = bin_probabilities(bin_edges, pyx1)
+    discretized_pyx2 = bin_probabilities(bin_edges, pyx2)
+    return discretized_pyx1, discretized_pyx2
+
+def cdf_from_GMM(x, alphas, mius, sigmas):
+    '''    
+    estimates a CDF from the input GMM, for a given x
+
+    Only works for 1D
+    alphas = vector of weights
+    mius = vector of means
+    sigmas = vector of covars 
+
+    Returns 
+    mcdf = a float 
+    '''
+    assert alphas.ndim == 1, "Alphas should be a 1D array"
+    assert mius.ndim == 1, "Mius should be a 1D array"
+    assert sigmas.ndim == 1, "Sigmas should be a 1D array"
+    assert alphas.shape[0] == mius.shape[0] == sigmas.shape[0], "all inputs should be same length"
+    
+    mcdf = 0.0
+    for i in range(len(alphas)): 
+        mcdf += alphas[i] * norm.cdf(x, loc=mius[i], scale=sigmas[i])
+    return mcdf 
+
+def bin_probabilities(bin_edges, parameters): 
+    ''' calculate P(Y|X=x) within each x bin. '''
+    # unpack parameters
+    n_gaussians = parameters.shape[1] / 3
+    assert n_gaussians.is_int(), 'pyx should be an array of format [mius, sigmas, alphas]'
+    mius = parameters[:n_gaussians]
+    sigmas = parameters[n_gaussians:2*n_gaussians]
+    alphas = parameters[2*n_gaussians:]
+
+    #calculate mcdf for each bin edge
+    cdfs = np.array([cdf_from_GMM(x, alphas, mius, sigmas) for x in bin_edges])
+    # subtract to find prob for inside each bin  
+    probs_array = np.zeros(len(cdfs)-1)
+    for i in range(len(probs_array)): 
+        probs_array[i] = cdfs[i+1] - cdfs[i]
+    # return: array with p for each bin (len= 1 shorter than bin_edges)
+    return probs_array 
+
+
+
+######################################### K MEANS STUFF #################################
 def do_kMeans(data, params):
     """computes and returns the Kmeans clustering for the given distribution"""
     return KMeans(n_clusters=params['n_clusters'], n_init=10, n_jobs=-1).fit_predict(data)
