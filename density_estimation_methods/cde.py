@@ -7,7 +7,8 @@ class CDE(ABC):
         ...
 
     @abstractmethod
-    def train(self, Xtr, Ytr, Xts, Yts, save_dir):
+    def train(self, Xtr, Ytr, Xts, Yts):
+    # def train(self, Xtr, Ytr, Xts, Yts, save_dir):
         ...
 
     @abstractmethod

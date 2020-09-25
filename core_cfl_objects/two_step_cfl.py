@@ -17,10 +17,10 @@ class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there 
         self.CDE_model.train(Xtr, Ytr, Xts, Yts)
 
         # predict P(Y|X)
-        pyx = self.CDE_model.predict(X, Y)
+        pyx = self.CDE_model.predict(X)
 
         # partition X and Y with P(Y|X)
-        xlbls, ylbls = self.cluster_model.train(pyx)
+        xlbls, ylbls = self.cluster_model.train(pyx, Y)
         return xlbls, ylbls
         
     def tune(self, X, Y):

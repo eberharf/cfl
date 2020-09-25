@@ -31,6 +31,12 @@ from density_estimation_methods.cde import CDE #base class
 #         scaler = StandardScaler().fit(data)
 #         normalized = scaler.transform(data).astype('float32')
 #         return normalized
+    # def get_model(self): 
+    #     ''' Return model object.
+    #         Arguments: None
+    #         Returns: network model (tf.keras.models.Model object)
+    #     '''
+    #     return self.model
 
 
 
@@ -54,7 +60,8 @@ class CondExp(CDE):
         self.verbose = verbose
         self.model = self.build_model()
 
-    def train(self, Xtr, Ytr, Xts, Yts, save_dir):
+    # def train(self, Xtr, Ytr, Xts, Yts, save_dir):
+    def train(self, Xtr, Ytr, Xts, Yts):
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
             updates model weights each epoch and evaluates on test set periodically.
             Saves model weights as checkpoints.
@@ -66,6 +73,10 @@ class CondExp(CDE):
                 save_dir : directory path to save checkpoints to (string)
             Returns: None
         '''
+        #TODO: do a more formalized checking that actual dimensions match expected 
+        assert self.data_info['X_dims'][1] == Xtr.shape[1] == Xts.shape[1], "Expected X-dim do not match actual X-dim"
+
+
         # TODO: make validation set optional (is this really helpful?)
         # TODO: standardize save path structure
         # TODO: save each checkpoint to different name
@@ -84,6 +95,7 @@ class CondExp(CDE):
 
         if self.verbose:
             self.model.summary()
+
 
         # Construct train and test datasets (load, shuffle, set batch size)
         dataset_tr = tf.data.Dataset.from_tensor_slices((Xtr, Ytr)).shuffle(Xtr.shape[0]).batch(batch_size)
@@ -112,8 +124,8 @@ class CondExp(CDE):
                 print('Epoch {}/{}: train_loss: {}, test_loss: {}'.format(
                     i, n_epochs, train_losses[-1], test_losses[-1]))
 
-            if i % save_every == 0:
-                self.save_parameters(save_dir + "_{}".format(i))
+            # if i % save_every == 0: 
+            #     self.save_parameters(save_dir + "_{}".format(i))
 
         if self.verbose:
             self.graph_results(train_losses, test_losses)
@@ -139,7 +151,7 @@ class CondExp(CDE):
                     note: this derivation of CDE doesn't require Y for prediction.
             Returns: model prediction (np.array) (TODO: check if this is really np.array or tf.Tensor)
         '''
-        if Y:
+        if Y is not None:
             raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
         return self.model.predict(X)
 
@@ -176,6 +188,8 @@ class CondExp(CDE):
     def build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
             Eventually, this architecture will have to become more dynamic (TODO).
+
+            Right now the architecture is optimized for visual bars 1000 10x10 images 
             Arguments: None
             Returns: the model (tf.keras.models.Model object)
         '''
@@ -188,7 +202,7 @@ class CondExp(CDE):
                                     activity_regularizer=tf.keras.regularizers.l2(0.0001),
                                     name='nn_dropout1')(input_layer)
         layer = tf.keras.layers.Dense(
-                                    units=1024,
+                                    units=50,
                                     activation='linear',
                                     kernel_initializer='he_normal',
                                     activity_regularizer=tf.keras.regularizers.l2(0.0001),
@@ -198,7 +212,7 @@ class CondExp(CDE):
                                     activity_regularizer=tf.keras.regularizers.l2(0.0001),
                                     name='nn_dropout2')(layer)
         layer = tf.keras.layers.Dense(
-                                    units=1024,
+                                    units=10,
                                     activation='linear',
                                     kernel_initializer='he_normal',
                                     activity_regularizer=tf.keras.regularizers.l2(0.0001),
@@ -215,3 +229,37 @@ class CondExp(CDE):
                                     name='nn_output_layer')(layer)
         model = tf.keras.models.Model(input_layer, output_layer)
         return model
+
+    @tf.function
+    def train_step(self, optimizer, train_x, train_y):
+        ''' train model with loss function defined in compute_loss and passed-in optimizer.
+            Arguments:
+                optimizer : the optimizer for the model (tf.keras.optimizers object)
+                train_x : a batch of observations of X (tf.Tensor)
+                train_y : a batch of observations of Y (tf.Tensor)
+            Returns: the loss for this batch (float)
+        '''
+
+        # GradientTape: Trace operations to compute gradients
+        with tf.GradientTape() as tape:
+            # calculate loss
+            loss = self.compute_loss(train_x, train_y, training=True)
+        # compute and apply gradients
+        gradients = tape.gradient(loss, self.model.trainable_variables)
+        optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
+        return loss
+
+    def compute_loss(self, x_true, y_true, training=False):
+        ''' Compute the mean squared error (MSE) between ground truth and prediction.
+            Arguments:
+                x_true : a batch of observations of X (tf.Tensor)
+                y_true : a batch of observations of Y (tf.Tensor)
+                training : whether to backpropagate gradient (boolean)
+            Returns: the average MSE for this batch (float)
+        '''
+        
+        y_hat = self.model(x_true, training=training)
+        cost = tf.keras.losses.MSE(y_true, y_hat)
+        return tf.reduce_mean(cost)    
+
+
