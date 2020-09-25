@@ -1,3 +1,5 @@
+#TODO: requirements out of date - doesn't include tqdm, should be remade
+
 #this file contains the requirements for cfl 
 # to create a conda environment from this file, run the commands: 
 # conda env create -f requirements.yml

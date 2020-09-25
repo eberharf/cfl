@@ -1,5 +1,6 @@
-import CFL_Core
-from CFL_Core import Two_Step_CFL_Core
+from core_cfl_objects.two_step_cfl import Two_Step_CFL_Core
+from cluster_methods.clusterer import Clusterer #these statements are of the form "from [folder].[file] import [class]"
+from density_estimation_methods.cde import CDE  
 # TODO: import these with init file
 
 class CFL(): 
@@ -27,7 +28,7 @@ class CFL():
             clusterer = self.lookup_clusterer(tags[1])(clusterer_params)
             self.core = Two_Step_CFL_Core(CDE, clusterer)
         else:
-            raise ValueError("tags argument must either consist of a CRE_tag or a (CDE_tag, clusterer_tag) tuple")
+            raise ValueError("tags argument must be a tuple of either the form (CRE_tag, ) or (CDE_tag, clusterer_tag) ")
 
     # CFL_core method to wrap
     def train(self, X, Y):

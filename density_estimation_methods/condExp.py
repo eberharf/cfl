@@ -5,9 +5,11 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from CDE import CDE #base class  
+from density_estimation_methods.cde import CDE #base class  
 
-class CondExp(CDE.CDE):
+example_params = {'batch_size': 128, 'lr': 1e-3, 'optimizer': tf.keras.optimizers.Adam(lr=1e-3), 'n_epochs': 100, 'test_every': 10, 'save_every': 10}
+
+class CondExp(CDE):
 
     def __init__(self, data_info, model_params, verbose):
         ''' Initialize model and define network. 
@@ -17,11 +19,10 @@ class CondExp(CDE.CDE):
                 verbose : whether to print out model information (boolean)
         '''
 
-        self.data_info = data_info
+        self.data_info = data_info #TODO: check that data_info is correct format
 
-        #TODO: don't have this dictionary once we actually pass it in 
-        model_params = {'batch_size': 128, 'lr': 1e-3, 'optimizer': tf.keras.optimizer.Adam(lr=1e-3), 'n_epochs': 100, 'test_every': 10, 'save_every': 10}
         self.model_params = model_params
+        #TODO: need to pass in the optimizer as a string, and then create the object - passing in the object is annoying
         self.verbose = verbose
         self.model = self.build_model()
 
@@ -152,7 +153,7 @@ class CondExp(CDE.CDE):
         '''
 
         # Network
-        input_layer = tf.keras.Input(shape=(self.data_info[X_dims][1],), 
+        input_layer = tf.keras.Input(shape=(self.data_info['X_dims'][1],), 
                                      name='nn_input_layer')
         layer = tf.keras.layers.Dropout(
                                     rate=0.2, 

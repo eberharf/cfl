@@ -1,17 +1,17 @@
 from sklearn.cluster import KMeans as sKMeans
-from Clusterer.clusterer_util import getYs
+from cluster_methods.clusterer_util import getYs
+from cluster_methods import clusterer
 
 import joblib
 import os #save, load model 
-from Clusterer import Clusterer
 
-class KMeans(Clusterer.Clusterer):
+class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there isn't
 
     def __init__(self, params):
         
-        self.params = params
-        # self.n_Xclusters=self.params['n_Xclusters'] #TODO: make it real 
-        # self.n_Yclusters=self.params['n_Yclusters']
+        # self.params = params
+        self.n_Xclusters=params['n_Xclusters'] 
+        self.n_Yclusters=params['n_Yclusters']
         self.n_Xclusters, self.n_Yclusters = (4, 4)
 
     def train(self, pyx, Y):
