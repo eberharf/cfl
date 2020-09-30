@@ -135,7 +135,8 @@ class VisualBarsData():
             if C==1 and H==1:
                 gt_labels[i] = 3 # P(T|C,H) = 1.
 
-        return gt_labels 
+        return gt_labels.astype(int)
+
 
     def _generate_target(self): 
         '''probabilistically generates the target behavior for each image, based on the ground truth probabilities expressed at the top of this file'''
@@ -170,3 +171,8 @@ class VisualBarsData():
         fig.tight_layout()
         plt.show()
 
+    def saveSingleImage(self, fname):
+        image = self.X_images[np.random.choice(len(self.X_images))]
+        fig = plt.figure()
+        plt.imshow(image)
+        plt.savefig(fname)

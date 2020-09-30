@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from density_estimation_methods.cde import CDE #base class
 
 
-#TODO: this code hasn't been transferred from CFL.py yet 
+#TODO: this code hasn't been transferred from the old CFL.py yet 
 # #shuffles and splits data into training and testing sets
 #         self.X_tr, self.X_ts, self.Y_tr, self.Y_ts = \
 #             train_test_split(X, Y, shuffle=True, train_size=training_data_size, random_state=RANDOM_SEED)
