@@ -11,12 +11,23 @@ def getYs(Y_data, x_lbls):
     """
     y_ftrs = np.zeros((Y_data.shape[0], np.unique(x_lbls).size))
     # Loop, not vectorized, to save memory. Can take a while.
-    for y_id, y in enumerate(tqdm(Y_data)): #iterate over rows (ie each observation) of yData 
+    for y_id, y in enumerate(tqdm(Y_data)): #iterate over rows (ie each observation) of yData
         for x_lbl_id, x_lbl in enumerate(np.unique(x_lbls)): #np.unique(x_lbls) = each x-cluster 
             # Find ids of xs in this observational class
             this_class_rows = np.where(x_lbls==x_lbl)[0] #this_class_rows = rows for xs in this obs class 
             sorted_dists = np.sort(np.sum((y-Y_data)[this_class_rows]**2, axis=1)) # Compute distances of y to all y's in this observational class and sort them.
-            y_ftrs[y_id][x_lbl_id] = sorted_dists[1:5].mean() # Find the mean distance to the 4 closest points (excluding itself).
+            y_ftrs[y_id][x_lbl_id] = dist_to_closest_points(sorted_dists) # Find the mean distance to the 4 closest points (excluding itself).
 
     # print('Done. Clustering P(y | x_lbls).')
     return y_ftrs
+
+
+def dist_to_closest_points(sorted_dists): 
+    '''helper function for getYs. Tries to find the mean distance to the closest 4 points (excluding itself). If it is unable to,
+    ''' 
+    if len(sorted_dists) > 5: 
+        return sorted_dists[1:5].mean()
+    elif len(sorted_dists) > 1: 
+        return sorted_dists[1:].mean()
+    else: 
+        raise IndexError("tbh I'm not exactly sure what went wrong to get you here") #TODO: real error message here please 
