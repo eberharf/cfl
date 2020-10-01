@@ -23,11 +23,13 @@ def getYs(Y_data, x_lbls):
 
 
 def dist_to_closest_points(sorted_dists): 
-    '''helper function for getYs. Tries to find the mean distance to the closest 4 points (excluding itself). If it is unable to,
+    '''helper function for getYs. Tries to find the mean distance to the closest 4 points (excluding itself). If there are not enough points 
+    in the class, uses whatever points there are to calculate a mean distance
     ''' 
     if len(sorted_dists) > 5: 
         return sorted_dists[1:5].mean()
     elif len(sorted_dists) > 1: 
         return sorted_dists[1:].mean()
     else: 
-        raise IndexError("tbh I'm not exactly sure what went wrong to get you here") #TODO: real error message here please 
+        raise RuntimeWarning("There is only 1 element in this class. Unable to calculate distance") 
+        return 0
