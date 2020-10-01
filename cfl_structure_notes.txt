@@ -24,14 +24,3 @@ How it works structure
 
 
 
-
-Folder struct 
-- CFL.py 
-- core_tools 
-    - CFL_Core
-    - density estimation
-    - clusterers
-- data_tools
-    - config
-    - preprocessing
-- visualization

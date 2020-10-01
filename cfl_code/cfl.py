@@ -1,5 +1,5 @@
 from core_cfl_objects.two_step_cfl import Two_Step_CFL_Core
-from cluster_methods.clusterer import Clusterer #these statements are of the form "from [folder].[file] import [class]"
+import cluster_methods
 from density_estimation_methods.cde import CDE  
 # TODO: import these with init file
 

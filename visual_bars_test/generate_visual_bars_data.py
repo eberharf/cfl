@@ -42,6 +42,9 @@ import matplotlib.pyplot as plt
 class VisualBarsData(): 
 
     def __init__(self, n_samples=1000, im_shape=(10,10), noise_lvl=0):
+        '''the constructor generates n_samples binary vertical bars images with shape im_shape, 
+        generates the ground labels for each image, and generates the target behavior associated 
+        with each image in separate, aligned np arrays'''
         self.n_samples = n_samples #number of images to generate 
 
         #X_images = images, Hs and HBs = arrays of len n containing ground truth about var. values in each image
@@ -106,14 +109,16 @@ class VisualBarsData():
 
     def _ground_truth_classes(self):
         """ 
-        modified from behave() in ai_gratings.py 
+        Generates the 'ground truth' 
+        classification labels for each image based on whether hidden variable is 
+        active and/or horizontal bars present
 
         Input 
         X_images - array of binary images with some combo of horiz/vert bars 
         Hs - array, aligned with X_images, saying whether hidden var is active for each image
         HBs - array, aligned with X_images, saying whether each image contains a horiz bar or not 
 
-        Returns 
+        modified from behave() in ai_gratings.py (Chalupka 2015)
 
         """
 
@@ -139,7 +144,8 @@ class VisualBarsData():
 
 
     def _generate_target(self): 
-        '''probabilistically generates the target behavior for each image, based on the ground truth probabilities expressed at the top of this file'''
+        '''probabilistically generates the target behavior for each image, based on the
+         ground truth probabilities expressed at the top of this file'''
         p_dict = {0: 0.1, 1: 0.4, 2: 0.7, 3: 1.}
         
         target_vals = np.zeros(self.n_samples)
@@ -153,7 +159,6 @@ class VisualBarsData():
         '''shows the binary images in matplotlib'''       
         n_cols = 10 
         n_rows = (self.n_samples //10) + 1
-
 
         fig, a = plt.subplots(nrows=n_rows, ncols=n_cols, squeeze=False, figsize=(10,10)) 
         for i in range(self.n_samples): 

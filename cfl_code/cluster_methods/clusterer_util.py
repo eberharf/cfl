@@ -2,6 +2,12 @@ from tqdm import tqdm #progress bar
 import warnings
 import numpy as np
 
+#TODO: where I left off  
+# I didn't actually test the new function I added dist_to_closest_points 
+# bc when I tried to use some fake generated data, i got errors that i dind't quite understand (IndexErrors) about the shape of the data 
+# on line 24 (sorted_dists = blah blah). I still don't like/ fully understand waht this function does, and want to add some assert statements
+#or something to get it under control 
+
 def getYs(Y_data, x_lbls):
     """
     helper function for do_clustering. 
