@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from density_estimation_methods.cde import CDE #base class
+from cfl.density_estimation_methods.cde import CDE #base class
 
 
 #TODO: this code hasn't been transferred from the old CFL.py yet 

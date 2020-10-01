@@ -1,5 +1,6 @@
-from core_cfl_objects.cfl_core import CFL_Core
 from sklearn.model_selection import train_test_split
+
+from cfl.core_cfl_objects.cfl_core import CFL_Core
 
 class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there isn't
 

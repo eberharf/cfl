@@ -3,9 +3,11 @@ import tensorflow as tf
 from itertools import permutations
 import tqdm #progress bar 
 
-from cluster_methods import kmeans #clustering 
-import core_cfl_objects.two_step_cfl as tscfl #CFL object 
-from density_estimation_methods import condExp #density estimation 
+# import cfl 
+from cfl.cluster_methods import kmeans 
+import cfl.core_cfl_objects.two_step_cfl as tscfl
+from cfl.density_estimation_methods import condExp
+
 import generate_visual_bars_data as vbd #visual bars data 
 
 def find_best_unique_mapping(ground_truth, x_lbls): 
@@ -103,7 +105,7 @@ def run_Visual_bars_test(sample_size, im_shape, noise_lvl, cluster_params, CDE_p
     percent_accurate = accuracy(truth, x_lbls, mapping)
     return percent_accurate
 
-def multiTest(n_trials, sample_sizes)  
+def multiTest(n_trials, sample_sizes): 
   
     #number of trials to run for each sample 
     im_shape = (10, 10)

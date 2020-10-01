@@ -1,6 +1,6 @@
 from sklearn.cluster import KMeans as sKMeans
-from cluster_methods.clusterer_util import getYs
-from cluster_methods import clusterer
+from cfl.cluster_methods.clusterer_util import getYs
+from cfl.cluster_methods import clusterer
 
 import joblib
 import os #save, load model 

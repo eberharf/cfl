@@ -1,7 +1,6 @@
-from core_cfl_objects.two_step_cfl import Two_Step_CFL_Core
-import cluster_methods
-from density_estimation_methods.cde import CDE  
-# TODO: import these with init file
+from cfl.core_cfl_objects.two_step_cfl import Two_Step_CFL_Core
+from cfl.cluster_methods.clusterer import Clusterer
+from cfl.density_estimation_methods.cde import CDE  
 
 class CFL(): 
     
