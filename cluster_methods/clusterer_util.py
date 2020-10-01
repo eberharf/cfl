@@ -1,4 +1,5 @@
 from tqdm import tqdm #progress bar
+import warnings
 import numpy as np
 
 def getYs(Y_data, x_lbls):
@@ -31,5 +32,5 @@ def dist_to_closest_points(sorted_dists):
     elif len(sorted_dists) > 1: 
         return sorted_dists[1:].mean()
     else: 
-        raise RuntimeWarning("There is only 1 element in this class. Unable to calculate distance") 
+        warnings.warn("There is only 1 element in this class. Unable to calculate distance") 
         return 0
