@@ -10,11 +10,10 @@ from scipy.states import entropy #calculate KL divergence
 
 N_CLASSES = 4 #TODO: get rid of this
 
-#TODO: add a warning if one of the clusters ends up having 0 members in it (important bc otherwise people might get confused )
 
 
 ################################# EPSILON CLUSTERING STUFF ######################################
-do_epsilon_clustering(data, params):
+def do_epsilon_clustering(data, params):
     """
     Executes clustering based on the equivalence relation x1 ~ x2 iff P(Y|x1) = P(Y|x2) +- epsilon
     where epsilon is a small value

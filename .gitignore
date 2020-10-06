@@ -5,6 +5,7 @@ _pycache_/
 .ipynb_checkpoints/
 cfl_examples/
 
-# Also don't track .csv (data files) or .pyc (compiled code)
+# Also don't track .csv /.xlsx (data files) or .pyc (compiled code)
 *.pyc
 *.csv
+*.xlsx

@@ -1,6 +1,7 @@
 import numpy as np 
 import tensorflow as tf
 import tqdm #progress bar 
+from sklearn.metrics import adjusted_rand_score
 
 # import cfl 
 from cfl.cluster_methods import kmeans 
@@ -9,8 +10,10 @@ from cfl.density_estimation_methods import condExp
 
 import generate_visual_bars_data as vbd #visual bars data 
 
-def single_visual_bars_run(sample_size, im_shape, noise_lvl, cluster_params, condExp_params): 
-    vb_data = vbd.VisualBarsData(n_samples=sample_size, im_shape = im_shape, noise_lvl=noise_lvl)
+#TODO: while these are ostensibly separated into two diff. functions, this code is not very modular/neat at the moment 
+
+def single_visual_bars_run(sample_size, im_shape, noise_lvl, cluster_params, condExp_params, set_seed=None): 
+    vb_data = vbd.VisualBarsData(n_samples=sample_size, im_shape = im_shape, noise_lvl=noise_lvl, set_random_seed=set_seed)
     x = vb_data.getImages()
     y = vb_data.getTarget()
     
@@ -32,11 +35,10 @@ def single_visual_bars_run(sample_size, im_shape, noise_lvl, cluster_params, con
 
     # check the results of CFL against the original 
     truth=vb_data.getGroundTruth().astype(int)
-    # mapping = find_best_unique_mapping(truth, x_lbls)[0] #TODO CHANGE THIS 
-    # percent_accurate = accuracy(truth, x_lbls, mapping)
-    # return percent_accurate
+    percent_accurate = check_cluster_accuracy(truth, x_lbls)
+    return percent_accurate
 
-def multiTest(n_trials, sample_sizes): 
+def multiTest(n_trials, sample_sizes, set_seed): 
     '''
     Input 
     n_trials = number of trials to run for each set of parameters 
@@ -58,8 +60,10 @@ def multiTest(n_trials, sample_sizes):
 
             # parameters for CDE 
             optimizer_Adam = tf.keras.optimizers.Adam(lr=1e-3)
-            condExp_params = {'batch_size': 128, 'lr': 1e-3, 'optimizer': optimizer_Adam, 'n_epochs': 200, 'test_every': 10, 'save_every': 10}
+            condExp_params = {'batch_size': 128, 'lr': 1e-3, 'optimizer': optimizer_Adam, 'n_epochs': 200, 'test_every': 200, 'save_every': 200}
 
-            percent_accurate = run_Visual_bars_test(sample_size, im_shape, noise_lvl, cluster_params, condExp_params)
+            percent_accurate = single_visual_bars_run(sample_size, im_shape, noise_lvl, cluster_params, condExp_params, set_seed)
             print("percent accuracy is : ", percent_accurate)
 
+def check_cluster_accuracy(cluster_labels1, cluster_labels2): 
+    return adjusted_rand_score(cluster_labels1, cluster_labels2)
