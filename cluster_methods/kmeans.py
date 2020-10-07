@@ -26,7 +26,7 @@ class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there 
 
     def predict(self, pyx, Y):
         x_lbls = self.xkmeans.predict(pyx)
-        y_distribution = getYs(x_lbls, Y)
+        y_distribution = getYs(Y, x_lbls)
         y_lbls = self.ykmeans.predict(y_distribution)
         return x_lbls, y_lbls
 
