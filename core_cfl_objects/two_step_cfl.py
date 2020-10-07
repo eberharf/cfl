@@ -1,5 +1,6 @@
 from core_cfl_objects.cfl_core import CFL_Core
 from sklearn.model_selection import train_test_split
+from util.data_processing import standardize_train_test
 
 class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there isn't
 
@@ -8,20 +9,23 @@ class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there 
         self.cluster_model = cluster_model
 
     
-    def train(self, X, Y):
+    def train(self, X, Y, standardize=False, save_path=None):
         
         # train-test split
-        Xtr, Xts, Ytr, Yts = train_test_split(X, Y, shuffle=True, test_size=0.25)
+        # standardize if specified
+        self.Xtr, self.Xts, self.Ytr, self.Yts, self.Itr, self.Its= train_test_split(X, Y, range(X.shape[0]), shuffle=True, train_size=0.85)
+        if standardize:
+            self.Xtr, self.Xts, self.Ytr, self.Yts = standardize_train_test([self.Xtr, self.Xts, self.Ytr, self.Yts])
 
         # train CDE
-        self.CDE_model.train(Xtr, Ytr, Xts, Yts)
+        train_losses, test_losses = self.CDE_model.train(self.Xtr, self.Ytr, self.Xts, self.Yts, save_path)
 
         # predict P(Y|X)
-        pyx = self.CDE_model.predict(X)
+        pyx_tr = self.CDE_model.predict(self.Xtr)
 
         # partition X and Y with P(Y|X)
-        xlbls, ylbls = self.cluster_model.train(pyx, Y)
-        return xlbls, ylbls
+        xlbls, ylbls = self.cluster_model.train(pyx_tr, self.Ytr)
+        return xlbls, ylbls, train_losses, test_losses
         
     def tune(self, X, Y):
         # TODO: do this later
@@ -35,6 +39,6 @@ class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there 
         pyx = self.CDE_model.predict(X, Y)
 
         # partition X and Y with P(Y|X)
-        xlbls, ylbls = self.cluster_model.predict(pyx)
+        xlbls, ylbls = self.cluster_model.predict(pyx, Y)
 
         return xlbls, ylbls
