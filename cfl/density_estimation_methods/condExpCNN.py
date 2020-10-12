@@ -49,11 +49,11 @@ class CondExpCNN(CDE):
         #TODO: do a more formalized checking that actual dimensions match expected 
         assert self.data_info['X_dims'][1] == Xtr.shape[1] == Xts.shape[1], "Expected X-dim do not match actual X-dim"
 
-        self.model.compile(optimizer='adam',
+        self.model.compile(optimizer=self.model_params['optimizer'],
                     loss=tf.keras.losses.MeanSquaredError(),
                     metrics=['accuracy'])
 
-        history = self.model.fit(Xtr, Ytr, epochs=10, 
+        history = self.model.fit(Xtr, Ytr, batch_size=self.model_params['batch_size'], epochs=self.model_params['n_epochs'], 
                             validation_data=(Xts, Yts))
 
         plt.plot(history.history['accuracy'], label='accuracy')
