@@ -1,6 +1,6 @@
 from sklearn.cluster import KMeans as sKMeans
-from cluster_methods.clusterer_util import getYs
-from cluster_methods import clusterer
+from cfl.cluster_methods.clusterer_util import getYs
+from cfl.cluster_methods import clusterer
 
 import joblib
 import os #save, load model 
@@ -20,7 +20,6 @@ class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there 
         y_distribution = getYs(Y, x_lbls) #y_distribution = P(y|Xclass)
         self.ykmeans =  sKMeans(n_clusters=self.n_Yclusters)
         y_lbls = self.ykmeans.fit_predict(y_distribution) 
-
         return x_lbls, y_lbls
     
 

@@ -5,7 +5,7 @@ import numpy as np
 #TODO: where I left off  
 # I didn't actually test the new function I added dist_to_closest_points 
 # bc when I tried to use some fake generated data, i got errors that i dind't quite understand (IndexErrors) about the shape of the data 
-# on line 25 (sorted_dists = blah blah). I still don't like/ fully understand waht this function does, and want to add some assert statements
+# on line 24 (sorted_dists = blah blah). I still don't like/ fully understand waht this function does, and want to add some assert statements
 #or something to get it under control 
 
 def getYs(Y_data, x_lbls):
@@ -35,7 +35,7 @@ def dist_to_closest_points(sorted_dists):
     ''' 
     if len(sorted_dists) > 5: 
         return sorted_dists[1:5].mean()
-    elif len(sorted_dists) > 1: 
+    elif len(sorted_dists) > 1:  #TODO: add a warning if we enter this case (and change the following so that it works without stopping everything)
         return sorted_dists[1:].mean()
     else: 
         warnings.warn("There is only 1 element in this class. Unable to calculate distance") 
