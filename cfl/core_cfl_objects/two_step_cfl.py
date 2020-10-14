@@ -1,5 +1,5 @@
 from sklearn.model_selection import train_test_split
-from util.data_processing import standardize_train_test
+from cfl.util.data_processing import standardize_train_test
 
 from cfl.core_cfl_objects.cfl_core import CFL_Core
 

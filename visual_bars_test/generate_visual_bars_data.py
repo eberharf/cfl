@@ -4,6 +4,7 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 ########
 # A binary image dataset created from the following probabilities:
@@ -127,7 +128,7 @@ class VisualBarsData():
                     (self.random.random(n_samples)<0.5)
 
         # Make images with randomly placed Gs.
-        for sample_id in range(n_samples):
+        for sample_id in tqdm(range(n_samples)):
             # Place the vertical bars.
             VB_locs = self.random.choice(range(im_shape[1]), 
                                         VBs[sample_id], replace=False)

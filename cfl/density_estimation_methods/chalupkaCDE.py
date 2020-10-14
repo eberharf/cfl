@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from density_estimation_methods.cde import CDE #base class
+from cfl.density_estimation_methods.cde import CDE #base class
 
 import tensorflow as tf
 
@@ -49,22 +49,25 @@ class ChalupkaCDE(CDE):
         #TODO: do a more formalized checking that actual dimensions match expected 
         assert self.data_info['X_dims'][1] == Xtr.shape[1] == Xts.shape[1], "Expected X-dim do not match actual X-dim"
 
-        self.model.compile(optimizer=self.model_params['optimizer'],
-                    loss=tf.keras.losses.MeanSquaredError(),
-                    metrics=['accuracy'])
+        self.model.compile(
+            loss='mean_squared_error',
+            optimizer=self.model_params['optimizer'],
+        )
 
-        history = self.model.fit(Xtr, Ytr, batch_size=self.model_params['batch_size'], epochs=self.model_params['n_epochs'], 
-                            validation_data=(Xts, Yts))
+        history = self.model.fit(
+            Xtr, Ytr,
+            batch_size=self.model_params['batch_size'],
+            epochs=self.model_params['n_epochs'],
+            validation_data=(Xts,Yts),
+        )
 
-        plt.plot(history.history['accuracy'], label='accuracy')
-        plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
+        plt.plot(history.history['loss'], label='train_loss')
+        plt.plot(history.history['val_loss'], label = 'val_loss')
         plt.xlabel('Epoch')
-        plt.ylabel('Accuracy')
-        # plt.ylim([0.5, 1])
-        plt.legend(loc='lower right')
+        plt.ylabel('MSE')
+        plt.legend(loc='upper right')
         plt.show()
 
-        test_loss, test_acc = self.model.evaluate(Xts,  Yts, verbose=2)
         return history.history['loss'], history.history['val_loss']
 
 
@@ -131,10 +134,11 @@ class ChalupkaCDE(CDE):
             Returns: the model (tf.keras.models.Model object)
         '''
 
-        model = models.Sequential()
-        model.add(layers.Dense(50, activation='relu', input_shape=(100,)))
-        model.add(layers.Dense(50, activation='relu')) # TODO: currently not matching initialization rule but i don't think this will cause issues at our level of comparison
-        model.add(layers.Dense(1, activation='sigmoid'))
+        model = tf.keras.models.Sequential([
+        tf.keras.layers.Flatten(input_shape=(10, 10, 1)),
+        tf.keras.layers.Dense(50, activation='relu'),
+        tf.keras.layers.Dense(2, activation='softmax')
+        ])
 
         return model
 
