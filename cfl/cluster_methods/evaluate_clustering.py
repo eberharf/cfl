@@ -1,3 +1,6 @@
+import numpy as np 
+from sklearn.metrics import calinski_harabasz_score 
+
 def test_clustering(self, xStart, xStop, xStep, yStart, yStop, yStep, cluster_method='K_means'):
     """
     tests the quality of different numbers of clusters for the x and y data
@@ -31,7 +34,8 @@ def test_clustering(self, xStart, xStop, xStep, yStart, yStop, yStep, cluster_me
         for yni,ynClusters in enumerate(y_range):
             print('XCluster: {}, YCluster: {}'.format(xni, yni))
             self.do_clustering() #cluster both x and y
-            y_scores[xni,yni] = metrics.calinski_harabasz_score(self.yData, self.y_lbls) #calculate the score for the y cluster
-        x_scores[xni] = metrics.calinski_harabasz_score(self.xData, self.x_lbls) #calculate the score for the x cluster
+            y_scores[xni,yni] = calinski_harabasz_score(self.yData, self.y_lbls) #calculate the score for the y cluster
+        x_scores[xni] = calinski_harabasz_score(self.xData, self.x_lbls) #calculate the score for the x cluster
 
     return x_scores, y_scores
+
