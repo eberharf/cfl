@@ -13,10 +13,12 @@ class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there 
     def train(self, X, Y, standardize=False, save_path=None):
         
         # train-test split
+        split_data = train_test_split(X, Y, shuffle=True, train_size=0.75)
+        
         # standardize if specified
-        self.Xtr, self.Xts, self.Ytr, self.Yts, self.Itr, self.Its= train_test_split(X, Y, range(X.shape[0]), shuffle=True, train_size=0.85)
         if standardize:
-            self.Xtr, self.Xts, self.Ytr, self.Yts = standardize_train_test([self.Xtr, self.Xts, self.Ytr, self.Yts])
+            split_data = standardize_train_test(split_data)
+        self.Xtr, self.Xts, self.Ytr, self.Yts = split_data
 
         # train CDE
         train_losses, test_losses = self.CDE_model.train(self.Xtr, self.Ytr, self.Xts, self.Yts, save_path)

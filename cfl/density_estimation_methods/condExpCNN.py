@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from density_estimation_methods.cde import CDE #base class
+from cfl.density_estimation_methods.cde import CDE #base class
 
 import tensorflow as tf
 
@@ -18,7 +18,7 @@ example_params = {'batch_size': 128, 'lr': 1e-3, 'optimizer': tf.keras.optimizer
 
 class CondExpCNN(CDE):
 
-    def __init__(self, data_info, model_params, verbose):
+    def __init__(self, data_info, model_params, save_path):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data that will be passed in
@@ -30,7 +30,8 @@ class CondExpCNN(CDE):
 
         self.model_params = model_params
         #TODO: need to pass in the optimizer as a string, and then create the object - passing in the object is annoying
-        self.verbose = verbose
+        self.verbose = model_params['verbose']
+        self.save_path = save_path
         self.model = self.build_model()
 
     # def train(self, Xtr, Ytr, Xts, Yts, save_dir):

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 class CDE(ABC):
 
     @abstractmethod
-    def __init__(self, data_info, model_params, verbose):
+    def __init__(self, data_info, model_params, save_path):
         ...
 
     @abstractmethod

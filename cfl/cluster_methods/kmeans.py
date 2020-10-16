@@ -7,12 +7,12 @@ import os #save, load model
 
 class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there isn't
 
-    def __init__(self, params):
+    def __init__(self, params, save_path):
         
         # self.params = params
         self.n_Xclusters=params['n_Xclusters'] 
         self.n_Yclusters=params['n_Yclusters']
-        self.n_Xclusters, self.n_Yclusters = (4, 4)
+        self.save_path = save_path
 
     def train(self, pyx, Y):
         self.xkmeans = sKMeans(n_clusters=self.n_Xclusters)

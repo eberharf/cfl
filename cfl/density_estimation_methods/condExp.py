@@ -7,45 +7,11 @@ import matplotlib.pyplot as plt
 
 from cfl.density_estimation_methods.cde import CDE #base class
 
-
-#TODO: this code hasn't been transferred from the old CFL.py yet 
-# #shuffles and splits data into training and testing sets
-#         self.X_tr, self.X_ts, self.Y_tr, self.Y_ts = \
-#             train_test_split(X, Y, shuffle=True, train_size=training_data_size, random_state=RANDOM_SEED)
-#
-#         self.normalizeData() #normalize each chunk of data to have mean of 0 and var 1
-#
-# def normalizeData(self):
-#         """
-#         independently normalizes each training and testing set to have mean 0 and var 1.
-#         The scaling vector is calculated separately for training and testing so that there is
-#         no leak of information about the testing data into the training data
-#         """
-#         self.X_tr = self.normalizeHelper(self.X_tr)
-#         self.X_ts = self.normalizeHelper(self.X_ts)
-#         self.Y_tr = self.normalizeHelper(self.Y_tr)
-#         self.Y_ts = self.normalizeHelper(self.Y_ts)
-#
-#     def normalizeHelper(self, data):
-#         """for a inputted data set, calculated the scaler to normalize the data and applies the transformation"""
-#         scaler = StandardScaler().fit(data)
-#         normalized = scaler.transform(data).astype('float32')
-#         return normalized
-    # def get_model(self): 
-    #     ''' Return model object.
-    #         Arguments: None
-    #         Returns: network model (tf.keras.models.Model object)
-    #     '''
-    #     return self.model
-
-
-
-
 example_params = {'batch_size': 128, 'lr': 1e-3, 'optimizer': tf.keras.optimizers.Adam(lr=1e-3), 'n_epochs': 100, 'test_every': 10, 'save_every': 10}
 
 class CondExp(CDE):
 
-    def __init__(self, data_info, model_params, verbose):
+    def __init__(self, data_info, model_params, save_path):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data that will be passed in
@@ -57,7 +23,8 @@ class CondExp(CDE):
 
         self.model_params = model_params
         #TODO: need to pass in the optimizer as a string, and then create the object - passing in the object is annoying
-        self.verbose = verbose
+        self.verbose = model_params['verbose']
+        self.save_path = save_path
         self.model = self.build_model()
 
     # def train(self, Xtr, Ytr, Xts, Yts, save_dir):
