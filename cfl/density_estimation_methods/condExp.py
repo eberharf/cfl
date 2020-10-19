@@ -14,7 +14,7 @@ class CondExp(CDE):
     def __init__(self, data_info, model_params):
         ''' Initialize model and define network.
             Arguments:
-                data_info : a dictionary containing information about the data that will be passed in
+                data_info : a dictionary containing information about the data that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 model_params : dictionary containing parameters for the model
                 verbose : whether to print out model information (boolean)
         '''
@@ -39,6 +39,8 @@ class CondExp(CDE):
             Returns: None
         '''
         #TODO: do a more formalized checking that actual dimensions match expected 
+        #TODO: say what expected vs actual are 
+        #TODO: I got confused that it was Xtr Ytr Xts Yts, can there be an option where you put in just X, Y and it splits for you? I liked that more
         assert self.data_info['X_dims'][1] == Xtr.shape[1] == Xts.shape[1], "Expected X-dim do not match actual X-dim"
 
 

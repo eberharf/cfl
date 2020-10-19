@@ -75,11 +75,14 @@ This section contains a high-level description of many of the directories and fi
  ### `cfl`
  The root directory for the `cfl` package. This folder contains all functional code for `cfl`. 
 - `cfl.py`: **NOTE:** does not substantially exist yet; may not be developed. CFL() is (intended to be) a 'beginner-friendly' class that allows one to construct a CFL object from string and train and predict using the model without having to understand too much of what's going on 'under the hood.' 
+
 - `core_cfl_objects` 
+
 - `cluster_methods`
+    - `clusterer_util.py`: a helper file used by `kmeans.py`. The main function, `getYs()`, 
+
 - `density_estimation_methods` 
 - `visualization.py`
-
 
 
 ### `cfl_examples`
