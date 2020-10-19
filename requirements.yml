@@ -1,4 +1,4 @@
-#TODO: requirements out of date - doesn't include tqdm, keras, pandas.  should be remade
+#TODO: requirements out of date - doesn't include tqdm, keras, pandas, pytest, hypothesis.  should be remade
 
 #this file contains the requirements for cfl 
 # to create a conda environment from this file, run the commands: 
