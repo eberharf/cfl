@@ -7,11 +7,11 @@ class Clusterer(ABC):
         ...
 
     @abstractmethod
-    def train(self, pyx, Y):
+    def train(self, pyx, Y, saver):
         ... #return x_lbls, y_lbls
     
     @abstractmethod
-    def predict(self, pyx, Y):
+    def predict(self, pyx, Y, saver):
         ... # return x_lbls, y_lbls
     
     @abstractmethod

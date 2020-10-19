@@ -11,7 +11,7 @@ example_params = {'batch_size': 128, 'lr': 1e-3, 'optimizer': tf.keras.optimizer
 
 class CondExp(CDE):
 
-    def __init__(self, data_info, model_params, save_path):
+    def __init__(self, data_info, model_params):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data that will be passed in
@@ -24,11 +24,9 @@ class CondExp(CDE):
         self.model_params = model_params
         #TODO: need to pass in the optimizer as a string, and then create the object - passing in the object is annoying
         self.verbose = model_params['verbose']
-        self.save_path = save_path
         self.model = self.build_model()
 
-    # def train(self, Xtr, Ytr, Xts, Yts, save_dir):
-    def train(self, Xtr, Ytr, Xts, Yts):
+    def train(self, Xtr, Ytr, Xts, Yts, saver):
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
             updates model weights each epoch and evaluates on test set periodically.
             Saves model weights as checkpoints.
@@ -37,80 +35,55 @@ class CondExp(CDE):
                 Ytr : Y training set of dimensions [# training observations, # features] (np.array)
                 Xts : X test set of dimensions [# test observations, # features] (np.array)
                 Yts : Y test set of dimensions [# test observations, # features] (np.array)
-                save_dir : directory path to save checkpoints to (string)
+                saver : Saver to pull save paths from (Saver object)
             Returns: None
         '''
         #TODO: do a more formalized checking that actual dimensions match expected 
         assert self.data_info['X_dims'][1] == Xtr.shape[1] == Xts.shape[1], "Expected X-dim do not match actual X-dim"
 
 
-        # TODO: make validation set optional (is this really helpful?)
-        # TODO: standardize save path structure
-        # TODO: save each checkpoint to different name
+        self.model.compile(
+            loss='mean_squared_error',
+            optimizer=self.model_params['optimizer'],
+        )
 
-        # Setup
-         #TODO: instead of individually assigning everything here,
-         # check that dictionary only contains valid parameters and
-         # then assign everything in dict to a variable
-         # or something
-        batch_size = self.model_params['batch_size']
-        lr = self.model_params['lr']
-        optimizer = self.model_params['optimizer']
-        n_epochs = self.model_params['n_epochs']
-        test_every = self.model_params['test_every']
-        save_every = self.model_params['save_every']
+        model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+            filepath=saver.get_save_path('checkpoints/weights_epoch_{epoch:02d}_val_loss_{val_loss:.2f}'), # TODO fill this in
+            save_weights_only=True,
+            monitor='val_loss',
+            mode='min',
+            save_best_only=True)
 
-        if self.verbose:
-            self.model.summary()
+        history = self.model.fit(
+            Xtr, Ytr,
+            batch_size=self.model_params['batch_size'],
+            epochs=self.model_params['n_epochs'],
+            validation_data=(Xts,Yts),
+            callbacks=[model_checkpoint_callback]
+        )
 
+        train_loss = history.history['loss']
+        val_loss = history.history['val_loss']
+        self.graph_results(train_loss, val_loss, saver.get_save_path('train_val_loss'))
 
-        # Construct train and test datasets (load, shuffle, set batch size)
-        dataset_tr = tf.data.Dataset.from_tensor_slices((Xtr, Ytr)).shuffle(Xtr.shape[0]).batch(batch_size)
-        dataset_ts = tf.data.Dataset.from_tensor_slices((Xts, Yts)).shuffle(Xts.shape[0]).batch(batch_size)
+        np.save(saver.get_save_path('train_loss'), train_loss)
+        np.save(saver.get_save_path('val_loss'), val_loss)
+        return train_loss, val_loss
 
-        train_losses = []
-        test_losses = []
-
-        # Start training
-        print('Test every {} epochs'.format(test_every))
-        for i in range(n_epochs):
-
-            # train
-            train_loss = tf.keras.metrics.Mean()
-            for train_x, train_y in dataset_tr:
-                train_loss(self.train_step(optimizer, train_x, train_y))
-            train_losses.append(train_loss.result())
-
-            # test
-            if i % test_every == 0:
-                test_loss = tf.keras.metrics.Mean()
-                for test_x, test_y in dataset_ts:
-                    test_loss(self.evaluate(test_x, test_y, training=False))
-                test_losses.append(test_loss.result())
-
-                print('Epoch {}/{}: train_loss: {}, test_loss: {}'.format(
-                    i, n_epochs, train_losses[-1], test_losses[-1]))
-
-            # if i % save_every == 0: 
-            #     self.save_parameters(save_dir + "_{}".format(i))
-
-        if self.verbose:
-            self.graph_results(train_losses, test_losses)
-
-        return None
-
-
-    def graph_results(self, train_losses, test_losses):
+    def graph_results(self, train_loss, val_loss, save_path):
         '''graphs the training vs testing loss across all epochs of training'''
-        plt.plot(range(len(train_losses)), train_losses)
-        plt.plot(np.linspace(0,len(train_losses),len(test_losses)).astype(int), test_losses)
+        plt.plot(range(len(train_loss)), train_loss, label='train_loss')
+        plt.plot(np.linspace(0,len(train_loss),len(val_loss)).astype(int), val_loss, label='val_loss')
         plt.xlabel('Epochs')
-        plt.ylabel('Loss')
+        plt.ylabel('MSE')
         plt.title('Training and Test Loss')
-        plt.legend(['Train', 'Test'])
+        plt.legend(loc='upper right')
+        plt.savefig(save_path)
         plt.show()
 
-    def predict(self, X, Y=None): #put in the x and y you want to predict with
+
+    def predict(self, X, Y=None, saver=None): #put in the x and y you want to predict with
+        # TODO: deal with Y=None weirdness
         ''' Given a set of observations X, get neural network output.
             Arguments:
                 X : model input of dimensions [# observations, # x_features] (np.array)
@@ -118,10 +91,11 @@ class CondExp(CDE):
                     note: this derivation of CDE doesn't require Y for prediction.
             Returns: model prediction (np.array) (TODO: check if this is really np.array or tf.Tensor)
         '''
-        if Y is not None:
-            raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
-        return self.model.predict(X)
-
+        # if Y is not None:
+        #     raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
+        pyx = self.model.predict(X)
+        np.save(saver.get_save_path('pyx'), pyx)
+        return pyx
 
     def evaluate(self, X, Y, training=False):
         ''' Compute the mean squared error (MSE) between ground truth and prediction.

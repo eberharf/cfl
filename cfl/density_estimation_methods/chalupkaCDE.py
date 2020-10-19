@@ -18,7 +18,7 @@ example_params = {'batch_size': 128, 'lr': 1e-3, 'optimizer': tf.keras.optimizer
 
 class ChalupkaCDE(CDE):
 
-    def __init__(self, data_info, model_params, save_path):
+    def __init__(self, data_info, model_params):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data that will be passed in
@@ -31,11 +31,9 @@ class ChalupkaCDE(CDE):
         self.model_params = model_params
         #TODO: need to pass in the optimizer as a string, and then create the object - passing in the object is annoying
         self.verbose = model_params['verbose']
-        self.save_path = save_path
         self.model = self.build_model()
 
-    # def train(self, Xtr, Ytr, Xts, Yts, save_dir):
-    def train(self, Xtr, Ytr, Xts, Yts, save_path): # TODO: figure out saving conventions later
+    def train(self, Xtr, Ytr, Xts, Yts, saver): 
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
             updates model weights each epoch and evaluates on test set periodically.
             Saves model weights as checkpoints.
@@ -44,7 +42,7 @@ class ChalupkaCDE(CDE):
                 Ytr : Y training set of dimensions [# training observations, # features] (np.array)
                 Xts : X test set of dimensions [# test observations, # features] (np.array)
                 Yts : Y test set of dimensions [# test observations, # features] (np.array)
-                save_dir : directory path to save checkpoints to (string)
+                saver : Saver to pull save paths from (Saver object)
             Returns: None
         '''
         #TODO: do a more formalized checking that actual dimensions match expected 
@@ -54,12 +52,12 @@ class ChalupkaCDE(CDE):
             loss='mean_squared_error',
             optimizer=self.model_params['optimizer'],
         )
-
+        
         model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-            filepath=checkpoint_filepath, # TODO fill this in
+            filepath=saver.get_save_path('checkpoints/weights_epoch_{epoch:02d}_val_loss_{val_loss:.2f}'), # TODO fill this in
             save_weights_only=True,
             monitor='val_loss',
-            mode='max',
+            mode='min',
             save_best_only=True)
 
         history = self.model.fit(
@@ -70,29 +68,28 @@ class ChalupkaCDE(CDE):
             callbacks=[model_checkpoint_callback]
         )
 
-        plt.plot(history.history['loss'], label='train_loss')
-        plt.plot(history.history['val_loss'], label = 'val_loss')
-        plt.xlabel('Epoch')
-        plt.ylabel('MSE')
-        plt.legend(loc='upper right')
-        plt.show()
+        train_loss = history.history['loss']
+        val_loss = history.history['val_loss']
+        self.graph_results(train_loss, val_loss, saver.get_save_path('train_val_loss'))
 
-        return history.history['loss'], history.history['val_loss']
+        np.save(saver.get_save_path('train_loss'), train_loss)
+        np.save(saver.get_save_path('val_loss'), val_loss)
+        return train_loss, val_loss
 
 
-    def graph_results(self, train_losses, test_losses, save_path=None):
+    def graph_results(self, train_loss, val_loss, save_path):
         '''graphs the training vs testing loss across all epochs of training'''
-        plt.plot(range(len(train_losses)), train_losses)
-        plt.plot(np.linspace(0,len(train_losses),len(test_losses)).astype(int), test_losses)
+        plt.plot(range(len(train_loss)), train_loss, label='train_loss')
+        plt.plot(np.linspace(0,len(train_loss),len(val_loss)).astype(int), val_loss, label='val_loss')
         plt.xlabel('Epochs')
-        plt.ylabel('Loss')
+        plt.ylabel('MSE')
         plt.title('Training and Test Loss')
-        plt.legend(['Train', 'Test'])
-        # plt.savefig(save_path)
-        # plt.close()
+        plt.legend(loc='upper right')
+        plt.savefig(save_path)
         plt.show()
 
-    def predict(self, X, Y=None): #put in the x and y you want to predict with
+    def predict(self, X, Y=None, saver=None): #put in the x and y you want to predict with
+        # TODO: deal with Y=None weirdness
         ''' Given a set of observations X, get neural network output.
             Arguments:
                 X : model input of dimensions [# observations, # x_features] (np.array)
@@ -102,7 +99,9 @@ class ChalupkaCDE(CDE):
         # '''
         # if Y is not None:
         #     raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
-        return self.model.predict(X)
+        pyx = self.model.predict(X)
+        np.save(saver.get_save_path('pyx'), pyx)
+        return pyx
 
 
     def evaluate(self, X, Y, training=False):

@@ -18,7 +18,7 @@ example_params = {'batch_size': 128, 'lr': 1e-3, 'optimizer': tf.keras.optimizer
 
 class CondExpCNN(CDE):
 
-    def __init__(self, data_info, model_params, save_path):
+    def __init__(self, data_info, model_params):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data that will be passed in
@@ -31,11 +31,10 @@ class CondExpCNN(CDE):
         self.model_params = model_params
         #TODO: need to pass in the optimizer as a string, and then create the object - passing in the object is annoying
         self.verbose = model_params['verbose']
-        self.save_path = save_path
         self.model = self.build_model()
 
-    # def train(self, Xtr, Ytr, Xts, Yts, save_dir):
-    def train(self, Xtr, Ytr, Xts, Yts, save_path): # TODO: figure out saving conventions later
+
+    def train(self, Xtr, Ytr, Xts, Yts, saver): 
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
             updates model weights each epoch and evaluates on test set periodically.
             Saves model weights as checkpoints.
@@ -44,54 +43,66 @@ class CondExpCNN(CDE):
                 Ytr : Y training set of dimensions [# training observations, # features] (np.array)
                 Xts : X test set of dimensions [# test observations, # features] (np.array)
                 Yts : Y test set of dimensions [# test observations, # features] (np.array)
-                save_dir : directory path to save checkpoints to (string)
+                saver : Saver to pull save paths from (Saver object)
             Returns: None
         '''
         #TODO: do a more formalized checking that actual dimensions match expected 
         assert self.data_info['X_dims'][1] == Xtr.shape[1] == Xts.shape[1], "Expected X-dim do not match actual X-dim"
 
-        self.model.compile(optimizer=self.model_params['optimizer'],
-                    loss=tf.keras.losses.MeanSquaredError(),
-                    metrics=['accuracy'])
+        self.model.compile(
+            loss='mean_squared_error',
+            optimizer=self.model_params['optimizer'],
+        )
 
-        history = self.model.fit(Xtr, Ytr, batch_size=self.model_params['batch_size'], epochs=self.model_params['n_epochs'], 
-                            validation_data=(Xts, Yts))
+        model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+            filepath=saver.get_save_path('checkpoints/weights_epoch_{epoch:02d}_val_loss_{val_loss:.2f}'), # TODO fill this in
+            save_weights_only=True,
+            monitor='val_loss',
+            mode='min',
+            save_best_only=True)
 
-        plt.plot(history.history['accuracy'], label='accuracy')
-        plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
-        plt.xlabel('Epoch')
-        plt.ylabel('Accuracy')
-        plt.ylim([0.5, 1])
-        plt.legend(loc='lower right')
+        history = self.model.fit(
+            Xtr, Ytr,
+            batch_size=self.model_params['batch_size'],
+            epochs=self.model_params['n_epochs'],
+            validation_data=(Xts,Yts),
+            callbacks=[model_checkpoint_callback]
+        )
 
-        test_loss, test_acc = self.model.evaluate(Xts,  Yts, verbose=2)
-        return history.history['loss'], history.history['val_loss']
+        train_loss = history.history['loss']
+        val_loss = history.history['val_loss']
+        self.graph_results(train_loss, val_loss, saver.get_save_path('train_val_loss'))
+
+        np.save(saver.get_save_path('train_loss'), train_loss)
+        np.save(saver.get_save_path('val_loss'), val_loss)
+        return train_loss, val_loss
 
 
-    def graph_results(self, train_losses, test_losses, save_path=None):
+    def graph_results(self, train_loss, val_loss, save_path):
         '''graphs the training vs testing loss across all epochs of training'''
-        plt.plot(range(len(train_losses)), train_losses)
-        plt.plot(np.linspace(0,len(train_losses),len(test_losses)).astype(int), test_losses)
+        plt.plot(range(len(train_loss)), train_loss, label='train_loss')
+        plt.plot(np.linspace(0,len(train_loss),len(val_loss)).astype(int), val_loss, label='val_loss')
         plt.xlabel('Epochs')
-        plt.ylabel('Loss')
+        plt.ylabel('MSE')
         plt.title('Training and Test Loss')
-        plt.legend(['Train', 'Test'])
-        # plt.savefig(save_path)
-        # plt.close()
+        plt.legend(loc='upper right')
+        plt.savefig(save_path)
         plt.show()
 
-    def predict(self, X, Y=None): #put in the x and y you want to predict with
+    def predict(self, X, Y=None, saver=None): #put in the x and y you want to predict with
+        # TODO: deal with Y=None weirdness
         ''' Given a set of observations X, get neural network output.
             Arguments:
                 X : model input of dimensions [# observations, # x_features] (np.array)
                 Y : model input of dimensions [# observations, # y_features] (np.array)
                     note: this derivation of CDE doesn't require Y for prediction.
             Returns: model prediction (np.array) (TODO: check if this is really np.array or tf.Tensor)
-        '''
-        if Y is not None:
-            raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
-        return self.model.predict(X)
-
+        # '''
+        # if Y is not None:
+        #     raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
+        pyx = self.model.predict(X)
+        np.save(saver.get_save_path('pyx'), pyx)
+        return pyx
 
     def evaluate(self, X, Y, training=False):
         ''' Compute the mean squared error (MSE) between ground truth and prediction.

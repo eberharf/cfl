@@ -3,16 +3,16 @@ from abc import ABC, abstractmethod
 class CDE(ABC):
 
     @abstractmethod
-    def __init__(self, data_info, model_params, save_path):
+    def __init__(self, data_info, model_params):
         ...
 
     @abstractmethod
-    def train(self, Xtr, Ytr, Xts, Yts):
+    def train(self, Xtr, Ytr, Xts, Yts, saver):
     # def train(self, Xtr, Ytr, Xts, Yts, save_dir):
         ...
 
     @abstractmethod
-    def predict(self, X, Y=None): #put in the x and y you want to predict with
+    def predict(self, X, Y=None, saver=None): #put in the x and y you want to predict with
         ...
 
     @abstractmethod
