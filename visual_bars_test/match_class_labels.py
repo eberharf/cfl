@@ -40,22 +40,6 @@ def createLabelsDict(gt_labels, l):
         D[str(gt_labels[i])] = l[i] #cast gt_label as an immutable
     return D
     
-    
-def create_mapping_by_sampling(ground_truth, x_lbls, sample_len): 
-    ''' by sampling the first few entries in ground_truth and x_lbls, 
-    determines which class in ground_truth is most likely to correspond 
-    to which class in x_lbls'''
-    gtHead = ground_truth[0:sample_len]
-    xHead = x_lbls[0:sample_len]
-
-    mapping = {}
-    for gt_label in [0, 1, 2, 3]: 
-        # find the classes that correspond to the current ground truth label 
-        currentClasses = np.asarray(gtHead==gt_label).nonzero()
-        # figure out, of these, which class label in xHead is most common 
-        options = [np.count_nonzero(xHead[currentClasses]==0), np.count_nonzero(xHead[currentClasses]==1), np.count_nonzero(xHead[currentClasses]==2), np.count_nonzero(xHead[currentClasses]==3)]
-        mapping[str(gt_label)] = np.argmax(options)
-    return mapping 
 
 def accuracy(ground_truth, x_lbls, mapping): 
     '''checks the accuracy of the x_lbls against the ground_truth, according to the mapping bt ground_label class names and x_lbl class names'''
@@ -74,3 +58,23 @@ def accuracy(ground_truth, x_lbls, mapping):
         # add up all correctly classified images in the current class 
         accuracy_counter += np.sum(x_lbls[entries_in_gt_class]==current_x_lbl)
     return accuracy_counter/len(ground_truth) #return percent images correctly classified 
+
+    
+def create_mapping_by_sampling(ground_truth, x_lbls, sample_len): 
+    ''' by sampling the first few entries in ground_truth and x_lbls, 
+    determines which class in ground_truth is most likely to correspond 
+    to which class in x_lbls.
+    
+    This function is probably not as good to use as find_best_unique_mapping because
+    it doesn't guarantee a unique mapping (the same x label may be assigned to multiple ground truths)'''
+    gtHead = ground_truth[0:sample_len]
+    xHead = x_lbls[0:sample_len]
+
+    mapping = {}
+    for gt_label in [0, 1, 2, 3]: 
+        # find the classes that correspond to the current ground truth label 
+        currentClasses = np.asarray(gtHead==gt_label).nonzero()
+        # figure out, of these, which class label in xHead is most common 
+        options = [np.count_nonzero(xHead[currentClasses]==0), np.count_nonzero(xHead[currentClasses]==1), np.count_nonzero(xHead[currentClasses]==2), np.count_nonzero(xHead[currentClasses]==3)]
+        mapping[str(gt_label)] = np.argmax(options)
+    return mapping 
