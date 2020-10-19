@@ -1,6 +1,9 @@
 import numpy as np 
 from sklearn.metrics import calinski_harabasz_score 
 
+
+######## WARNING: This code has not been touched/maintained in a while (may not be good )
+
 def test_clustering(self, xStart, xStop, xStep, yStart, yStop, yStep, cluster_method='K_means'):
     """
     tests the quality of different numbers of clusters for the x and y data
