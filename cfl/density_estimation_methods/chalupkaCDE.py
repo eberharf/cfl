@@ -55,11 +55,19 @@ class ChalupkaCDE(CDE):
             optimizer=self.model_params['optimizer'],
         )
 
+        model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+            filepath=checkpoint_filepath, # TODO fill this in
+            save_weights_only=True,
+            monitor='val_loss',
+            mode='max',
+            save_best_only=True)
+
         history = self.model.fit(
             Xtr, Ytr,
             batch_size=self.model_params['batch_size'],
             epochs=self.model_params['n_epochs'],
             validation_data=(Xts,Yts),
+            callbacks=[model_checkpoint_callback]
         )
 
         plt.plot(history.history['loss'], label='train_loss')
