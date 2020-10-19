@@ -14,23 +14,25 @@ class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there 
         self.n_Xclusters=params['n_Xclusters'] 
         self.n_Yclusters=params['n_Yclusters']
 
-    def train(self, pyx, Y, saver):
+    def train(self, pyx, Y, saver=None):
         self.xkmeans = sKMeans(n_clusters=self.n_Xclusters)
         x_lbls = self.xkmeans.fit_predict(pyx)  
         y_distribution = getYs(Y, x_lbls) #y_distribution = P(y|Xclass)
         self.ykmeans =  sKMeans(n_clusters=self.n_Yclusters)
         y_lbls = self.ykmeans.fit_predict(y_distribution) 
-        np.save(saver.get_save_path('xlbls'), x_lbls)
-        np.save(saver.get_save_path('ylbls'), y_lbls)
+        if saver is not None:
+            np.save(saver.get_save_path('xlbls'), x_lbls)
+            np.save(saver.get_save_path('ylbls'), y_lbls)
         return x_lbls, y_lbls
     
 
-    def predict(self, pyx, Y, saver):
+    def predict(self, pyx, Y, saver=None):
         x_lbls = self.xkmeans.predict(pyx)
         y_distribution = getYs(Y, x_lbls)
         y_lbls = self.ykmeans.predict(y_distribution)
-        np.save(saver.get_save_path('xlbls'), x_lbls)
-        np.save(saver.get_save_path('ylbls'), y_lbls)
+        if saver is not None:
+            np.save(saver.get_save_path('xlbls'), x_lbls)
+            np.save(saver.get_save_path('ylbls'), y_lbls)
         return x_lbls, y_lbls
 
     def save_model(self, dir_path):
