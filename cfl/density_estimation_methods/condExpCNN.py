@@ -32,7 +32,7 @@ class CondExpCNN(CDE):
         self.model = self.build_model()
 
 
-    def train(self, Xtr, Ytr, Xts, Yts, saver): 
+    def train(self, Xtr, Ytr, Xts, Yts, saver=None): 
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
             updates model weights each epoch and evaluates on test set periodically.
             Saves model weights as checkpoints.
@@ -52,27 +52,35 @@ class CondExpCNN(CDE):
             optimizer=self.model_params['optimizer'],
         )
 
-        model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-            filepath=saver.get_save_path('checkpoints/weights_epoch_{epoch:02d}_val_loss_{val_loss:.2f}'), # TODO fill this in
-            save_weights_only=True,
-            monitor='val_loss',
-            mode='min',
-            save_best_only=True)
+        if saver is not None:
+            model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+                filepath=saver.get_save_path('checkpoints/weights_epoch_{epoch:02d}_val_loss_{val_loss:.2f}'), # TODO fill this in
+                save_weights_only=True,
+                monitor='val_loss',
+                mode='min',
+                save_best_only=True)
+            callbacks = [model_checkpoint_callback]
+        else:
+            callbacks = []
 
         history = self.model.fit(
             Xtr, Ytr,
             batch_size=self.model_params['batch_size'],
             epochs=self.model_params['n_epochs'],
             validation_data=(Xts,Yts),
-            callbacks=[model_checkpoint_callback]
+            callbacks=callbacks
         )
 
         train_loss = history.history['loss']
         val_loss = history.history['val_loss']
-        self.graph_results(train_loss, val_loss, saver.get_save_path('train_val_loss'))
 
-        np.save(saver.get_save_path('train_loss'), train_loss)
-        np.save(saver.get_save_path('val_loss'), val_loss)
+        if saver is not None:
+            self.graph_results(train_loss, val_loss, save_path=saver.get_save_path('train_val_loss'))
+            np.save(saver.get_save_path('train_loss'), train_loss)
+            np.save(saver.get_save_path('val_loss'), val_loss)
+        else:
+            self.graph_results(train_loss, val_loss, save_path=None)
+
         return train_loss, val_loss
 
 
@@ -84,7 +92,8 @@ class CondExpCNN(CDE):
         plt.ylabel('MSE')
         plt.title('Training and Test Loss')
         plt.legend(loc='upper right')
-        plt.savefig(save_path)
+        if save_path is not None:
+            plt.savefig(save_path)
         plt.show()
 
     def predict(self, X, Y=None, saver=None): #put in the x and y you want to predict with
@@ -99,7 +108,8 @@ class CondExpCNN(CDE):
         # if Y is not None:
         #     raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
         pyx = self.model.predict(X)
-        np.save(saver.get_save_path('pyx'), pyx)
+        if saver is not None:
+            np.save(saver.get_save_path('pyx'), pyx)
         return pyx
 
     def evaluate(self, X, Y, training=False):
