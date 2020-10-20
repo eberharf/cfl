@@ -2,11 +2,21 @@ from tqdm import tqdm #progress bar
 import warnings
 import numpy as np
 
-#TODO: where I left off  
-# I didn't actually test the new function I added dist_to_closest_points 
-# bc when I tried to use some fake generated data, i got errors that i dind't quite understand (IndexErrors) about the shape of the data 
-# on line 24 (sorted_dists = blah blah). I still don't like/ fully understand waht this function does, and want to add some assert statements
-#or something to get it under control 
+# the pseudocode for this is 
+#y_ftrs = an array with (number of rows x/y) rows and (number of x classes) columns 
+# each iteration through the inner for loop fills in one field of the current row
+#the values that get filled in are the mean distance to the closest four points (excluding the current point itself  )
+
+
+# make an array with n by x_lbls rows and columns 
+#iterate through each row in yData 
+# for each y data: 
+    # find the rows in x_lbls that correspond to each class label 
+    # and fill in the columns of that row of y_ftrs with the distance between the current y and 
+    # the four closest points in corresponding to each x_lbl 
+
+
+#note: euclidean/L2 distance metric may be less useful in high-dimensions 
 
 def getYs(Y_data, x_lbls):
     """
@@ -21,16 +31,18 @@ def getYs(Y_data, x_lbls):
     for y_id, y in enumerate(tqdm(Y_data)): #iterate over rows (ie each observation) of yData
         for x_lbl_id, x_lbl in enumerate(np.unique(x_lbls)): #np.unique(x_lbls) = each x-cluster 
             # Find ids of xs in this observational class
-            this_class_rows = np.where(x_lbls==x_lbl)[0] #this_class_rows = rows for xs in this obs class 
-            sorted_dists = np.sort(np.sum((y-Y_data)[this_class_rows]**2, axis=1)) # Compute distances of y to all y's in this observational class and sort them.
+            this_class_rows = np.where(x_lbls==x_lbl)[0] #this_class_rows = rows for xs in this obs class
+            print("this class rows is", this_class_rows)
+            # Compute distances of y to all y's in this observational class and sort them.
+            distances_from_y_to_members_of_current_class = np.sum((y-Y_data)[this_class_rows]**2, axis=1)
+            sorted_dists = np.sort(distances_from_y_to_members_of_current_class)
             y_ftrs[y_id][x_lbl_id] = dist_to_closest_points(sorted_dists) # Find the mean distance to the 4 closest points (excluding itself).
-
-    # print('Done. Clustering P(y | x_lbls).')
     return y_ftrs
 
 
 def dist_to_closest_points(sorted_dists): 
-    '''helper function for getYs. Tries to find the mean distance to the closest 4 points (excluding itself). If there are not enough points 
+    '''helper function for getYs. Tries to find the mean distance to the closest 4 points
+     (excluding itself). If there are not enough points 
     in the class, uses whatever points there are to calculate a mean distance
     ''' 
     if len(sorted_dists) > 5: 
