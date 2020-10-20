@@ -66,7 +66,9 @@ class CondExp(CDE):
 
         train_loss = history.history['loss']
         val_loss = history.history['val_loss']
-        self.graph_results(train_loss, val_loss, saver.get_save_path('train_val_loss'))
+        
+        if self.verbose: 
+            self.graph_results(train_loss, val_loss, saver.get_save_path('train_val_loss'))
 
         np.save(saver.get_save_path('train_loss'), train_loss)
         np.save(saver.get_save_path('val_loss'), val_loss)
@@ -96,7 +98,7 @@ class CondExp(CDE):
         # if Y is not None:
         #     raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
         pyx = self.model.predict(X)
-        np.save(saver.get_save_path('pyx'), pyx)
+        # np.save(saver.get_save_path('pyx'), pyx)
         return pyx
 
     def evaluate(self, X, Y, training=False):
