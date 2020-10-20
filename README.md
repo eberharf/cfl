@@ -47,7 +47,7 @@ Check that your installation has been successful by opening a Python terminal fr
     - `two_step_cfl.py`
 - `cluster_methods`
     - KMeans: 
-    - clusterer_util
+    - kmeans_helper
     - epsilon
     - evaluate_clustering.py
 - `density_estimation_methods` 
@@ -79,7 +79,7 @@ This section contains a high-level description of many of the directories and fi
 - `core_cfl_objects` 
 
 - `cluster_methods`
-    - `clusterer_util.py`: a helper file used by `kmeans.py`. The main function, `getYs()`, 
+    - `kmeans_helper.py`: a helper file used by `kmeans.py`. The main function, `Y_cond_prob()`, 
 
 - `density_estimation_methods` 
 - `visualization.py`
