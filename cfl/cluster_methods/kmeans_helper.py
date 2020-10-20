@@ -2,7 +2,7 @@ import warnings
 import numpy as np
 
 
-def cond_prob_of_Y(Y_data, x_lbls): 
+def Y_cond_prob(Y_data, x_lbls): 
     '''
     A helper function for kmeans. Calculates the conditional probability P(y|xClass), where y is an 
     entry in Y_data and xClass refers to the label on a cluster of x values, created by the previous step of 
