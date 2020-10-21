@@ -86,7 +86,6 @@ def dist_to_closest_points(sorted_dists):
     If there are not enough points 
     in the class, uses whatever points there are to calculate a mean distance
     ''' 
-    assert sorted_dists[0] == 0, "The first point in the list should be the distance between y and itself and have a distance of 0"
 
     if len(sorted_dists) > 5: 
         return sorted_dists[1:5].mean()
