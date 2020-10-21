@@ -26,6 +26,8 @@ class CondExpBase(CDE):
         self.model_params = model_params
         #TODO: need to pass in the optimizer as a string, and then create the object - passing in the object is annoying
         self.model = self.build_model()
+        
+        self.trained = False
 
     def train(self, Xtr, Ytr, Xts, Yts, saver=None):
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
@@ -83,6 +85,7 @@ class CondExpBase(CDE):
         else:
             self.graph_results(train_loss, val_loss, save_path=None)
 
+        self.trained = True
         return train_loss, val_loss
 
 
@@ -110,6 +113,8 @@ class CondExpBase(CDE):
         '''
         # if Y is not None:
         #     raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
+
+        assert self.trained, "Remember to train the model before prediction."
         pyx = self.model.predict(X)
         if saver is not None:
             np.save(saver.get_save_path('pyx'), pyx)
@@ -123,6 +128,8 @@ class CondExpBase(CDE):
                 training : whether to backpropagate gradient (boolean)
             Returns: the average MSE for this batch (float)
         '''
+        
+        assert self.trained, "Remember to train the model before evaluation."
 
         Y_hat = self.predict(X)
         loss_fxn = tf.keras.losses.get(self.model_params['loss'])
@@ -138,6 +145,7 @@ class CondExpBase(CDE):
         '''
         print("Loading parameters from ", file_path)
         self.model.load_weights(file_path)
+        self.trained = True
         return None
 
 
