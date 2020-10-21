@@ -1,3 +1,4 @@
 import cfl.density_estimation_methods.condExp
 import cfl.density_estimation_methods.chalupkaCDE
 import cfl.density_estimation_methods.condExpCNN
+import cfl.density_estimation_methods.condExpMod

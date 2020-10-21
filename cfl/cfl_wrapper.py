@@ -11,7 +11,8 @@ import os
 
 CDE_key = { 'CondExp'     : cdem.condExp.CondExp, 
             'ChalupkaCDE' : cdem.chalupkaCDE.ChalupkaCDE,
-            'CondExpCNN'  : cdem.condExpCNN.CondExpCNN }
+            'CondExpCNN'  : cdem.condExpCNN.CondExpCNN,
+            'CondExpMod'  : cdem.condExpMod.CondExpMod }
 
 cluster_key = { 'Kmeans' : ccm.kmeans.KMeans }
 
