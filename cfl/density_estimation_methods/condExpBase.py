@@ -43,10 +43,12 @@ class CondExpBase(CDE):
         #TODO: say what expected vs actual are 
         #TODO: I got confused that it was Xtr Ytr Xts Yts, can there be an option where you put in just X, Y and it splits for you? I liked that more
         assert self.data_info['X_dims'][1] == Xtr.shape[1] == Xts.shape[1], "Expected X-dim do not match actual X-dim"
-
+        if 'loss' not in self.model_params.keys():
+            print('No loss function specified in model_params, defaulting to mean_squared_error.')
+            self.model_params['loss'] = 'mean_squared_error'
 
         self.model.compile(
-            loss='mean_squared_error',
+            loss=self.model_params['loss'],
             optimizer=self.model_params['optimizer'],
         )
 
@@ -89,7 +91,7 @@ class CondExpBase(CDE):
         plt.plot(range(len(train_loss)), train_loss, label='train_loss')
         plt.plot(np.linspace(0,len(train_loss),len(val_loss)).astype(int), val_loss, label='val_loss')
         plt.xlabel('Epochs')
-        plt.ylabel('MSE')
+        plt.ylabel(self.model_params['loss'])
         plt.title('Training and Test Loss')
         plt.legend(loc='upper right')
         if save_path is not None:
@@ -113,7 +115,7 @@ class CondExpBase(CDE):
             np.save(saver.get_save_path('pyx'), pyx)
         return pyx
 
-    def evaluate(self, X, Y, training=False):
+    def evaluate(self, X, Y):
         ''' Compute the mean squared error (MSE) between ground truth and prediction.
             Arguments:
                 X : a batch of true observations of X (tf.Tensor)
@@ -122,8 +124,9 @@ class CondExpBase(CDE):
             Returns: the average MSE for this batch (float)
         '''
 
-        Y_hat = self.model(X, training=training)
-        cost = tf.keras.losses.MSE(Y, Y_hat) # TODO: make this change based on the loss definied in train()
+        Y_hat = self.predict(X)
+        loss_fxn = tf.keras.losses.get(self.model_params['loss'])
+        cost = loss_fxn(Y, Y_hat) 
         return tf.reduce_mean(cost)
 
 
