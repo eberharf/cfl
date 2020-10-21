@@ -21,13 +21,18 @@ class CondExpBase(CDE):
                 model_params : dictionary containing parameters for the model
         '''
 
+        # set attributes
         self.data_info = data_info #TODO: check that data_info is correct format
-
         self.model_params = model_params
+        self.trained = False # keep track of training status
+
         #TODO: need to pass in the optimizer as a string, and then create the object - passing in the object is annoying
         self.model = self.build_model()
         
-        self.trained = False
+        # load model weights if specified
+        if 'weights_path' in self.model_params.keys():
+            self.load_parameters(self.model_params['weights_path'])
+    
 
     def train(self, Xtr, Ytr, Xts, Yts, saver=None):
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
@@ -43,11 +48,12 @@ class CondExpBase(CDE):
         '''
         #TODO: do a more formalized checking that actual dimensions match expected 
         #TODO: say what expected vs actual are 
-        #TODO: I got confused that it was Xtr Ytr Xts Yts, can there be an option where you put in just X, Y and it splits for you? I liked that more
+        #TODO: I got confused that it was Xtr Ytr Xts Yts, can there be an 
+        #      option where you put in just X, Y and it splits for you? I liked that more
         assert self.data_info['X_dims'][1] == Xtr.shape[1] == Xts.shape[1], "Expected X-dim do not match actual X-dim"
         if 'loss' not in self.model_params.keys():
             print('No loss function specified in model_params, defaulting to mean_squared_error.')
-            self.model_params['loss'] = 'mean_squared_error'
+            self.model_params['loss'] = 'mean_squared_error' # TODO: we should resave parameters if we update them
 
         self.model.compile(
             loss=self.model_params['loss'],
@@ -143,6 +149,9 @@ class CondExpBase(CDE):
                 file_path : path to checkpoint file (string)
             Returns: None
         '''
+
+        assert hasattr(self, 'model'), 'Build model before loading parameters.'
+
         print("Loading parameters from ", file_path)
         self.model.load_weights(file_path)
         self.trained = True
