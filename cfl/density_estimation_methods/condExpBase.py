@@ -26,7 +26,6 @@ class CondExpBase(CDE):
         self.model_params = model_params
         self.trained = False # keep track of training status
 
-        #TODO: need to pass in the optimizer as a string, and then create the object - passing in the object is annoying
         self.model = self.build_model()
         
         # load model weights if specified
@@ -55,11 +54,19 @@ class CondExpBase(CDE):
             print('No loss function specified in model_params, defaulting to mean_squared_error.')
             self.model_params['loss'] = 'mean_squared_error' # TODO: we should resave parameters if we update them
 
+        # build optimizer
+        if not 'opt_config' in self.model_params.keys(): 
+            self.model_params['opt_config'] = {}
+        optimizer = tf.keras.optimizers.get({ 'class_name' : self.model_params['optimizer'],
+                                              'config' : self.model_params['opt_config']})
+
+        # compile model
         self.model.compile(
             loss=self.model_params['loss'],
-            optimizer=self.model_params['optimizer'],
+            optimizer=optimizer,
         )
 
+        # specify checkpoint save callback
         if saver is not None:
             model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
                 filepath=saver.get_save_path(
@@ -72,6 +79,7 @@ class CondExpBase(CDE):
         else:
             callbacks = []
 
+        # train model
         history = self.model.fit(
             Xtr, Ytr,
             batch_size=self.model_params['batch_size'],
@@ -81,6 +89,7 @@ class CondExpBase(CDE):
         )
 
 
+        # handle results
         train_loss = history.history['loss']
         val_loss = history.history['val_loss']
 
