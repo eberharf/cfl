@@ -2,7 +2,7 @@ import pytest
 
 import cfl 
 '''This module includes unit tests to check that 
-each module in the cfl package is able to be imported 
+each public module in the cfl package is able to be imported 
 using the statement 'import cfl' 
 
 As new modules are added, this file should be periodically 

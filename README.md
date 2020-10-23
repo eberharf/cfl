@@ -47,7 +47,7 @@ Check that your installation has been successful by opening a Python terminal fr
     - `two_step_cfl.py`
 - `cluster_methods`
     - KMeans: 
-    - kmeans_helper
+    - cond_prob_Y
     - epsilon
     - evaluate_clustering.py
 - `density_estimation_methods` 
@@ -79,7 +79,7 @@ This section contains a high-level description of many of the directories and fi
 - `core_cfl_objects` 
 
 - `cluster_methods`
-    - `kmeans_helper.py`: a helper file used by `kmeans.py`. The main function, `Y_cond_prob()`, 
+    - `cond_prob_Y.py`: a helper file used by `kmeans.py` to find the conditional probabilities of Y given X equals each x macrovariable. The main function, `continuous_Y()`, uses some tricks to do this effectively for a continuous (not discrete) Y 
 
 - `density_estimation_methods` 
 - `visualization.py`
