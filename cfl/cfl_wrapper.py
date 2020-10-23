@@ -24,7 +24,6 @@ def make_CFL(data_info, CDE_type, cluster_type, CDE_params, cluster_params, save
     cluster_object = cluster_key[cluster_type](cluster_params)
     saver = Saver(save_path)
     saver.set_save_mode('parameters')
-    saver.save_params(CDE_params, 'CDE_params')
     saver.save_params(cluster_params, 'cluster_params')
     cfl_object = Two_Step_CFL_Core(CDE_object, cluster_object, saver)
 

@@ -4,6 +4,8 @@ import os
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from cfl.util.data_processing import standardize_train_test
 
 from cfl.density_estimation_methods.cde import CDE #base class
 
@@ -13,27 +15,31 @@ from cfl.density_estimation_methods.cde import CDE #base class
 
 class CondExpBase(CDE):
 
-    def __init__(self, data_info, model_params):
+    def __init__(self, data_info, model_params, saver=None):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data 
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 model_params : dictionary containing parameters for the model
+                saver : Saver to pull save paths from (Saver object) 
         '''
 
         # set attributes
         self.data_info = data_info #TODO: check that data_info is correct format
         self.model_params = model_params
+        self.saver = saver
+        self.to_save = saver is not None
+        self.check_save_model_params()
         self.trained = False # keep track of training status
 
         self.model = self.build_model()
         
         # load model weights if specified
-        if 'weights_path' in self.model_params.keys():
+        if self.model_params['weights_path'] is not None:
             self.load_parameters(self.model_params['weights_path'])
     
 
-    def train(self, Xtr, Ytr, Xts, Yts, saver=None):
+    def train(self, X, Y, standardize):
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
             updates model weights each epoch and evaluates on test set periodically.
             Saves model weights as checkpoints.
@@ -42,21 +48,25 @@ class CondExpBase(CDE):
                 Ytr : Y training set of dimensions [# training observations, # features] (np.array)
                 Xts : X test set of dimensions [# test observations, # features] (np.array)
                 Yts : Y test set of dimensions [# test observations, # features] (np.array)
-                saver : Saver to pull save paths from (Saver object)
             Returns: None
         '''
         #TODO: do a more formalized checking that actual dimensions match expected 
         #TODO: say what expected vs actual are 
         #TODO: I got confused that it was Xtr Ytr Xts Yts, can there be an 
         #      option where you put in just X, Y and it splits for you? I liked that more
-        assert self.data_info['X_dims'][1] == Xtr.shape[1] == Xts.shape[1], "Expected X-dim do not match actual X-dim"
-        if 'loss' not in self.model_params.keys():
-            print('No loss function specified in model_params, defaulting to mean_squared_error.')
-            self.model_params['loss'] = 'mean_squared_error' # TODO: we should resave parameters if we update them
+        # assert self.data_info['X_dims'][1] == Xtr.shape[1] == Xts.shape[1], "Expected X-dim do not match actual X-dim"
+
+
+        # train-test split
+        split_data = train_test_split(X, Y, shuffle=True, train_size=0.75)
+        
+        # standardize if specified
+        if standardize:
+            split_data = standardize_train_test(split_data)
+        Xtr, Xts, Ytr, Yts = split_data
+
 
         # build optimizer
-        if not 'opt_config' in self.model_params.keys(): 
-            self.model_params['opt_config'] = {}
         optimizer = tf.keras.optimizers.get({ 'class_name' : self.model_params['optimizer'],
                                               'config' : self.model_params['opt_config']})
 
@@ -67,9 +77,9 @@ class CondExpBase(CDE):
         )
 
         # specify checkpoint save callback
-        if saver is not None:
+        if self.to_save:
             model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-                filepath=saver.get_save_path(
+                filepath=self.saver.get_save_path(
                     'checkpoints/weights_epoch_{epoch:02d}_val_loss_{val_loss:.2f}'),
                 save_weights_only=True,
                 monitor='val_loss',
@@ -93,10 +103,10 @@ class CondExpBase(CDE):
         train_loss = history.history['loss']
         val_loss = history.history['val_loss']
 
-        if saver is not None:
-            self.graph_results(train_loss, val_loss, save_path=saver.get_save_path('train_val_loss'))
-            np.save(saver.get_save_path('train_loss'), train_loss)
-            np.save(saver.get_save_path('val_loss'), val_loss)
+        if self.to_save:
+            self.graph_results(train_loss, val_loss, save_path=self.saver.get_save_path('train_val_loss'))
+            np.save(self.saver.get_save_path('train_loss'), train_loss)
+            np.save(self.saver.get_save_path('val_loss'), val_loss)
         else:
             self.graph_results(train_loss, val_loss, save_path=None)
 
@@ -117,7 +127,7 @@ class CondExpBase(CDE):
         plt.show()
 
 
-    def predict(self, X, Y=None, saver=None): #put in the x and y you want to predict with
+    def predict(self, X, Y=None): #put in the x and y you want to predict with
         # TODO: deal with Y=None weirdness
         ''' Given a set of observations X, get neural network output.
             Arguments:
@@ -131,8 +141,8 @@ class CondExpBase(CDE):
 
         assert self.trained, "Remember to train the model before prediction."
         pyx = self.model.predict(X)
-        if saver is not None:
-            np.save(saver.get_save_path('pyx'), pyx)
+        if self.to_save:
+            np.save(self.saver.get_save_path('pyx'), pyx)
         return pyx
 
     def evaluate(self, X, Y):
@@ -196,3 +206,23 @@ class CondExpBase(CDE):
         return model
 
 
+    def check_save_model_params(self):
+        default_params = {  'batch_size'  : 32, 
+                            'n_epochs'    : 20,
+                            'optimizer'   : 'adam',
+                            'opt_config'  : {},
+                            'verbose'     : True,
+                            'dense_units' : [50, self.data_info['Y_dims'][1]],
+                            'activations' : ['relu', 'linear'],
+                            'weights_path': None,
+                            'loss'        : 'mean_squared_error'
+                        }
+        
+        for k in default_params.keys():
+            if k not in self.model_params.keys():
+                print('{} not specified in model_params, defaulting to {}'.format(k, default_params[k]))
+                self.model_params[k] = default_params[k]
+
+        if self.to_save:
+            self.saver.save_parameters(self.model_params, 'CDE_params')
+        
