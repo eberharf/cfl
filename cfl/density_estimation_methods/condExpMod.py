@@ -26,16 +26,14 @@ class CondExpMod(CondExpBase):
             Returns: the model (tf.keras.models.Model object)
         '''
 
-        assert 'dense_units' in self.model_params.keys(), "Please specify layer sizes in model_params['dense_units']."
+        assert self.model_params['dense_units'] is not {}, "Please specify layer sizes in model_params['dense_units']."
+        assert self.model_params['activations'] is not {}, "Please specify layer sizes in model_params['activations']."
         assert self.model_params['dense_units'][-1] == self.data_info['Y_dims'][1], \
                 "The output layer size (last entry in model_params['dense_units'] should be equal to the number of Y features."
-        
-        if 'activations' not in self.model_params.keys():
-            print('No activation functions specified, defaulting to linear activations.')
-            self.model_params['activations'] = ['linear'] * len(self.model_params['dense_units'])
-        
+            
         assert len(self.model_params['dense_units']) == len(self.model_params['activations']), \
                 "model_params['dense_units'] and model_params['activation'] should be the same length."
+
 
         model = tf.keras.models.Sequential([
             tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],))] + # input layer
