@@ -214,6 +214,7 @@ class CondExpBase(CDE):
                             'verbose'     : True,
                             'dense_units' : [50, self.data_info['Y_dims'][1]],
                             'activations' : ['relu', 'linear'],
+                            'dropouts'    : [0, 0],
                             'weights_path': None,
                             'loss'        : 'mean_squared_error'
                         }

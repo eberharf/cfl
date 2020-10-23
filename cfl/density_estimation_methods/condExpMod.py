@@ -28,19 +28,23 @@ class CondExpMod(CondExpBase):
 
         assert self.model_params['dense_units'] is not {}, "Please specify layer sizes in model_params['dense_units']."
         assert self.model_params['activations'] is not {}, "Please specify layer sizes in model_params['activations']."
+        assert self.model_params['dropouts'] is not {}, "Please specify layer sizes in model_params['dropouts']."
         assert self.model_params['dense_units'][-1] == self.data_info['Y_dims'][1], \
                 "The output layer size (last entry in model_params['dense_units'] should be equal to the number of Y features."
             
         assert len(self.model_params['dense_units']) == len(self.model_params['activations']), \
                 "model_params['dense_units'] and model_params['activation'] should be the same length."
+        assert len(self.model_params['dense_units']) == len(self.model_params['dropouts']), \
+                "model_params['dense_units'] and model_params['activation'] should be the same length."
 
-
-        model = tf.keras.models.Sequential([
-            tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],))] + # input layer
-            [tf.keras.layers.Dense(units=units, activation=act) for units,act # loop through specified layer sizes and activations
-                in zip(self.model_params['dense_units'], self.model_params['activations'])]
-        )
         
+        arch = [tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],))] # input layer
+        for units,act,dropout in zip(self.model_params['dense_units'], self.model_params['activations'], self.model_params['dropouts']):
+            arch.append(tf.keras.layers.Dense(units=units, activation=act))
+            arch.append(tf.keras.layers.Dropout(dropout))
+
+        model = tf.keras.models.Sequential(arch)
+
         return model
 
 

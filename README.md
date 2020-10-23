@@ -150,7 +150,7 @@ Here are the current variables you can set:
     - What is it: list of tf.keras.Dense layer sizes 
     - Valid values: int list
     - Required: no
-    - Default: `[50, data_info.Yshape[1]]`
+    - Default: `[50, data_info['Y_dims'][1]]`
     - Applies to: `CondExpMod`
 
 - `'activations'`
@@ -160,9 +160,23 @@ Here are the current variables you can set:
     - Default: `['relu', 'linear']`
     - Applies to: `CondExpMod`
 
+- `'dropouts'`
+    - What is it: list of dropout rates after each layer specified in 'dense_units'
+    - Valid values: float (from 0 to 1) list.
+    - Required: no
+    - Default: `[0, 0]`
+    - Applies to: `CondExpMod`
+
 - `'weights_path'`
     - What is it: path to saved keras model checkpoint to load in to model
     - Valid values: string
     - Required: no
     - Default: `None`
+    - Applies to: all `CondExpBase` children
+
+- `'loss'`
+    - What is it: which loss function to optimize network with respect to (https://www.tensorflow.org/api_docs/python/tf/keras/losses)
+    - Valid values: string
+    - Required: no
+    - Default: `mean_squared_error`
     - Applies to: all `CondExpBase` children
