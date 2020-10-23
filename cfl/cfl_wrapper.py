@@ -16,12 +16,11 @@ CDE_key = { 'CondExp'     : cdem.condExp.CondExp,
 
 cluster_key = { 'Kmeans' : ccm.kmeans.KMeans }
 
-def make_CFL(data_info, CDE_type, cluster_type, CDE_params, cluster_params, save_path):
-
-
+def make_CFL(data_info, CDE_type, cluster_type, CDE_params, cluster_params, save_path, random_state=None):
     # build CFL object! 
-    CDE_object = CDE_key[CDE_type](data_info, CDE_params)
-    cluster_object = cluster_key[cluster_type](cluster_params)
+
+    CDE_object = CDE_key[CDE_type](data_info, CDE_params, random_state)
+    cluster_object = cluster_key[cluster_type](cluster_params, random_state)
     saver = Saver(save_path)
     saver.set_save_mode('parameters')
     saver.save_params(cluster_params, 'cluster_params')

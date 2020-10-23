@@ -8,7 +8,6 @@ class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there 
         self.CDE_model = CDE_model
         self.cluster_model = cluster_model
         self.saver = saver
-
     
     def train(self, X, Y, standardize=False):
         
