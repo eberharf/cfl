@@ -7,14 +7,17 @@ from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class CondExpMod(CondExpBase):
 
-    def __init__(self, data_info, model_params):
+    def __init__(self, data_info, model_params, random_state):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data that will be passed in
                 model_params : dictionary containing parameters for the model
                 verbose : whether to print out model information (boolean)
+                #TODO:^verbose is in the doc string but not in the function signature, not sure if it's supposed to be verbose or not 
+                random_state : an optional parameter (int) that can be set to create reproducible randomness 
+
         '''
-        super().__init__(data_info, model_params)
+        super().__init__(data_info, model_params, random_state)
 
 
     def build_model(self):

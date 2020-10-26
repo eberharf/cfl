@@ -8,25 +8,31 @@ import os #save, load model
 
 class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there isn't
 
-    def __init__(self, params):
+    def __init__(self, params, random_state=None):
         
         # self.params = params
         self.n_Xclusters=params['n_Xclusters'] 
         self.n_Yclusters=params['n_Yclusters']
+        self.random_state = random_state
 
     def train(self, dataset):
 
         assert dataset.pyx is not None, 'Generate pyx predictions with CDE before clustering.'
 
         #train x clusters 
+<<<<<<< HEAD
         self.xkmeans = sKMeans(n_clusters=self.n_Xclusters)
         x_lbls = self.xkmeans.fit_predict(dataset.pyx)  
+=======
+        self.xkmeans = sKMeans(n_clusters=self.n_Xclusters, random_state=self.random_state)
+        x_lbls = self.xkmeans.fit_predict(pyx)  
+>>>>>>> 31baf8f67f3d77ef7869ca4f92756d286208ccd3
 
         #find conditional probabilities P(y|Xclass) for each y 
         y_probs = cond_prob_Y.continuous_Y(dataset.Y, x_lbls) 
 
         #train y clusters 
-        self.ykmeans =  sKMeans(n_clusters=self.n_Yclusters)
+        self.ykmeans =  sKMeans(n_clusters=self.n_Yclusters, random_state=self.random_state)
         y_lbls = self.ykmeans.fit_predict(y_probs) 
 
         #save results 

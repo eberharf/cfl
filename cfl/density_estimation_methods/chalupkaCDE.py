@@ -7,14 +7,15 @@ from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class ChalupkaCDE(CondExpBase):
 
-    def __init__(self, data_info, model_params):
+    def __init__(self, data_info, model_params, random_state=None):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data 
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 model_params : dictionary containing parameters for the model
+                random_state (int): Used to set a random seed to create reproducible results
         '''
-        super().__init__(data_info, model_params)
+        super().__init__(data_info, model_params, random_state)
 
     def build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.

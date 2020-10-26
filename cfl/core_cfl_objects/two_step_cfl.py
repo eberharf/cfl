@@ -7,7 +7,11 @@ class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there 
     def __init__(self, CDE_model, cluster_model):
         self.CDE_model = CDE_model
         self.cluster_model = cluster_model
+<<<<<<< HEAD
 
+=======
+        self.saver = saver
+>>>>>>> 31baf8f67f3d77ef7869ca4f92756d286208ccd3
     
     def train(self, dataset, standardize=False):
 
