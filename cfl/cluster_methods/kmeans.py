@@ -13,7 +13,7 @@ class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there 
         self.params = params
         self.random_state = random_state
         self.experiment_saver = experiment_saver
-
+        self.model_name = 'KMeans'
         self.check_save_model_params()
         self.n_Xclusters=params['n_Xclusters'] 
         self.n_Yclusters=params['n_Yclusters']
@@ -86,6 +86,8 @@ class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there 
             if k not in self.params.keys():
                 print('{} not specified in model_params, defaulting to {}'.format(k, default_params[k]))
                 self.params[k] = default_params[k]
+
+        self.params['model_name'] = self.model_name
 
         if self.experiment_saver is not None:
             self.experiment_saver.save_params(self.params, 'cluster_params')
