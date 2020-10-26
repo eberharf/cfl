@@ -4,46 +4,36 @@ from cfl.core_cfl_objects.cfl_core import CFL_Core
 
 class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there isn't
 
-    def __init__(self, CDE_model, cluster_model, saver=None):
+    def __init__(self, CDE_model, cluster_model):
         self.CDE_model = CDE_model
         self.cluster_model = cluster_model
-        self.saver = saver
 
     
-    def train(self, X, Y, standardize=False):
-        
-        # set save mode
-        if self.saver is not None:
-            self.saver.set_save_mode('train')
+    def train(self, dataset, standardize=False):
 
         # train CDE
-        train_losses, test_losses = self.CDE_model.train(X, Y, standardize=standardize)
+        train_losses, test_losses = self.CDE_model.train(dataset, standardize=standardize)
 
         # predict P(Y|X)
-        pyx = self.CDE_model.predict(X)
+        pyx = self.CDE_model.predict(dataset)
 
         # partition X and Y with P(Y|X)
-        xlbls, ylbls = self.cluster_model.train(pyx, Y)
+        xlbls, ylbls = self.cluster_model.train(dataset)
 
         return xlbls, ylbls, train_losses, test_losses
         
-    def tune(self, X, Y):
+    def tune(self, dataset):
         # TODO: do this later
         ...
 
 
-    def predict(self, X, Y, data_series=None):
+    def predict(self, dataset):
         # TODO: make sure model's already trained etc
         
-        # set save mode
-        if self.saver is not None:
-            self.saver.set_save_mode('predict')
-            self.saver.set_data_series(data_series)
-        
         # predict P(Y|X)
-        pyx = self.CDE_model.predict(X, Y)
+        pyx = self.CDE_model.predict(dataset)
 
         # partition X and Y with P(Y|X)
-        xlbls, ylbls = self.cluster_model.predict(pyx, Y)
+        xlbls, ylbls = self.cluster_model.predict(dataset)
 
         return xlbls, ylbls

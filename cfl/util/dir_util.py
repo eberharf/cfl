@@ -10,8 +10,8 @@ def get_next_dirname(path):
         next subdirectory name. 
     '''
     i = 0
-    while os.path.exists(os.path.join(path, 'run{}'.format(str(i).zfill(4)))):
+    while os.path.exists(os.path.join(path, 'experiment{}'.format(str(i).zfill(4)))):
         i += 1  
-    return 'run{}'.format(str(i).zfill(4))
+    return 'experiment{}'.format(str(i).zfill(4))
 
 

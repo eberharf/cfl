@@ -14,33 +14,35 @@ class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there 
         self.n_Xclusters=params['n_Xclusters'] 
         self.n_Yclusters=params['n_Yclusters']
 
-    def train(self, pyx, Y, saver=None):
+    def train(self, dataset):
+
+        assert dataset.pyx is not None, 'Generate pyx predictions with CDE before clustering.'
 
         #train x clusters 
         self.xkmeans = sKMeans(n_clusters=self.n_Xclusters)
-        x_lbls = self.xkmeans.fit_predict(pyx)  
+        x_lbls = self.xkmeans.fit_predict(dataset.pyx)  
 
         #find conditional probabilities P(y|Xclass) for each y 
-        y_probs = cond_prob_Y.continuous_Y(Y, x_lbls) 
+        y_probs = cond_prob_Y.continuous_Y(dataset.Y, x_lbls) 
 
         #train y clusters 
         self.ykmeans =  sKMeans(n_clusters=self.n_Yclusters)
         y_lbls = self.ykmeans.fit_predict(y_probs) 
 
         #save results 
-        if saver is not None:
-            np.save(saver.get_save_path('xlbls'), x_lbls)
-            np.save(saver.get_save_path('ylbls'), y_lbls)
+        if dataset.to_save:
+            np.save(dataset.saver.get_save_path('xlbls'), x_lbls)
+            np.save(dataset.saver.get_save_path('ylbls'), y_lbls)
         return x_lbls, y_lbls
     
 
-    def predict(self, pyx, Y, saver=None):
-        x_lbls = self.xkmeans.predict(pyx)
-        y_probs = cond_prob_Y.continuous_Y(Y, x_lbls) 
-        y_lbls = self.ykmeans.predict(cond_prob_Y)
-        if saver is not None:
-            np.save(saver.get_save_path('xlbls'), x_lbls)
-            np.save(saver.get_save_path('ylbls'), y_lbls)
+    def predict(self, dataset):
+        x_lbls = self.xkmeans.predict(dataset.pyx)
+        y_probs = cond_prob_Y.continuous_Y(dataset.Y, x_lbls) 
+        y_lbls = self.ykmeans.predict(y_probs)
+        if dataset.to_save:
+            np.save(dataset.saver.get_save_path('xlbls'), x_lbls)
+            np.save(dataset.saver.get_save_path('ylbls'), y_lbls)
         return x_lbls, y_lbls
 
     def save_model(self, dir_path):

@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 def continuous_Y(Y_data, x_lbls): 
     '''
@@ -42,7 +43,7 @@ def continuous_Y(Y_data, x_lbls):
 
     # fill in cond_Y_prob with the distance between the current y 
     # and the ys associated with each x class 
-    for y_id, y in enumerate(Y_data): 
+    for y_id, y in enumerate(tqdm(Y_data)): 
         for i in range(num_x_classes): 
             this_class_indices = x_lbl_indices[i]
             ys_in_this_x_class = Y_data[this_class_indices]

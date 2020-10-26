@@ -2,7 +2,6 @@
 import cfl.density_estimation_methods as cdem
 import cfl.cluster_methods as ccm
 from cfl.core_cfl_objects.two_step_cfl import Two_Step_CFL_Core
-from cfl.saver import Saver
 
 import os
 
@@ -16,15 +15,12 @@ CDE_key = { 'CondExp'     : cdem.condExp.CondExp,
 
 cluster_key = { 'Kmeans' : ccm.kmeans.KMeans }
 
-def make_CFL(data_info, CDE_type, cluster_type, CDE_params, cluster_params, save_path):
+def make_CFL(data_info, CDE_type, cluster_type, CDE_params, cluster_params):
 
 
     # build CFL object! 
     CDE_object = CDE_key[CDE_type](data_info, CDE_params)
     cluster_object = cluster_key[cluster_type](cluster_params)
-    saver = Saver(save_path)
-    saver.set_save_mode('parameters')
-    saver.save_params(cluster_params, 'cluster_params')
-    cfl_object = Two_Step_CFL_Core(CDE_object, cluster_object, saver)
+    cfl_object = Two_Step_CFL_Core(CDE_object, cluster_object)
 
     return cfl_object

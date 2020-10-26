@@ -15,20 +15,17 @@ from cfl.density_estimation_methods.cde import CDE #base class
 
 class CondExpBase(CDE):
 
-    def __init__(self, data_info, model_params, saver=None):
+    def __init__(self, data_info, model_params):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data 
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 model_params : dictionary containing parameters for the model
-                saver : Saver to pull save paths from (Saver object) 
         '''
 
         # set attributes
         self.data_info = data_info #TODO: check that data_info is correct format
         self.model_params = model_params
-        self.saver = saver
-        self.to_save = saver is not None
         self.check_save_model_params()
         self.trained = False # keep track of training status
 
@@ -39,7 +36,7 @@ class CondExpBase(CDE):
             self.load_parameters(self.model_params['weights_path'])
     
 
-    def train(self, X, Y, standardize):
+    def train(self, dataset, standardize):
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
             updates model weights each epoch and evaluates on test set periodically.
             Saves model weights as checkpoints.
@@ -58,7 +55,7 @@ class CondExpBase(CDE):
 
 
         # train-test split
-        split_data = train_test_split(X, Y, shuffle=True, train_size=0.75)
+        split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
         
         # standardize if specified
         if standardize:
@@ -77,9 +74,9 @@ class CondExpBase(CDE):
         )
 
         # specify checkpoint save callback
-        if self.to_save:
+        if dataset.to_save:
             model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-                filepath=self.saver.get_save_path(
+                filepath=dataset.saver.get_save_path(
                     'checkpoints/weights_epoch_{epoch:02d}_val_loss_{val_loss:.2f}'),
                 save_weights_only=True,
                 monitor='val_loss',
@@ -103,10 +100,10 @@ class CondExpBase(CDE):
         train_loss = history.history['loss']
         val_loss = history.history['val_loss']
 
-        if self.to_save:
-            self.graph_results(train_loss, val_loss, save_path=self.saver.get_save_path('train_val_loss'))
-            np.save(self.saver.get_save_path('train_loss'), train_loss)
-            np.save(self.saver.get_save_path('val_loss'), val_loss)
+        if dataset.to_save:
+            self.graph_results(train_loss, val_loss, save_path=dataset.saver.get_save_path('train_val_loss'))
+            np.save(dataset.saver.get_save_path('train_loss'), train_loss)
+            np.save(dataset.saver.get_save_path('val_loss'), val_loss)
         else:
             self.graph_results(train_loss, val_loss, save_path=None)
 
@@ -127,7 +124,7 @@ class CondExpBase(CDE):
         plt.show()
 
 
-    def predict(self, X, Y=None): #put in the x and y you want to predict with
+    def predict(self, dataset): #put in the x and y you want to predict with
         # TODO: deal with Y=None weirdness
         ''' Given a set of observations X, get neural network output.
             Arguments:
@@ -140,10 +137,10 @@ class CondExpBase(CDE):
         #     raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
 
         assert self.trained, "Remember to train the model before prediction."
-        pyx = self.model.predict(X)
-        if self.to_save:
-            np.save(self.saver.get_save_path('pyx'), pyx)
-        return pyx
+        dataset.pyx = self.model.predict(dataset.X)
+        if dataset.to_save:
+            np.save(dataset.saver.get_save_path('pyx'), dataset.pyx)
+        return dataset.pyx
 
     def evaluate(self, X, Y):
         ''' Compute the mean squared error (MSE) between ground truth and prediction.
@@ -224,6 +221,6 @@ class CondExpBase(CDE):
                 print('{} not specified in model_params, defaulting to {}'.format(k, default_params[k]))
                 self.model_params[k] = default_params[k]
 
-        if self.to_save:
-            self.saver.save_parameters(self.model_params, 'CDE_params')
+        # if dataset.to_save:
+        #     dataset.saver.save_parameters(self.model_params, 'CDE_params')
         
