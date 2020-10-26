@@ -35,6 +35,10 @@ def continuous_Y(Y_data, x_lbls):
     # different x class, and each array contains all the indices from x_lbls 
     # where that class occurs  
     x_lbl_indices = rows_where_each_x_class_occurs(x_lbls)
+    #ys_in_each_x_class is an analagous list, which contains the actual y values
+    # instead of the associated indices
+    ys_in_each_x_class = [Y_data[i] for i in x_lbl_indices]
+
 
     # cond_Y_prob will store the P(Y|Xclasses) as they are calculated 
     num_x_classes = len(x_lbl_indices)
@@ -44,12 +48,14 @@ def continuous_Y(Y_data, x_lbls):
     # fill in cond_Y_prob with the distance between the current y 
     # and the ys associated with each x class 
     for y_id, y in enumerate(tqdm(Y_data)): 
-        for i in range(num_x_classes): 
-            this_class_indices = x_lbl_indices[i]
-            ys_in_this_x_class = Y_data[this_class_indices]
-            cond_Y_prob[y_id][i] = avg_nearest_neighbors_dist(y, ys_in_this_x_class, y_in_otherYs=(y_id in this_class_indices))
+        for current_class, cluster_vals in enumerate(ys_in_each_x_class): 
+            cond_Y_prob[y_id][current_class] = avg_nearest_neighbors_dist(y, cluster_vals, y_in_otherYs=(y_id in x_lbl_indices[current_class]))
     return cond_Y_prob
 
+    # if we were to vectorize the above operation, I think it would look like
+    # redefiniting avg_nearest_neighbors_dist to return a np.array of length num_x_classes with the distance values
+    # for each row, it would be 
+    # cond_Y_prob[y_id] = avg_nearest_neighbors_dist(y, y_data)
 
 def rows_where_each_x_class_occurs(x_lbls): 
     '''returns rows in which each x_lbl occurs, as a list of np arrays'''
