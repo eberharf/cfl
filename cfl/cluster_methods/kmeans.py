@@ -20,13 +20,8 @@ class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there 
         assert dataset.pyx is not None, 'Generate pyx predictions with CDE before clustering.'
 
         #train x clusters 
-<<<<<<< HEAD
-        self.xkmeans = sKMeans(n_clusters=self.n_Xclusters)
-        x_lbls = self.xkmeans.fit_predict(dataset.pyx)  
-=======
         self.xkmeans = sKMeans(n_clusters=self.n_Xclusters, random_state=self.random_state)
-        x_lbls = self.xkmeans.fit_predict(pyx)  
->>>>>>> 31baf8f67f3d77ef7869ca4f92756d286208ccd3
+        x_lbls = self.xkmeans.fit_predict(dataset.pyx)  
 
         #find conditional probabilities P(y|Xclass) for each y 
         y_probs = cond_prob_Y.continuous_Y(dataset.Y, x_lbls) 
