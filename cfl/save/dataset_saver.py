@@ -18,11 +18,6 @@ class DatasetSaver():
 
         # make save dir for this dataset
         os.mkdir(self.save_path)
-
-        # add subdirectories
-        # # TODO: later on, we shouldn't have to save model info for every dataset but we will play it safe for now
-        # subdirs = ['model', 'results'] 
-        # [os.mkdir(os.path.join(self.save_path, sd)) for sd in subdirs]
         
         return self.save_path
 

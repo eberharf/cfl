@@ -8,12 +8,16 @@ import os #save, load model
 
 class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there isn't
 
-    def __init__(self, params, random_state=None):
+    def __init__(self, params, random_state=None, experiment_saver=None):
         
-        # self.params = params
+        self.params = params
+        self.random_state = random_state
+        self.experiment_saver = experiment_saver
+
+        self.check_save_model_params()
         self.n_Xclusters=params['n_Xclusters'] 
         self.n_Yclusters=params['n_Yclusters']
-        self.random_state = random_state
+
 
     def train(self, dataset):
 
@@ -71,3 +75,19 @@ class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there 
         
     def cluster_metric(self, prob_dist, lbls):
         return 0 #TODO: implement
+
+    # TODO: this should be pulled out into a base class once we have one
+    def check_save_model_params(self):
+        default_params = {  'n_Xclusters' : 4, 
+                            'n_Yclusters' : 4,
+                         }
+        
+        for k in default_params.keys():
+            if k not in self.params.keys():
+                print('{} not specified in model_params, defaulting to {}'.format(k, default_params[k]))
+                self.params[k] = default_params[k]
+
+        if self.experiment_saver is not None:
+            self.experiment_saver.save_params(self.params, 'cluster_params')
+        else:
+            print('You have not provided an ExperimentSaver. Your may continue to run CFL but your configuration will not be saved.')

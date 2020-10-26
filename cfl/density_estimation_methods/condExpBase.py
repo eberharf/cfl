@@ -16,28 +16,30 @@ from cfl.density_estimation_methods.cde import CDE #base class
 
 class CondExpBase(CDE):
 
-    def __init__(self, data_info, model_params, random_state=None):
+    def __init__(self, data_info, params, random_state=None, experiment_saver=None, model_name='CondExpBase'):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data 
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
-                model_params : dictionary containing parameters for the model
+                params : dictionary containing parameters for the model
                 random_state (int): Used to set a random seed to create reproducible results
         '''
         #globally set the random seed to a reproducible value before creating/training the model 
         self._set_random_state(random_state)
 
         # set attributes
+        self.model_name = model_name
         self.data_info = data_info #TODO: check that data_info is correct format
-        self.model_params = model_params
+        self.params = params
+        self.experiment_saver = experiment_saver
         self.check_save_model_params()
         self.trained = False # keep track of training status
 
         self.model = self.build_model()
         
         # load model weights if specified
-        if self.model_params['weights_path'] is not None:
-            self.load_parameters(self.model_params['weights_path'])
+        if self.params['weights_path'] is not None:
+            self.load_parameters(self.params['weights_path'])
     
 
     def train(self, dataset, standardize):
@@ -65,12 +67,12 @@ class CondExpBase(CDE):
 
 
         # build optimizer
-        optimizer = tf.keras.optimizers.get({ 'class_name' : self.model_params['optimizer'],
-                                              'config' : self.model_params['opt_config']})
+        optimizer = tf.keras.optimizers.get({ 'class_name' : self.params['optimizer'],
+                                              'config' : self.params['opt_config']})
 
         # compile model
         self.model.compile(
-            loss=self.model_params['loss'],
+            loss=self.params['loss'],
             optimizer=optimizer,
         )
 
@@ -90,8 +92,8 @@ class CondExpBase(CDE):
         # train model
         history = self.model.fit(
             Xtr, Ytr,
-            batch_size=self.model_params['batch_size'],
-            epochs=self.model_params['n_epochs'],
+            batch_size=self.params['batch_size'],
+            epochs=self.params['n_epochs'],
             validation_data=(Xts,Yts),
             callbacks=callbacks
         )
@@ -117,7 +119,7 @@ class CondExpBase(CDE):
         plt.plot(range(len(train_loss)), train_loss, label='train_loss')
         plt.plot(np.linspace(0,len(train_loss),len(val_loss)).astype(int), val_loss, label='val_loss')
         plt.xlabel('Epochs')
-        plt.ylabel(self.model_params['loss'])
+        plt.ylabel(self.params['loss'])
         plt.title('Training and Test Loss')
         plt.legend(loc='upper right')
         if save_path is not None:
@@ -155,7 +157,7 @@ class CondExpBase(CDE):
         assert self.trained, "Remember to train the model before evaluation."
 
         Y_hat = self.predict(X)
-        loss_fxn = tf.keras.losses.get(self.model_params['loss'])
+        loss_fxn = tf.keras.losses.get(self.params['loss'])
         cost = loss_fxn(Y, Y_hat) 
         return tf.reduce_mean(cost)
 
@@ -218,12 +220,16 @@ class CondExpBase(CDE):
                         }
         
         for k in default_params.keys():
-            if k not in self.model_params.keys():
-                print('{} not specified in model_params, defaulting to {}'.format(k, default_params[k]))
-                self.model_params[k] = default_params[k]
+            if k not in self.params.keys():
+                print('{} not specified in params, defaulting to {}'.format(k, default_params[k]))
+                self.params[k] = default_params[k]
+        
+        self.params['model_name'] = self.model_name
 
-        # if dataset.to_save:
-        #     dataset.saver.save_parameters(self.model_params, 'CDE_params')
+        if self.experiment_saver is not None:
+            self.experiment_saver.save_params(self.params, 'CDE_params')
+        else:
+            print('You have not provided an ExperimentSaver. Your may continue to run CFL but your configuration will not be saved.')
         
     def _set_random_state(self, random_state):
         '''
