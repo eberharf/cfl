@@ -16,7 +16,7 @@ class ExperimentSaver():
         # make sure base_path exists, if not make it
         if not os.path.exists(self.base_path):
             print("base_path '{}' does not exist, creating now.".format(self.base_path))
-            os.mkdir(self.base_path)
+            os.makedirs(self.base_path)
 
         # create dir for this run
         exp_path = os.path.join(self.base_path, get_next_dirname(self.base_path))
