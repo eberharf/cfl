@@ -11,7 +11,7 @@ class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there 
     def train(self, dataset, standardize=False):
 
         # train CDE
-        train_losses, test_losses = self.CDE_model.train(dataset, standardize=standardize)
+        train_losses, test_losses = self.CDE_model.train(dataset, standardize=standardize, best=True)
 
         # predict P(Y|X)
         pyx = self.CDE_model.predict(dataset)

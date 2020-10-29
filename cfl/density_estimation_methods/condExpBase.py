@@ -38,11 +38,13 @@ class CondExpBase(CDE):
         self.model = self.build_model()
         
         # load model weights if specified
+        self.weights_loaded = False
         if self.params['weights_path'] is not None:
             self.load_parameters(self.params['weights_path'])
+            self.weights_loaded = True
     
 
-    def train(self, dataset, standardize):
+    def train(self, dataset, standardize, best):
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
             updates model weights each epoch and evaluates on test set periodically.
             Saves model weights as checkpoints.
@@ -56,6 +58,9 @@ class CondExpBase(CDE):
         #TODO: do a more formalized checking that actual dimensions match expected 
         #TODO: say what expected vs actual are 
 
+        if self.weights_loaded:
+            print('No need to train, specified weights loaded already.')
+            return [],[]
 
         # train-test split
         split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
@@ -80,7 +85,7 @@ class CondExpBase(CDE):
         if dataset.to_save:
             model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
                 filepath=dataset.saver.get_save_path(
-                    'checkpoints/weights_epoch_{epoch:02d}_val_loss_{val_loss:.2f}'),
+                    'checkpoints/best_weights'),
                 save_weights_only=True,
                 monitor='val_loss',
                 mode='min',
@@ -109,6 +114,11 @@ class CondExpBase(CDE):
             np.save(dataset.saver.get_save_path('val_loss'), val_loss)
         else:
             self.graph_results(train_loss, val_loss, save_path=None)
+
+        if best:
+            # load weights from epoch with lowest validation loss
+            self.load_parameters(dataset.saver.get_save_path(
+                    'checkpoints/best_weights'))
 
         self.trained = True
         return train_loss, val_loss
