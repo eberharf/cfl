@@ -2,11 +2,6 @@
 
 ## Set-up instructions 
 
-Initial requirements:  
-Python 3.7.4  
-Anaconda 4.8.4  
-(full requirements in `requirements.yml`)
-
 ### Clone the repository 
 
 Git clone this repository onto your computer: 
@@ -14,16 +9,14 @@ Git clone this repository onto your computer:
 git clone https://github.com/eberharf/cfl.git
 ```
 
-### Add to path 
-Before running this code, add the path to the location of this respository to your $PYTHONPATH variable. For example, on my machine I would add 
-```
-C:\Users\Jenna\Documents\Schmidt\cfl
-```
-to the PYTHONPATH variable in my system environment variables. 
+### Install Dependencies 
 
- This will allow you to easily import the `cfl` package into any other file using the statement `import cfl`. 
+Any version of Python compatible with 3.7.4 
+View full requirements (with the version we used) in the `requirements.yml` file. 
+You may either manually install the required packages or follow the instructions below to generate a conda virtual environment with all the required dependencies from file.  
 
-### Create a conda environment 
+
+#### Create a conda environment 
 To create a conda virtual environment with the required dependencies for `cfl` from the file `requirements.yml`, navigate into the root directory of `cfl` and run the command: 
 ```
 conda env create -f requirements.yml
@@ -31,65 +24,59 @@ conda env create -f requirements.yml
 
 Then activate the newly created environment:
 ```
-conda activate cfl-environment
+conda activate cfl-env
 ```
 
+(These instructions use Anaconda 4.8.4)
+
+### Add the cfl-env environment to the Jupyter notebook kernel 
+
+In order to be able to access the 
+```
+ ipython kernel install --name cfl-env --user
+```
+
+### Add `cfl` to path 
+Before running this code, add the path to the location of the respository to your **`PYTHONPATH`** variable. This will allow you to easily import the `cfl` package into any other file (regardless of the location of that file) using the statement `import cfl`. 
+
+For example, on my machine I would add 
+```
+C:\Users\Jenna\Documents\Schmidt\cfl
+```
+to the PYTHONPATH variable in my system environment variables. Consult Google for system-specific instructions on how to modify your environment variables.
+
+
 You should now be ready to run `cfl`. 
-Check that your installation has been successful by opening a Python terminal from the conda environment and typing `import cfl`.
-
-
-## Directory Structure 
-
- ### `cfl`
-- `cfl.py`
-- `core_cfl_objects`
-    - `cfl_core.py`
-    - `two_step_cfl.py`
-- `cluster_methods`
-    - KMeans: 
-    - cond_prob_Y
-    - epsilon
-    - evaluate_clustering.py
-- `density_estimation_methods` 
-    - cde
-    - chalupkaCDE 
-    - condExp
-    - condExpCNN 
-- `visualization.py`
-
-### `cfl_examples`
-
-### `visual_bars_test`
-- `generate_visual_bars_data.py`
-- `visual_bars_performance_test.py` 
-- assorted jupyter notebooks
-- `match_class_labels.py`
-
-### `testing`
+Check that your installation has been successful by opening a Python terminal from the cfl conda environment (or whatever environment you're using) and typing `import cfl`.
 
 
 ## Description 
+
+# TODO 
+step 3: exhaustively go through the pydocs and comment everything that needs commenting 
 This section contains a high-level description of many of the directories and files within the repository. 
 
+### CFL 
+The most current documentation for the `cfl` package can be viewed using `PyDoc`. Use the following instructions to open the documentation: 
 
- ### `cfl`
- The root directory for the `cfl` package. This folder contains all functional code for `cfl`. 
-- `cfl.py`: **NOTE:** does not substantially exist yet; may not be developed. CFL() is (intended to be) a 'beginner-friendly' class that allows one to construct a CFL object from string and train and predict using the model without having to understand too much of what's going on 'under the hood.' 
+1. First, make sure that you have a local copy of the `cfl` repository installed on your machine according to the above instructions. 
 
-- `core_cfl_objects` 
+2. Open a terminal window.  
+Start a PyDoc server on the HTTP port 1234 by typing: 
+```
+python -m pydoc -p 1234
+```
 
-- `cluster_methods`
-    - `cond_prob_Y.py`: a helper file used by `kmeans.py` to find the conditional probabilities of Y given X equals each x macrovariable. The main function, `continuous_Y()`, uses some tricks to do this effectively for a continuous (not discrete) Y 
-
-- `density_estimation_methods` 
-- `visualization.py`
+3. Press `b` to open the webpage in your browser. 
+3. Scroll past the Built-In Modules to the link to **`cfl`** `(package)`. Click on this link to view the various sub-modules in `cfl` and see details about each module. 
 
 
 ### `cfl_examples`
 contains example applications of `cfl` to various data sets. **NOTE**: this folder has not been cleaned up/uses outdated versions of cfl. Use with caution.
 
 ### `visual_bars_test`
-Contains code for generating visual bars data set (see Chalupka 2015) and code to efficiently test the performance of CFL with different parameters on the visual bars data set. The visual bars data set is useful as a simple toy example for cfl because, since it is simulated, it contains straightforward ground truth at each step, which can be compared against the CFL results  
+Contains code for generating visual bars data set (see Chalupka 2015) and code to efficiently test the performance of CFL with different parameters on the visual bars data set. We use the visual bars data as simple toy data to run through different parts of CFL. Since this data is entirely synthetic, the ground truth at each step is known and can be compared against the CFL results. 
+
 - `generate_visual_bars_data.py`: module to generate VisualBarsData objects, which create and return images and the associated properties of the images (eg ground truth, target behavior)
 - `visual_bars_performance_test.py`: #TODO: WHAT IS THE EXACT PURPOSE OF THIS CLASS . NEED TO KNOW FOR REFACTORING 
 
@@ -99,12 +86,14 @@ Contains code for generating visual bars data set (see Chalupka 2015) and code t
     - `match_class_labels.py`
 
 ### `testing`
-This folder contains the automated test suite for checking the expected functionality of the code and preventing regression (loss of functionality). Look here for example code calls and to see expected behavior. 
-
+This folder contains the automated test suite for checking the expected functionality of the code and preventing regression (loss of functionality). 
+s
 **NOTE:** most tests not created yet 
 
 
 ## Running CFL
+
+# TODO: add example calls 
 
 ### Configuring `model_params`
 When constructing a new CDE object, you can specify a `model_params` dictionary.
