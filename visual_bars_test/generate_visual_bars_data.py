@@ -189,17 +189,22 @@ class VisualBarsData():
         return images[:n_images]
 
 
-    def viewImages(self, x_lbls=None):
+    def viewImages(self, n_images=None, x_lbls=None):
         '''shows the images from X_images in matplotlib. Can input labels to 
         associate with each image (optional), otherwise the ground truth labels 
-        will be used
+        will be used. Best for viewing a lot of images at once 
         
         Parameters: 
+        n_images (int): Optional number of images to display. If not specified, up to 50 images will be shown 
         x_lbls (1D np array): Optional labels to show at the top of each image. If not specified, ground truth will be used 
         '''      
+        # set the number of images to show 
+        if n_images is None: 
+            maxImages = 50  
+        else:
+            maxImages = n_images
 
-        #set the number of rows/columns of images to show 
-        maxImages = 50  
+        #set the number of rows/columns to display images over
         n_cols = 10 
         if self.X_images.shape[0] > maxImages:
             n_rows = 5 
@@ -232,6 +237,12 @@ class VisualBarsData():
         fig.tight_layout()
         plt.show()
 
+    def viewSingleImage(self): 
+        '''chooses a random image from X_images and displays it'''
+        image = self.X_images[self.random.choice(len(self.X_images))]
+        fig = plt.figure()
+        plt.imshow(image)
+
     def saveSingleImage(self, fname):
         '''chooses a random image from X_images and saves it with the name fname'''
         image = self.X_images[self.random.choice(len(self.X_images))]
@@ -241,4 +252,4 @@ class VisualBarsData():
 
     def saveData(self): 
         '''saves the images, ground truth, and target effects''' 
-        pass
+        pass #TODO: implement? 
