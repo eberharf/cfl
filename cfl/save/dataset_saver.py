@@ -39,7 +39,7 @@ class DatasetSaver():
         '''
 
         # make sure we're not overriding a preexisting dir
-        assert not os.path.exists(self.save_path), 
+        assert not os.path.exists(self.save_path), \
             "You have already saved results at {}". format(self.save_path)
 
         # make save dir for this dataset
