@@ -1,11 +1,16 @@
+# a helper file used by `kmeans.py` to find the y conditional probabilities 
+# ie P(Y=y|X=Xclass), the conditional probability of each y value, given each X-macrovariable 
+
 import numpy as np
 from tqdm import tqdm
 
+
 def continuous_Y(Y_data, x_lbls): 
     '''
-    A helper function for CFL's kmeans clustering that estimates the conditional probability density P(Y=y|X=xClass) 
-    for every y (observation in Y_data) and xClass (macrovariable constructed from X_data, the "causal" data set)  when 
-    Y_data contains variable(s) over a continuous distribution. 
+    A helper function for CFL's kmeans clustering 
+    Estimates the conditional probability density P(Y=y|X=xClass) 
+    for every y (observation in Y_data) and xClass (macrovariable constructed from X_data, the "causal" data set) 
+    when Y_data contains variable(s) over a continuous distribution. 
     
     
     It approximates the probability density P(Y=y1) by using the density of points around y1
@@ -58,7 +63,8 @@ def continuous_Y(Y_data, x_lbls):
     # cond_Y_prob[y_id] = avg_nearest_neighbors_dist(y, y_data)
 
 def rows_where_each_x_class_occurs(x_lbls): 
-    '''returns rows in which each x_lbl occurs, as a list of np arrays'''
+    '''helper function for continuous_Y()
+    returns rows in which each x_lbl occurs, as a list of np arrays'''
     x_lbl_indices = []
     # for each x class that exists, 
     for x_lbl in np.unique(x_lbls): 
@@ -69,6 +75,7 @@ def rows_where_each_x_class_occurs(x_lbls):
 
 def avg_nearest_neighbors_dist(y, other_Ys, y_in_otherYs, k_neighbors=4): 
     '''
+    helper function for continuous_Y()
     returns the distance between a point y and its nearest neighbors in the cluster other_Ys
 
     calculates this distance by finding the euclidean distance (squared) between 

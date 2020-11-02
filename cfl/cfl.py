@@ -6,8 +6,15 @@ class CFL():
     
 
     def __init__(self, tags, data_info, config):     
-        '''constructor for CFL from string
+        '''
+        **NOTE:** does not substantially exist yet; may not be developed. 
+        CFL is (intended to be) a 'beginner-friendly' class that allows one to construct 
+        a CFL object from string and train and predict using the model without having to 
+        understand too much of what's going on 'under the hood.' However, this class is currently 
+        not being developed.
 
+        For an easy method to create cfl objects in one step, use cfl_wrapper.make_CFL()
+        
         Inputs: 
         - tags : tuple containing strings specifying the methods to use. Can take either the format ("CRE") or ("CDE", "clusterer")
         - config : a configuration file for the model. TODO: not specified yet 
