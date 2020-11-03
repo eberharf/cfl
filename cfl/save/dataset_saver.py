@@ -39,13 +39,12 @@ class DatasetSaver():
         '''
 
         # make sure we're not overriding a preexisting dir
-        assert not os.path.exists(self.save_path), \
-            "You have already saved results at {}". format(self.save_path)
+        assert not os.path.exists(save_path), "You have already saved results at {}". format(save_path)
 
         # make save dir for this dataset
-        os.mkdir(self.save_path)
+        os.mkdir(save_path)
         
-        return self.save_path
+        return save_path
 
     def get_save_path(self, fn):
         ''' Returns current save path based on the current path for this 
