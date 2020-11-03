@@ -95,7 +95,7 @@ s
 
 # TODO: add example calls 
 
-### Configuring `model_params`
+### Configuring CDE `model_params`
 When constructing a new CDE object, you can specify a `model_params` dictionary.
 This allows you to specify the configuration of your CDE model during instantiation. 
 Here are the current variables you can set:
