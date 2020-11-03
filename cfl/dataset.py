@@ -2,7 +2,7 @@
 
 class Dataset():
 
-    def __init__(self, X, Y, dataset_label, experiment_saver=None):
+    def __init__(self, X, Y, dataset_label=None, experiment_saver=None):
         self.X = X
         self.Y = Y
         self.dataset_label = dataset_label
