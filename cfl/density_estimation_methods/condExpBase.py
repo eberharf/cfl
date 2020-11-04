@@ -2,7 +2,6 @@ import os
 # TODO: add GPU support
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import numpy as np
-import random as rn
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -16,17 +15,13 @@ from cfl.density_estimation_methods.cde import CDE #base class
 
 class CondExpBase(CDE):
 
-    def __init__(self, data_info, params, random_state=None, experiment_saver=None, model_name='CondExpBase'):
+    def __init__(self, data_info, params,  experiment_saver=None, model_name='CondExpBase'):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data 
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 params : dictionary containing parameters for the model
-                random_state (int): Used to set a random seed to create reproducible results
         '''
-        #globally set the random seed to a reproducible value before creating/training the model 
-        self._set_random_state(random_state)
-
         # set attributes
         self.model_name = model_name
         self.data_info = data_info #TODO: check that data_info is correct format
@@ -250,15 +245,3 @@ class CondExpBase(CDE):
         else:
             print('You have not provided an ExperimentSaver. Your may continue to run CFL but your configuration will not be saved.')
         
-    def _set_random_state(self, random_state):
-        '''
-        sets a random seed in order to generate reproducible results. 
-
-        sets a global random seed at the numpy, python, and tensorflow level, 
-        as per the instructions for generating reproducible keras results here: 
-        https://keras.io/getting_started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development 
-        ''' 
-        
-        np.random.seed(random_state)
-        rn.seed(random_state)
-        tf.random.set_seed(random_state)

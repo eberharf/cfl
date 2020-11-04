@@ -7,16 +7,15 @@ from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class CondExp(CondExpBase):
 
-    def __init__(self, data_info, params, random_state=None, experiment_saver=None):
+    def __init__(self, data_info, params, experiment_saver=None):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data 
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 params : dictionary containing parameters for the model
-                random_state : an optional parameter (int) that can be set to create reproducible randomness 
         '''
         self.model_name = 'CondExp'
-        super().__init__(data_info, params, random_state, experiment_saver, self.model_name)
+        super().__init__(data_info, params, experiment_saver, self.model_name)
 
 
     def build_model(self):
