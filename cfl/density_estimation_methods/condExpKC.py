@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from cfl.density_estimation_methods.condExpBase import CondExpBase
 
-class ChalupkaCDE(CondExpBase):
+class CondExpKC(CondExpBase):
 
     def __init__(self, data_info, params, random_state=None, experiment_saver=None):
         ''' Initialize model and define network.

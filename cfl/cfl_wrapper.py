@@ -9,7 +9,7 @@ import os
 # methods for registration
 
 CDE_key = { 'CondExp'     : cdem.condExp.CondExp, 
-            'ChalupkaCDE' : cdem.chalupkaCDE.ChalupkaCDE,
+            'CondExpKC' : cdem.condExpKC.CondExpKC,
             'CondExpCNN'  : cdem.condExpCNN.CondExpCNN,
             'CondExpMod'  : cdem.condExpMod.CondExpMod }
 
