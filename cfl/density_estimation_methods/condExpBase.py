@@ -116,7 +116,13 @@ class CondExpBase(CDE):
         else:
             self.graph_results(train_loss, val_loss, save_path=None)
 
-        if best:
+        if best and (not dataset.to_save):
+            print("You have specified 'best', but the model weights associated" +
+            " with the best loss can only be recovered if a DatasetSaver" +
+            " is associated with this Dataset to keep track of those weights." +
+            " Will proceed with final weights instead of best weights.")
+        
+        if best and dataset.to_save:
             # load weights from epoch with lowest validation loss
             self.load_parameters(dataset.saver.get_save_path(
                     'checkpoints/best_weights'))
