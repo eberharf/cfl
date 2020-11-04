@@ -100,7 +100,8 @@ class CondExpBase(CDE):
             batch_size=self.params['batch_size'],
             epochs=self.params['n_epochs'],
             validation_data=(Xts,Yts),
-            callbacks=callbacks
+            callbacks=callbacks, 
+            verbose=self.params['verbose']
         )
 
 
@@ -134,7 +135,8 @@ class CondExpBase(CDE):
         plt.legend(loc='upper right')
         if save_path is not None:
             plt.savefig(save_path)
-        plt.show()
+        if self.params['show_plot']:
+            plt.show()
 
 
     def predict(self, dataset): #put in the x and y you want to predict with
@@ -221,12 +223,13 @@ class CondExpBase(CDE):
                             'n_epochs'    : 20,
                             'optimizer'   : 'adam',
                             'opt_config'  : {},
-                            'verbose'     : True,
+                            'verbose'     : 1,
                             'dense_units' : [50, self.data_info['Y_dims'][1]],
                             'activations' : ['relu', 'linear'],
                             'dropouts'    : [0, 0],
                             'weights_path': None,
-                            'loss'        : 'mean_squared_error'
+                            'loss'        : 'mean_squared_error',
+                            'show_plot'   : True
                         }
         
         for k in default_params.keys():
