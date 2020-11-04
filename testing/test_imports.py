@@ -1,13 +1,13 @@
 import pytest 
 
 import cfl 
-'''This module includes unit tests to check that 
-each public module in the cfl package is able to be imported 
-using the statement 'import cfl' 
+# This module includes unit tests to check that 
+# each public module in the cfl package is able to be imported 
+# using the statement 'import cfl' 
 
-As new modules are added, this file should be periodically 
-updated to include any new additions
-'''
+# As new modules are added, this file should be periodically 
+# updated to include any new additions
+
 
 #########CLUSTER METHODS 
 
@@ -34,7 +34,7 @@ def test_bad_import_cde():
         density_estimation_methods.condExp.CondExp
 
 def test_import_chalupka(): 
-    assert cfl.density_estimation_methods.chalupkaCDE.ChalupkaCDE  #check if class exists 
+    assert cfl.density_estimation_methods.condExpKC.CondExpKC  #check if class exists 
 
 def test_import_CNN(): 
     assert cfl.density_estimation_methods.condExpCNN.CondExpCNN  #check if class exists 
@@ -55,3 +55,4 @@ def test_bad_import_cfl():
 ########VISUALIZATION.py
 def test_import_visualize(): 
     assert cfl.visualization #check that file imports successfully
+
