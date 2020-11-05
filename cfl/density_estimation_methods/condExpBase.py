@@ -24,19 +24,35 @@ class CondExpBase(CDE):
         '''
         # set attributes
         self.model_name = model_name
-        self.data_info = data_info #TODO: check that data_info is correct format
+        self.data_info = data_info # TODO: check that data_info is correct format
+        # TODO: these default parameters should later be saved in a file
+        self.default_params = { 'batch_size'  : 32, 
+                                'n_epochs'    : 20,
+                                'optimizer'   : 'adam',
+                                'opt_config'  : {},
+                                'verbose'     : 1,
+                                'dense_units' : [50, self.data_info['Y_dims'][1]],
+                                'activations' : ['relu', 'linear'],
+                                'dropouts'    : [0, 0],
+                                'weights_path': None,
+                                'loss'        : 'mean_squared_error',
+                                'show_plot'   : True,
+                                'model_name'  : self.model_name
+                            }
         self.params = params
         self.experiment_saver = experiment_saver
         self.check_save_model_params()
+
         self.trained = False # keep track of training status
+        self.weights_loaded = False
 
         self.model = self.build_model()
         
         # load model weights if specified
-        self.weights_loaded = False
         if self.params['weights_path'] is not None:
             self.load_parameters(self.params['weights_path'])
             self.weights_loaded = True
+            self.trained = True
     
 
     def train(self, dataset, standardize, best):
@@ -58,12 +74,12 @@ class CondExpBase(CDE):
             return [],[]
 
         # train-test split
-        split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
+        dataset.split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
         
         # standardize if specified
         if standardize:
-            split_data = standardize_train_test(split_data)
-        Xtr, Xts, Ytr, Yts = split_data
+            dataset.split_data = standardize_train_test(dataset.split_data)
+        Xtr, Xts, Ytr, Yts = dataset.split_data
 
 
         # build optimizer
@@ -158,7 +174,7 @@ class CondExpBase(CDE):
             np.save(dataset.saver.get_save_path('pyx'), dataset.pyx)
         return dataset.pyx
 
-    def evaluate(self, X, Y):
+    def evaluate(self, dataset):
         ''' Compute the mean squared error (MSE) between ground truth and prediction.
             Arguments:
                 X : a batch of true observations of X (tf.Tensor)
@@ -169,9 +185,9 @@ class CondExpBase(CDE):
         
         assert self.trained, "Remember to train the model before evaluation."
 
-        Y_hat = self.predict(X)
+        Y_hat = self.predict(dataset)
         loss_fxn = tf.keras.losses.get(self.params['loss'])
-        cost = loss_fxn(Y, Y_hat) 
+        cost = loss_fxn(dataset.Y, Y_hat) 
         return tf.reduce_mean(cost)
 
 
@@ -220,28 +236,28 @@ class CondExpBase(CDE):
 
 
     def check_save_model_params(self):
-        default_params = {  'batch_size'  : 32, 
-                            'n_epochs'    : 20,
-                            'optimizer'   : 'adam',
-                            'opt_config'  : {},
-                            'verbose'     : 1,
-                            'dense_units' : [50, self.data_info['Y_dims'][1]],
-                            'activations' : ['relu', 'linear'],
-                            'dropouts'    : [0, 0],
-                            'weights_path': None,
-                            'loss'        : 'mean_squared_error',
-                            'show_plot'   : True
-                        }
+        ''' Check that all expected model parameters have been provided,
+        and substitute the default if not. Remove any unused but specified parameters.
         
-        for k in default_params.keys():
-            if k not in self.params.keys():
-                print('{} not specified in params, defaulting to {}'.format(k, default_params[k]))
-                self.params[k] = default_params[k]
-        
-        self.params['model_name'] = self.model_name
+        Arguments: None
+        Returns: None
+        '''
 
+        # make sure we have a value for every expected parameter
+        for k in self.default_params.keys():
+            if k not in self.params.keys():
+                print('{} not specified in params, defaulting to {}'.format(k, self.default_params[k]))
+                self.params[k] = self.default_params[k]
+        
+        # remove any variables that weren't supposed to be specified
+        for k in self.params.keys():
+            if k not in self.default_params.keys():
+                print('{} not a valid params, removing from self.params'.format(k))
+
+        # save parameters
         if self.experiment_saver is not None:
             self.experiment_saver.save_params(self.params, 'CDE_params')
         else:
-            print('You have not provided an ExperimentSaver. Your may continue to run CFL but your configuration will not be saved.')
+            print('You have not provided an ExperimentSaver. ' + 
+                'Your may continue to run CFL but your configuration will not be saved.')
         
