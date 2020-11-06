@@ -60,11 +60,14 @@ class CondExpBase(CDE):
             updates model weights each epoch and evaluates on test set periodically.
             Saves model weights as checkpoints.
             Arguments:
-                Xtr : X training set of dimensions [# training observations, # features] (np.array)
-                Ytr : Y training set of dimensions [# training observations, # features] (np.array)
-                Xts : X test set of dimensions [# test observations, # features] (np.array)
-                Yts : Y test set of dimensions [# test observations, # features] (np.array)
-            Returns: None
+                dataset: Dataset object containing X and Y data for this training run (Dataset)
+                standardize: whether or not to z-score X and Y (bool) 
+                TODO: eventually standardize should be kept within Dataset and specify for X and Y separately
+                best: whether to use weights from epoch with best test-loss, 
+                      or from most recent epoch for future prediction(bool)
+            Returns: 
+                train_loss: array of losses on train set (or [] if model has already been trained) (np.array)
+                test_loss: array of losses on test set (or [] if model has already been trained) (np.array)
         '''
         #TODO: do a more formalized checking that actual dimensions match expected 
         #TODO: say what expected vs actual are 
@@ -115,7 +118,6 @@ class CondExpBase(CDE):
             verbose=self.params['verbose']
         )
 
-
         # handle results
         train_loss = history.history['loss']
         val_loss = history.history['val_loss']
@@ -160,9 +162,7 @@ class CondExpBase(CDE):
         # TODO: deal with Y=None weirdness
         ''' Given a set of observations X, get neural network output.
             Arguments:
-                X : model input of dimensions [# observations, # x_features] (np.array)
-                Y : model input of dimensions [# observations, # y_features] (np.array)
-                    note: this derivation of CDE doesn't require Y for prediction.
+                dataset: Dataset object containing X and Y data for this training run (Dataset)
             Returns: model prediction (np.array) (TODO: check if this is really np.array or tf.Tensor)
         '''
         # if Y is not None:
@@ -177,9 +177,7 @@ class CondExpBase(CDE):
     def evaluate(self, dataset):
         ''' Compute the mean squared error (MSE) between ground truth and prediction.
             Arguments:
-                X : a batch of true observations of X (tf.Tensor)
-                Y : a batch of true observations of Y, corresponding to X (tf.Tensor)
-                training : whether to backpropagate gradient (boolean)
+                dataset: Dataset object containing X and Y data for this training run (Dataset)
             Returns: the average MSE for this batch (float)
         '''
         
@@ -203,10 +201,13 @@ class CondExpBase(CDE):
         print("Loading parameters from ", file_path)
         self.model.load_weights(file_path)
         self.trained = True
-        return None
-
 
     def save_parameters(self, file_path):
+        ''' Save model weights from current model.
+            Arguments:
+                file_path : path to checkpoint file (string)
+            Returns: None
+        '''
         print("Saving parameters to ", file_path)
         self.model.save_weights(file_path)
 

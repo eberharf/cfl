@@ -7,16 +7,15 @@ class CDE(ABC):
         ...
 
     @abstractmethod
-    def train(self, Xtr, Ytr, Xts, Yts, saver=None):
-    # def train(self, Xtr, Ytr, Xts, Yts, save_dir):
+    def train(self,dataset, standardize, best):
         ...
 
     @abstractmethod
-    def predict(self, X, Y=None, saver=None): #put in the x and y you want to predict with
+    def predict(self, dataset):
         ...
 
     @abstractmethod
-    def evaluate(self, X, Y, evaluate): 
+    def evaluate(self, dataset):
         ...
 
     @abstractmethod

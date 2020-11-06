@@ -20,9 +20,9 @@ class CondExpMod(CondExpBase):
 
     def build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
-            Eventually, this architecture will have to become more dynamic (TODO).
-
-            Right now the architecture is optimized for visual bars 1000 10x10 images 
+            This model takes specifications through the self.params dict to define
+            it's architecture.
+            
             Arguments: None
             Returns: the model (tf.keras.models.Model object)
         '''
