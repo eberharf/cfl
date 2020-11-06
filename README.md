@@ -75,13 +75,13 @@ Contains code for generating visual bars data set (see Chalupka 2015) and code t
 
 - `generate_visual_bars_data.py`: module to generate VisualBarsData objects, which create and return images and the associated properties of the images (eg ground truth, target behavior)
 
-### `data/el_nino` 
-Contains the pickle file for the El Nino data. See the `el_nino_example.ipynb` notebook for an example of how to load this data. 
+### `data/el_nino`
+Contains the pickle file for the El Nino data. See the `el_nino_example.ipynb` notebook for an example of how to load this data.
 
-### `data/galaxies` 
-Contains the .dvc (data version control) files associated with each file of the galaxy data. The actual data is stored on Google Drive. 
+### `data/galaxies`
+Contains the .dvc (data version control) files associated with each file of the galaxy data. The actual data is stored on Google Drive.
 
-**NOTE:** Instructions on how to use .dvc will be added soon. In the meantime, ask Iman if you have any questions. 
+**NOTE:** Instructions on how to use .dvc will be added soon. In the meantime, ask Iman if you have any questions.
 
 ### `testing`
 This folder contains the automated test suite for checking the expected functionality of the code and preventing regression (loss of functionality).
