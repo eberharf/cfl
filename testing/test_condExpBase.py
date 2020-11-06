@@ -2,7 +2,7 @@ import pytest
 from cfl.density_estimation_methods.condExpMod import CondExpMod
 import tensorflow as tf
 # tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-import visual_bars.generate_visual_bars_data as vbd
+import visual_bars_test.generate_visual_bars_data as vbd
 from cfl.save.experiment_saver import ExperimentSaver
 from cfl.dataset import Dataset
 import os
@@ -16,16 +16,16 @@ def get_data_helper(n_samples):
     noise_lvl= 0.03
     set_seed = 180
 
-    # create visual bars data
-    vb_data = vbd.VisualBarsData(   n_samples=n_samples,
-                                    im_shape = im_shape,
-                                    noise_lvl=noise_lvl,
+    # create visual bars data 
+    vb_data = vbd.VisualBarsData(   n_samples=n_samples, 
+                                    im_shape = im_shape, 
+                                    noise_lvl=noise_lvl, 
                                     set_random_seed=set_seed)
-    # retrieve the images and the target
+    # retrieve the images and the target 
     X = vb_data.getImages()
     Y = vb_data.getTarget()
 
-    X = np.reshape(X, (X.shape[0], X.shape[1]*X.shape[2]))
+    X = np.reshape(X, (X.shape[0], X.shape[1]*X.shape[2])) 
     Y = np.expand_dims(Y, -1)
 
     assert X.shape == (n_samples,100), 'X data shape is incorrect: {}'.format(X.shape)
@@ -44,8 +44,8 @@ Y_DIM = 1
 
 WEIGHTS_PATH = 'testing/test_results/test_condExpBase_resources/experiment0000/dataset0/checkpoints/best_weights'
 
-DATA_INFO = { 'X_dims' : (N_TRAIN,X_DIM),
-              'Y_dims' : (N_TRAIN,Y_DIM) }
+DATA_INFO = { 'X_dims' : (N_TRAIN,X_DIM), 
+              'Y_dims' : (N_TRAIN,Y_DIM) } 
 
 CDE_PARAMS = { 'batch_size'  : 32,
                'optimizer'   : 'adam',
@@ -54,7 +54,7 @@ CDE_PARAMS = { 'batch_size'  : 32,
                'opt_config'  : {'lr': 1e-3},
                'dense_units' : [20, DATA_INFO['Y_dims'][1]],
                'activations' : ['relu', 'sigmoid'],
-               'dropouts'    : [0.2, 0],
+               'dropouts'    : [0.2, 0], 
                'show_plot'   : False }
 
 CDE_PARAMS_WP = CDE_PARAMS.copy()
@@ -64,8 +64,8 @@ CDE_PARAMS_WP['weights_path'] = WEIGHTS_PATH
 X, Y = get_data_helper(N_TRAIN)
 dtrain = Dataset(X, Y, dataset_label='dtrain', experiment_saver=None)
 
-ceb_obj = CondExpMod(  data_info=DATA_INFO,
-                        params=CDE_PARAMS,
+ceb_obj = CondExpMod(  data_info=DATA_INFO, 
+                        params=CDE_PARAMS, 
                         experiment_saver=None
                     )
 tr_loss, ts_loss = ceb_obj.train(dataset=dtrain, standardize=False, best=False)
@@ -76,8 +76,8 @@ pred = ceb_obj.predict(dtest)
 # generate results to test when weights_path is supplied
 dtrain_wp = Dataset(X, Y, dataset_label='dtrain_wp', experiment_saver=None)
 
-ceb_obj_wp = CondExpMod(   data_info=DATA_INFO,
-                            params=CDE_PARAMS_WP,
+ceb_obj_wp = CondExpMod(   data_info=DATA_INFO, 
+                            params=CDE_PARAMS_WP, 
                             experiment_saver=None
                         )
 tr_loss_wp, ts_loss_wp = ceb_obj_wp.train(dataset=dtrain_wp, standardize=False, best=False)
@@ -92,8 +92,8 @@ def test_init():
             - was the model successfully built?
             - since no weights_path was specified, model should be untrained
     '''
-    ceb_obj_tmp = CondExpMod(   data_info=DATA_INFO,
-                                params=CDE_PARAMS,
+    ceb_obj_tmp = CondExpMod(   data_info=DATA_INFO, 
+                                params=CDE_PARAMS, 
                                 experiment_saver=None
                             )
 
@@ -105,8 +105,8 @@ def test_init_wp():
         - was the model successfully built?
         - since no weights_path was specified, model should be untrained
     '''
-    ceb_obj_tmp = CondExpMod(   data_info=DATA_INFO,
-                                params=CDE_PARAMS_WP,
+    ceb_obj_tmp = CondExpMod(   data_info=DATA_INFO, 
+                                params=CDE_PARAMS_WP, 
                                 experiment_saver=None
                             )
     assert ceb_obj_tmp.trained==True, "Since weights_path was supplied, model is already trained."
@@ -139,7 +139,7 @@ def test_train_wp():
     '''
     assert tr_loss_wp==[], 'tr_loss was not [] when weights_path was supplied: {}'.format(tr_loss_wp)
     assert ts_loss_wp==[], 'ts_loss was not [] when weights_path was supplied: {}'.format(ts_loss_wp)
-
+ 
 def test_predict():
     ''' tests the following:
             - prediction is correct size when weights_path not used
@@ -164,8 +164,8 @@ def test_load_parameters():
         - self.trained is true after loading parameters
     '''
 
-    ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO,
-                                        params=CDE_PARAMS,
+    ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO, 
+                                        params=CDE_PARAMS, 
                                         experiment_saver=None
                                     )
 
@@ -177,16 +177,16 @@ def test_save_parameters():
     ''' tests the following:
         - file exists at file_path after saving parameters
     '''
-
-    ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO,
-                                params=CDE_PARAMS,
+    
+    ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO, 
+                                params=CDE_PARAMS, 
                                 experiment_saver=None
                             )
 
     ceb_obj_tmp.load_parameters(WEIGHTS_PATH)
     new_path = 'testing/test_results/tmp_weights.h5'
     ceb_obj_tmp.save_parameters(new_path)
-
+    
     assert os.path.exists(new_path), 'File for saved parameters does not exist.'
 
     os.remove(new_path)
@@ -195,8 +195,8 @@ def test_check_save_model_params():
     ''' tests the following:
         - all keys in self.default_params show up in self.params
     '''
-    ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO,
-                            params=CDE_PARAMS,
+    ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO, 
+                            params=CDE_PARAMS, 
                             experiment_saver=None
                         )
 
