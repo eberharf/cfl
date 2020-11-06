@@ -9,11 +9,42 @@ from cfl.util.data_processing import standardize_train_test
 
 from cfl.density_estimation_methods.cde import CDE #base class
 
-# example_params = {'batch_size': 128, 'lr': 1e-3, 
-#       'optimizer': tf.keras.optimizers.Adam(lr=1e-3), 'n_epochs': 100, 
-#       'test_every': 10, 'save_every': 10}
-
 class CondExpBase(CDE):
+    ''' A class to define, train, and performance inference with conditional density
+    estimators that fall under the "conditional expectation" umbrella. This subset
+    of conditional density estimators (referred to as 'CondExp') learns E[P(Y|X)] instead
+    of the full conditional distribution. This base class implements all functions needed
+    for training and predictiion, and supplies a model architecture that can be overridden
+    by children of this class. In general, if you would like to use a CondExp CDE for
+    your CFL pipeline, it is easiest to either 1) inherit this class and override the build_model
+    function, which defines the architecture, or 2) use the condExpMod child class which
+    allows you to pass in limited architecture specifications through the params attribute.
+
+    Attributes:
+        model_name : name of the model so that the model type can be recovered from saved parameters (str)
+        data_info : dict with information about the dataset shape (dict)
+        default_params : default parameters to fill in if user doesn't provide a given entry (dict)
+        params : parameters for the CDE that are passed in by the user and corrected by check_save_model_params (dict)
+        experiment_saver : ExperimentSaver object for the current CFL configuration (ExperimentSaver)
+        trained : whether or not the modeled has been trained yet. This can either happen by
+                  defining by instantiating the class and calling train, or by passing in a path
+                  to saved weights from a previous training session through params['weights_path']. (bool)
+        weights_loaded : whether or not weights were loaded from params['weights_path]. (bool)
+        model : tensorflow model for this CDE (tf.keras.Model.Sequential)
+
+
+    Methods:
+        train : train the neural network on a given Dataset
+        graph_results : helper function to graph training and validation loss
+        predict : once the model is trained, predict for a given Dataset 
+        evaluate : return the model's prediction loss on a Dataset
+        load_parameters : load tensorflow model weights from a file into self.model
+        save_parameters : save the current weights of self.model
+        build_model : create and return a tensorflow model
+        check_save_model_params : fill in any parameters that weren't provided in params with
+                                  the default value, and discard any unnecessary paramaters
+                                  that were provided.
+    '''
 
     def __init__(self, data_info, params,  experiment_saver=None, model_name='CondExpBase'):
         ''' Initialize model and define network.

@@ -6,7 +6,13 @@ import matplotlib.pyplot as plt
 from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class CondExpMod(CondExpBase):
-
+    ''' A child class of CondExpBase that takes in model specifications from 
+        self.params to define the model architecture. This class aims to 
+        simplify the process of tuning a mainstream feed-forward model.
+    
+        See CondExpBase documentation for more details. 
+    
+    '''
     def __init__(self, data_info, params, experiment_saver=None):
         ''' Initialize model and define network.
             Arguments:

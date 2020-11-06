@@ -5,7 +5,13 @@ import matplotlib.pyplot as plt
 
 from cfl.density_estimation_methods.condExpBase import CondExpBase
 
-class CondExp(CondExpBase):
+class CondExp(CondExpBase): # TODO: this class should be renamed
+    ''' A child class of CondExpBase that defines a model specialized
+        for the visual bars dataset. 
+        
+        See CondExpBase documentation for more details. 
+
+    '''
 
     def __init__(self, data_info, params, experiment_saver=None):
         ''' Initialize model and define network.

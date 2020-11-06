@@ -6,7 +6,12 @@ import matplotlib.pyplot as plt
 from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class CondExpKC(CondExpBase):
-
+    ''' A child class of CondExpBase that loosely recreates the 
+        model construted in Chalupka 2015 visual bars code.
+        
+        See CondExpBase documentation for more details. 
+    
+    '''
     def __init__(self, data_info, params, experiment_saver=None):
         ''' Initialize model and define network.
             Arguments:

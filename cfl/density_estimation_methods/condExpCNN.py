@@ -6,7 +6,13 @@ import matplotlib.pyplot as plt
 from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class CondExpCNN(CondExpBase):
+    ''' A child class of CondExpBase that defines a model specialized
+        for the visual bars dataset and uses 2D convolutional layers instead
+        of flattening the image data. 
+    
+        See CondExpBase documentation for more details. 
 
+    '''
     def __init__(self, data_info, params, experiment_saver=None):
         ''' Initialize model and define network.
             Arguments:
