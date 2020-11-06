@@ -27,17 +27,20 @@ def test_import_evaluate_clustering():
 #test imports of all concrete CDE methods 
 
 def test_import_cde(): 
-    assert cfl.density_estimation_methods.condExpVB.CondExpVB  #check if class exists 
+    assert cfl.density_estimation_methods.condExp.CondExp  #check if class exists 
 
 def test_bad_import_cde(): 
     with pytest.raises(Exception): 
-        density_estimation_methods.condExpVB.CondExpVB
+        density_estimation_methods.condExp.CondExp
 
 def test_import_chalupka(): 
     assert cfl.density_estimation_methods.condExpKC.CondExpKC  #check if class exists 
 
 def test_import_CNN(): 
     assert cfl.density_estimation_methods.condExpCNN.CondExpCNN  #check if class exists 
+
+def test_import_Mod(): 
+    assert cfl.density_estimation_methods.condExpMod.CondExpMod
 
 ############CORE CFL OBJECTS 
 #test import of concrete cfl method (two-step cfl)
@@ -52,7 +55,17 @@ def test_bad_import_cfl():
     with pytest.raises(Exception): 
         cfl.CFL 
 
+def test_import_cfl_wrapper(): 
+    assert cfl.cfl_wrapper.make_CFL
+
 ########VISUALIZATION.py
 def test_import_visualize(): 
-    assert cfl.visualization #check that file imports successfully
+    assert cfl.visualization_methods.visualization #check that file imports successfully
+
+######### SAVERS 
+def test_import_dataset_saver(): 
+    assert cfl.save.dataset_saver.DatasetSaver
+
+def test_import_experiment_saver():
+    assert cfl.save.experiment_saver.ExperimentSaver
 
