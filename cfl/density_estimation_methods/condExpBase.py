@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from cfl.util.data_processing import standardize_train_test
 
-from cfl.density_estimation_methods.cde import CDE #base class
+from cfl.density_estimation_methods.cde_interface import CDE #base class
 
 class CondExpBase(CDE):
     ''' A class to define, train, and performance inference with conditional density

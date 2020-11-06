@@ -8,7 +8,7 @@ import os
 # later on, these keys can be loaded from a file, so that we can create
 # methods for registration
 
-CDE_key = { 'CondExp'     : cdem.condExp.CondExp, 
+CDE_key = { 'CondExpVB'     : cdem.condExpVB.CondExpVB, 
             'CondExpKC' : cdem.condExpKC.CondExpKC,
             'CondExpCNN'  : cdem.condExpCNN.CondExpCNN,
             'CondExpMod'  : cdem.condExpMod.CondExpMod }

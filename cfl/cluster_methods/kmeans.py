@@ -1,12 +1,12 @@
 from sklearn.cluster import KMeans as sKMeans
 from cfl.cluster_methods import cond_prob_Y
-from cfl.cluster_methods import clusterer
+from cfl.cluster_methods.clusterer_interface import Clusterer
 import numpy as np
 
 import joblib
 import os #save, load model 
 
-class KMeans(clusterer.Clusterer): #pylint says there's an issue here but there isn't
+class KMeans(Clusterer): #pylint says there's an issue here but there isn't
     ''' This class uses K-Means to form the observational partition that CFL 
         is trying to identify. It trains to K-Means models, one to cluster datapoints
         based on P(Y|X=x), and the other to cluster datapoints based on a proxy

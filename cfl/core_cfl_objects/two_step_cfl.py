@@ -1,6 +1,6 @@
 
 
-from cfl.core_cfl_objects.cfl_core import CFL_Core
+from cfl.core_cfl_objects.cfl_core_interface import CFL_Core
 
 class Two_Step_CFL_Core(CFL_Core): #pylint says there's an issue here but there isn't
     ''' This class encapsulates an entire CFL pipeline by acting as a wrapper

@@ -27,11 +27,11 @@ def test_import_evaluate_clustering():
 #test imports of all concrete CDE methods 
 
 def test_import_cde(): 
-    assert cfl.density_estimation_methods.condExp.CondExp  #check if class exists 
+    assert cfl.density_estimation_methods.condExpVB.CondExpVB  #check if class exists 
 
 def test_bad_import_cde(): 
     with pytest.raises(Exception): 
-        density_estimation_methods.condExp.CondExp
+        density_estimation_methods.condExpVB.CondExpVB
 
 def test_import_chalupka(): 
     assert cfl.density_estimation_methods.condExpKC.CondExpKC  #check if class exists 
