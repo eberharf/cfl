@@ -46,12 +46,16 @@ class CondExpBase(CDE):
                                   that were provided.
     '''
 
-    def __init__(self, data_info, params,  experiment_saver=None, model_name='CondExpBase'):
+    def __init__(self, data_info, params, experiment_saver=None, model_name='CondExpBase'):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data 
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 params : dictionary containing parameters for the model
+                experiment_saver : ExperimentSaver object for the current CFL configuration (ExperimentSaver)
+                model_name : name of the model so that the model type can be recovered from saved parameters (str)
+            
+            Returns: None
         '''
         # set attributes
         self.model_name = model_name
