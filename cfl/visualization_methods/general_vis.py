@@ -42,7 +42,7 @@ def view_class_examples(images, im_shape, n_examples, x_lbls):
     # (so that we don't try to display more images than we possibly can)
     N_ROWS = min(n_examples, min([len(x) for x in x_lbl_indices]))
     if N_ROWS==0:
-        print('You have at least one class with no examples. Currently, this' + \ 
+        print('You have at least one class with no examples. Currently, this' +
         'function limits the number of examples displayed by the size of the smallest class')
         return
         
