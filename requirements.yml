@@ -1,0 +1,20 @@
+# this file contains the requirements for the cfl package
+
+# to create a conda environment from this file, run the commands: 
+# conda env create -f conda-specs.yml
+# conda activate cfl-env
+
+
+name: cfl-env
+channels:
+  - defaults
+dependencies:
+  - tqdm
+  - pytest=6.0.1
+  - matplotlib=3.3.1
+  - tensorflow
+  - numpy=1.19.2
+  - joblib=0.16.0
+  - scikit-learn=0.23.2
+  - jupyter
+  - pytest=6.0.1 #pytest is needed just to run tests, not to use cfl 
