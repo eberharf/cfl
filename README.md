@@ -13,10 +13,13 @@ git clone https://github.com/eberharf/cfl.git
 
 This package was developed with Python 3.7.4 and requires a version of Python compatible with that.
 
-View full list of required packages in the `requirements.yml` file.  
-You may either manually install the required packages or follow the instructions below to generate a conda virtual environment with all the required dependencies from file. 
+You may either manually install the required packages or follow the instructions below to generate a conda virtual environment with all the required dependencies from file. We recommend using a conda virtual environment (see next section), because we can provide the most assistance for this method.
 
-We recommend using a conda virtual environment, because that is what we have been using, so we can provide the most support if you also do this. If you do not already have conda, see [this documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/install/). For our purposes, I think either the full Anaconda distribution or the smaller Miniconda should be sufficient for doing this set-up. 
+If you do not already have conda, see [this documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) for information on how to install it. For our purposes, I think either the full Anaconda distribution or the smaller Miniconda should work fine.  
+
+
+View full list of required packages in the `requirements.yml` file.  
+
 
 
 #### Create a conda environment
