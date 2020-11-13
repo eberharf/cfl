@@ -39,11 +39,20 @@ In order to be able to access the
 ### Add `cfl` to path
 Before running this code, add the path to the location of the respository to your **`PYTHONPATH`** variable. This will allow you to easily import the `cfl` package into any other file (regardless of the location of that file) using the statement `import cfl`.
 
-For example, on my machine I would add
+For example, on my windows machine I would add
 ```
 C:\Users\Jenna\Documents\Schmidt\cfl
 ```
-to the PYTHONPATH variable in my system environment variables. Consult Google for system-specific instructions on how to modify your environment variables.
+to the PYTHONPATH variable in my system environment variables. 
+
+On mac, open ~/.bash_profile with a text editor (i.e. `vim ~/.bash_profile` from terminal), and add the following lines to the end of the file:
+
+```
+PYTHONPATH=/path/to/cfl
+export PYTHONPATH
+```
+
+Consult Google for system-specific instructions on how to modify your environment variables.
 
 
 You should now be ready to run `cfl`.
