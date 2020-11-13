@@ -1,0 +1,1 @@
+{"batch_size": 32, "optimizer": "adam", "n_epochs": 60, "verbose": 1, "opt_config": {"lr": 0.001}, "dense_units": [20, 1], "activations": ["relu", "sigmoid"], "dropouts": [0.2, 0], "show_plot": false, "weights_path": null, "loss": "mean_squared_error", "model_name": "CondExpMod"}

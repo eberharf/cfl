@@ -6,26 +6,29 @@ import matplotlib.pyplot as plt
 from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class CondExpMod(CondExpBase):
-
-    def __init__(self, data_info, params, random_state=None, experiment_saver=None):
+    ''' A child class of CondExpBase that takes in model specifications from 
+        self.params to define the model architecture. This class aims to 
+        simplify the process of tuning a mainstream feed-forward model.
+    
+        See CondExpBase documentation for more details. 
+    
+    '''
+    def __init__(self, data_info, params, experiment_saver=None):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data that will be passed in
                 params : dictionary containing parameters for the model
-                verbose : whether to print out model information (boolean)
-                #TODO:^verbose is in the doc string but not in the function signature, not sure if it's supposed to be verbose or not 
-                random_state : an optional parameter (int) that can be set to create reproducible randomness 
 
         '''
         self.model_name = 'CondExpMod'
-        super().__init__(data_info, params, random_state, experiment_saver, self.model_name)
+        super().__init__(data_info, params, experiment_saver, self.model_name)
 
 
     def build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
-            Eventually, this architecture will have to become more dynamic (TODO).
-
-            Right now the architecture is optimized for visual bars 1000 10x10 images 
+            This model takes specifications through the self.params dict to define
+            it's architecture.
+            
             Arguments: None
             Returns: the model (tf.keras.models.Model object)
         '''
