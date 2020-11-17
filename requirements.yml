@@ -1,6 +1,6 @@
 # this file contains the requirements for the cfl package
 
-# to create a conda environment from this file, run the commands: 
+# to create a conda environment from this file, run the commands:
 # conda env create -f conda-specs.yml
 # conda activate cfl-env
 
@@ -17,4 +17,6 @@ dependencies:
   - joblib=0.16.0
   - scikit-learn=0.23.2
   - jupyter
-  - pytest=6.0.1 #pytest is needed just to run tests, not to use cfl 
+  - pytest=6.0.1 #pytest is needed just to run tests, not to use cfl
+
+#additions: pandas (for brain mice data)
