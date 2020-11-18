@@ -1,21 +1,21 @@
 from sklearn.cluster import KMeans as sKMeans
-from cfl.cluster_methods import cond_prob_Y
+from cfl.cluster_methods import Y_given_Xmacro
 from cfl.cluster_methods.clusterer_interface import Clusterer
 import numpy as np
 
 import joblib
-import os #save, load model 
+import os #save, load model
 
 class KMeans(Clusterer): #pylint says there's an issue here but there isn't
-    ''' This class uses K-Means to form the observational partition that CFL 
+    ''' This class uses K-Means to form the observational partition that CFL
         is trying to identify. It trains to K-Means models, one to cluster datapoints
         based on P(Y|X=x), and the other to cluster datapoints based on a proxy
-        for P(Y=y|X) (more information on this proxy in the helper file cond_prob_Y.py).
+        for P(Y=y|X) (more information on this proxy in the helper file Y_given_Xmacro.py).
         Once these two K-Means models are trained, they can then be used to assign
         new datapoints to the original clusters found.
 
         Attributes:
-            params : parameters for the clusterer that are passed in by the 
+            params : parameters for the clusterer that are passed in by the
                      user and corrected by check_save_model_params (dict)
             random_state : value of random seed to set in clustering for reproducible results
                            (None if this shouldn't be held constant) (int)
@@ -23,14 +23,14 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
             model_name : name of the model so that the model type can be recovered from saved parameters (str)
             n_Xclusters : number of X macrovariables to find (int)
             n_Yclusters : number of Y macrovariables to find (int)
-        
+
         Methods:
             train : fit a kmeans model with P(Y|X=x) found by CDE, and a fit second kmeans
-                    model with proxy for P(Y=y|X). 
+                    model with proxy for P(Y=y|X).
             predict : assign new datapoints to clusters found in train
             save_model : save sklearn kmeans model in compressed file
             load_model : load sklearn kmeans model that was saved using save_model
-            evaluate_clusters : evaluate the goodness of clustering based on metric specified 
+            evaluate_clusters : evaluate the goodness of clustering based on metric specified
                                 in cluster_metric()
             cluster_metric : a metric to judge the goodness of clustering (not yet implemented).
             check_save_model_params : fill in any parameters that weren't provided in params with
@@ -46,7 +46,7 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
                 random_state : value of random seed to set in clustering for reproducible results
                             (None if this shouldn't be held constant) (int)
                 experiment_saver : ExperimentSaver object for the current CFL configuration (ExperimentSaver)
-            
+
             Returns: None
         '''
 
@@ -55,7 +55,7 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
         self.experiment_saver = experiment_saver
         self.model_name = 'KMeans'
         self.check_save_model_params()
-        self.n_Xclusters=params['n_Xclusters'] 
+        self.n_Xclusters=params['n_Xclusters']
         self.n_Yclusters=params['n_Yclusters']
 
 
@@ -64,7 +64,7 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
 
             Arguments:
                 dataset : Dataset object containing X, Y and pyx data for fitting the clusterers (Dataset)
-            
+
             Returns:
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
@@ -72,37 +72,37 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
 
         assert dataset.pyx is not None, 'Generate pyx predictions with CDE before clustering.'
 
-        #train x clusters 
+        #train x clusters
         self.xkmeans = sKMeans(n_clusters=self.n_Xclusters, random_state=self.random_state)
-        x_lbls = self.xkmeans.fit_predict(dataset.pyx)  
+        x_lbls = self.xkmeans.fit_predict(dataset.pyx)
 
-        #find conditional probabilities P(y|Xclass) for each y 
-        y_probs = cond_prob_Y.continuous_Y(dataset.Y, x_lbls) 
+        #find conditional probabilities P(y|Xclass) for each y
+        y_probs = Y_given_Xmacro.continuous_Y(dataset.Y, x_lbls)
 
-        #train y clusters 
+        #train y clusters
         self.ykmeans =  sKMeans(n_clusters=self.n_Yclusters, random_state=self.random_state)
-        y_lbls = self.ykmeans.fit_predict(y_probs) 
+        y_lbls = self.ykmeans.fit_predict(y_probs)
 
-        #save results 
+        #save results
         if dataset.to_save:
             np.save(dataset.saver.get_save_path('xlbls'), x_lbls)
             np.save(dataset.saver.get_save_path('ylbls'), y_lbls)
         return x_lbls, y_lbls
-    
+
 
     def predict(self, dataset):
         ''' Assign new datapoints to clusters found in training.
 
             Arguments:
                 dataset : Dataset object containing X, Y and pyx data to assign parition labels to (Dataset)
-            
+
             Returns:
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
         '''
 
         x_lbls = self.xkmeans.predict(dataset.pyx)
-        y_probs = cond_prob_Y.continuous_Y(dataset.Y, x_lbls) 
+        y_probs = Y_given_Xmacro.continuous_Y(dataset.Y, x_lbls)
         y_lbls = self.ykmeans.predict(y_probs)
         if dataset.to_save:
             np.save(dataset.saver.get_save_path('xlbls'), x_lbls)
@@ -111,8 +111,8 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
 
     def save_model(self, dir_path):
         ''' Save both kmeans models to compressed files.
-            
-            Arguments: 
+
+            Arguments:
                 dir_path : directory in which to save models (str)
             Returns: None
         '''
@@ -122,8 +122,8 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
 
     def load_model(self, dir_path):
         ''' Load both kmeans models from directory path.
-            
-            Arguments: 
+
+            Arguments:
                 dir_path : directory in which to save models (str)
             Returns: None
         '''
@@ -137,7 +137,7 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
         ''' Compute evaluation metric on clustering done by both
             kmeans models on a given Dataset.
 
-            Arguments: 
+            Arguments:
                 dataset : Dataset object containing X, Y to evaluate clustering on (Dataset)
             Returns:
                 xscore : metric value for X partition (float)
@@ -146,16 +146,16 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
 
         # generate labels on pyx and y_probs
         x_lbls = self.xkmeans.predict(dataset.pyx)
-        y_probs = cond_prob_Y.continuous_Y(x_lbls, dataset.Y)
+        y_probs = Y_given_Xmacro.continuous_Y(x_lbls, dataset.Y)
         y_lbls = self.ykmeans.predict(y_probs)
-        
+
         # evaluate score
         # TODO: pick metric
         xscore = self.cluster_metric(dataset.pyx, x_lbls)
         yscore = self.cluster_metric(y_probs, y_lbls)
 
         return xscore, yscore
-        
+
     def cluster_metric(self, prob_dist, lbls):
         return 0 #TODO: implement
 
@@ -169,10 +169,10 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
             Returns: None
         '''
 
-        default_params = {  'n_Xclusters' : 4, 
+        default_params = {  'n_Xclusters' : 4,
                             'n_Yclusters' : 4,
                          }
-        
+
         for k in default_params.keys():
             if k not in self.params.keys():
                 print('{} not specified in model_params, defaulting to {}'.format(k, default_params[k]))
