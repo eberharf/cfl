@@ -6,7 +6,7 @@ import numpy as np
 import joblib
 import os #save, load model
 
-class KMeans(Clusterer): #pylint says there's an issue here but there isn't
+class KMeans(Clusterer):
     ''' This class uses K-Means to form the observational partition that CFL
         is trying to identify. It trains to K-Means models, one to cluster datapoints
         based on P(Y|X=x), and the other to cluster datapoints based on a proxy
@@ -38,23 +38,22 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
                                       that were provided.
     '''
 
-    def __init__(self, params, random_state=None, experiment_saver=None):
+    def __init__(self, params, random_state=None):
         ''' Set attributes and verify supplied params.
 
             Arguments:
                 params : dictionary containing parameters for the model
                 random_state : value of random seed to set in clustering for reproducible results
                             (None if this shouldn't be held constant) (int)
-                experiment_saver : ExperimentSaver object for the current CFL configuration (ExperimentSaver)
 
             Returns: None
         '''
+        super(KMeans, self).__init__(params) #calls ABC's constructor
 
         self.params = params
         self.random_state = random_state
-        self.experiment_saver = experiment_saver
         self.model_name = 'KMeans'
-        self.check_save_model_params()
+        self.check_model_params()
         self.n_Xclusters=params['n_Xclusters']
         self.n_Yclusters=params['n_Yclusters']
 
@@ -159,8 +158,7 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
     def cluster_metric(self, prob_dist, lbls):
         return 0 #TODO: implement
 
-    # TODO: this should be pulled out into a base class once we have one
-    def check_save_model_params(self):
+    def check_model_params(self):
         ''' Check that all expected model parameters have been provided,
             and substitute the default if not. Remove any unused but specified parameters.
             # TODO: currently does not remove unused parameters
