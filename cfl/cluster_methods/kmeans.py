@@ -1,26 +1,26 @@
-from sklearn.cluster import KMeans as sKMeans
-from cfl.cluster_methods import Y_given_Xmacro
-from cfl.cluster_methods.clusterer_interface import Clusterer
-import numpy as np
+"""Kmeans clustering"""
 
-import joblib
-import os #save, load model
+import numpy as np
+from sklearn.cluster import KMeans as sKMeans
+
+from cfl.cluster_methods.clusterer_interface import Clusterer #abstract base class
+from cfl.cluster_methods import Y_given_Xmacro #calculate P(Y|Xmacro)
 
 class KMeans(Clusterer):
-    ''' This class uses K-Means to form the observational partition that CFL
+    """ This class uses K-Means to form the observational partition that CFL
         is trying to identify. It trains to K-Means models, one to cluster datapoints
         based on P(Y|X=x), and the other to cluster datapoints based on a proxy
         for P(Y=y|X) (more information on this proxy in the helper file Y_given_Xmacro.py).
         Once these two K-Means models are trained, they can then be used to assign
         new datapoints to the original clusters found.
 
+
         Attributes:
             params : parameters for the clusterer that are passed in by the
-                     user and corrected by check_save_model_params (dict)
+                     user and corrected by check_model_params (dict)
             random_state : value of random seed to set in clustering for reproducible results
                            (None if this shouldn't be held constant) (int)
-            experiment_saver : ExperimentSaver object for the current CFL configuration (ExperimentSaver)
-            model_name : name of the model so that the model type can be recovered from saved parameters (str)
+            model_name : name of the model so that the model type can be recovered from saved parameters (str) #TODO: change description
             n_Xclusters : number of X macrovariables to find (int)
             n_Yclusters : number of Y macrovariables to find (int)
 
@@ -36,30 +36,32 @@ class KMeans(Clusterer):
             check_save_model_params : fill in any parameters that weren't provided in params with
                                       the default value, and discard any unnecessary paramaters
                                       that were provided.
-    '''
+    """
 
     def __init__(self, params, random_state=None):
-        ''' Set attributes and verify supplied params.
+        """ Set attributes and verify supplied params.
 
             Arguments:
-                params : dictionary containing parameters for the model
+                params : dictionary containing parameters for the model. For Kmeans, these parameters should
+                be 'n_Xclusters' and 'n_Yclusters' (the number of clusters to produce for x and y, respectively)
                 random_state : value of random seed to set in clustering for reproducible results
                             (None if this shouldn't be held constant) (int)
 
             Returns: None
-        '''
-        super(KMeans, self).__init__(params) #calls ABC's constructor
+        """
+        super(KMeans, self).__init__(params, random_state) #calls ABC's constructor #TODO: nothing of importance done here
 
-        self.params = params
-        self.random_state = random_state
         self.model_name = 'KMeans'
-        self.check_model_params()
-        self.n_Xclusters=params['n_Xclusters']
-        self.n_Yclusters=params['n_Yclusters']
 
+        self.params = self._check_model_params(params)
+
+        self.random_state = random_state
+
+        self.xmodel = self._create_X_model()
+        self.ymodel = self._create_Y_model()
 
     def train(self, dataset):
-        ''' Fit two kmeans models: one on P(Y|X=x), and the other on the proxy for P(Y=y|X).
+        """ Fit two kmeans models: one on P(Y|X=x), and the other on (a proxy for) P(Y=y|X).
 
             Arguments:
                 dataset : Dataset object containing X, Y and pyx data for fitting the clusterers (Dataset)
@@ -67,30 +69,27 @@ class KMeans(Clusterer):
             Returns:
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
-        '''
-
-        assert dataset.pyx is not None, 'Generate pyx predictions with CDE before clustering.'
+        """
+        pyx = dataset.get_pyx()
+        assert pyx is not None, 'Predict conditional probabilities for this dataset with a CDE before clustering.'
 
         #train x clusters
-        self.xkmeans = sKMeans(n_clusters=self.n_Xclusters, random_state=self.random_state)
-        x_lbls = self.xkmeans.fit_predict(dataset.pyx)
+        x_lbls = self._train_model(self.xmodel, pyx)
 
-        #find conditional probabilities P(y|Xclass) for each y
+        #find conditional probabilities P(y|Xclass) for each y #TODO: change depending on type of data
         y_probs = Y_given_Xmacro.continuous_Y(dataset.Y, x_lbls)
 
         #train y clusters
-        self.ykmeans =  sKMeans(n_clusters=self.n_Yclusters, random_state=self.random_state)
-        y_lbls = self.ykmeans.fit_predict(y_probs)
+        y_lbls = self.ymodel.fit_predict(y_probs)
 
-        #save results
-        if dataset.to_save:
-            np.save(dataset.saver.get_save_path('xlbls'), x_lbls)
-            np.save(dataset.saver.get_save_path('ylbls'), y_lbls)
         return x_lbls, y_lbls
 
+    def _train_model(self, model, cond_probs):
+        return model.fit_predict(cond_probs)
 
     def predict(self, dataset):
-        ''' Assign new datapoints to clusters found in training.
+        """
+        Assign new datapoints to clusters found in training.
 
             Arguments:
                 dataset : Dataset object containing X, Y and pyx data to assign parition labels to (Dataset)
@@ -98,42 +97,22 @@ class KMeans(Clusterer):
             Returns:
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
-        '''
+        """
 
         x_lbls = self.xkmeans.predict(dataset.pyx)
         y_probs = Y_given_Xmacro.continuous_Y(dataset.Y, x_lbls)
         y_lbls = self.ykmeans.predict(y_probs)
-        if dataset.to_save:
-            np.save(dataset.saver.get_save_path('xlbls'), x_lbls)
-            np.save(dataset.saver.get_save_path('ylbls'), y_lbls)
         return x_lbls, y_lbls
 
-    def save_model(self, dir_path):
-        ''' Save both kmeans models to compressed files.
+    def _predict_X_model(self, dataset):
+        pass
 
-            Arguments:
-                dir_path : directory in which to save models (str)
-            Returns: None
-        '''
-
-        joblib.dump(self.xkmeans, os.path.join(dir_path, 'xkmeans'))
-        joblib.dump(self.ykmeans, os.path.join(dir_path, 'ykmeans'))
-
-    def load_model(self, dir_path):
-        ''' Load both kmeans models from directory path.
-
-            Arguments:
-                dir_path : directory in which to save models (str)
-            Returns: None
-        '''
-
-        # TODO: error handling for file not found
-        self.xkmeans = joblib.load(os.path.join(dir_path, 'xkmeans'))
-        self.ykmeans = joblib.load(os.path.join(dir_path, 'ykmeans'))
-
+    def _predict_Y_model(self, dataset):
+        pass
 
     def evaluate_clusters(self, dataset):
-        ''' Compute evaluation metric on clustering done by both
+        """
+        Compute evaluation metric on clustering done by both
             kmeans models on a given Dataset.
 
             Arguments:
@@ -141,7 +120,7 @@ class KMeans(Clusterer):
             Returns:
                 xscore : metric value for X partition (float)
                 yscore : metric value for Y partition (float)
-        '''
+        """
 
         # generate labels on pyx and y_probs
         x_lbls = self.xkmeans.predict(dataset.pyx)
@@ -158,27 +137,37 @@ class KMeans(Clusterer):
     def cluster_metric(self, prob_dist, lbls):
         return 0 #TODO: implement
 
-    def check_model_params(self):
-        ''' Check that all expected model parameters have been provided,
-            and substitute the default if not. Remove any unused but specified parameters.
-            # TODO: currently does not remove unused parameters
+    def _check_model_params(self, input_params):
+        """
+         Check that all expected model parameters have been provided,
+            and substitute the default if not. Remove any unused but
+            specified parameters.
+            Arguments: Params
+            Returns: Verified parameter dictionary
+        """
 
-            Arguments: None
-            Returns: None
-        '''
+        verified_params = {}
 
-        default_params = {  'n_Xclusters' : 4,
-                            'n_Yclusters' : 4,
+        # creates a dictionary of default values for each parameter
+        default_params = {'n_Xclusters' : 4,
+                          'n_Yclusters' : 4,
                          }
 
-        for k in default_params.keys():
-            if k not in self.params.keys():
-                print('{} not specified in model_params, defaulting to {}'.format(k, default_params[k]))
-                self.params[k] = default_params[k]
+        # check for parameters that are needed but not provided
+        for param in default_params:
+            if param not in input_params.keys():
+                print('{} not specified in input, defaulting to {}'.format(param, default_params[param]))
+                verified_params[param] = default_params[param]
 
-        self.params['model_name'] = self.model_name
+        # check for parameters that are provided but not needed
+        for param in input_params:
+            if param not in default_params.keys():
+                print('{} specified but not used by {} clusterer'.format(param, self.model_name))
 
-        if self.experiment_saver is not None:
-            self.experiment_saver.save_params(self.params, 'cluster_params')
-        else:
-            print('You have not provided an ExperimentSaver. Your may continue to run CFL but your configuration will not be saved.')
+        return verified_params
+
+    def _create_X_model(self):
+        return sKMeans(n_clusters=self.params['n_Xclusters'], random_state=self.random_state)
+
+    def _create_Y_model(self):
+        return sKMeans(n_clusters=self.params['n_Yclusters'], random_state=self.random_state)

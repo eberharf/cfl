@@ -22,3 +22,7 @@ class Dataset():
     def set_pyx(self, pyx):
         """set a conditional probability value (from previous training)"""
         self.pyx = pyx
+
+    def get_Y(self):
+        """returns the Y (target) dataset"""
+        return self.Y
