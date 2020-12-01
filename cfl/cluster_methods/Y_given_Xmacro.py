@@ -1,6 +1,9 @@
-# a helper file used by `kmeans.py` to find the y conditional probabilities
-# ie P(Y=y|X=Xclass), the conditional probability of each y value, given each X-macrovariable
-
+"""
+a helper file used by `kmeans.py` to find P(Y=y|X=Xclass),
+ the conditional probability of each y value, given each X-macrovariable.
+Contains functions for clustering categorical and continuous 1-D Ys
+(not tested on higher dimensional Y)
+"""
 import numpy as np
 from tqdm import tqdm
 from cfl.util.x_lbl_util import rows_where_each_x_class_occurs
@@ -8,7 +11,6 @@ from cfl.util.x_lbl_util import rows_where_each_x_class_occurs
 
 def categorical_Y(Y_data, x_lbls):
     """
-    A helper function for CFL's kmeans clustering
     Estimates the conditional probability density P(Y=y|X=xClass)
     for every y (observation in Y_data) and xClass (macrovariable constructed from X_data, the "causal" data set)
     when Y_data contains categorical variables.
@@ -22,27 +24,32 @@ def categorical_Y(Y_data, x_lbls):
     entries of the array contain the conditional probability P(y|x) for the corresponding y value, given that the x is a member of
     the corresponding class of that column
     """
-
-    possible_Ys = np.unique(Y_data)
+    #TODO: check that this function does the right thing
+    Y_values = np.unique(Y_data)
 
     # x_lbl_indices is a list of np arrays, where each array pertains to a
     # different x class, and each array contains all the indices from x_lbls
     # where that class occurs
     x_lbl_indices = rows_where_each_x_class_occurs(x_lbls)
+
     #ys_in_each_x_class is an analagous list, which contains the actual y values
     # instead of the associated indices
     ys_in_each_x_class = [Y_data[i] for i in x_lbl_indices]
-
 
     # cond_Y_prob will store the P(Y|Xclasses) as they are calculated
     num_x_classes = len(x_lbl_indices)
     num_Ys = Y_data.shape[0]
     cond_Y_prob = np.zeros((num_Ys, num_x_classes))
 
+    for i, y in enumerate(Y_data):
+        for j, xclass in enumerate(x_lbl_indices):
+            cond_Y_prob[i][j] = np.sum(ys_in_each_x_class == y) / len(xclass)
+
+    return cond_Y_prob
+
 
 def continuous_Y(Y_data, x_lbls):
     """
-    A helper function for CFL's kmeans clustering
     Estimates the conditional probability density P(Y=y|X=xClass)
     for every y (observation in Y_data) and xClass (macrovariable constructed from X_data, the "causal" data set)
     when Y_data contains variable(s) over a continuous distribution.
@@ -87,7 +94,7 @@ def continuous_Y(Y_data, x_lbls):
 
     # fill in cond_Y_prob with the distance between the current y
     # and the ys associated with each x class
-    for y_id, y in enumerate(tqdm(Y_data)):
+    for y_id, y in enumerate(Y_data):
         for current_class, cluster_vals in enumerate(ys_in_each_x_class):
             cond_Y_prob[y_id][current_class] = avg_nearest_neighbors_dist(y, cluster_vals, y_in_otherYs=(y_id in x_lbl_indices[current_class]))
     return cond_Y_prob
