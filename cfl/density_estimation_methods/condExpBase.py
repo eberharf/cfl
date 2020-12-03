@@ -36,7 +36,7 @@ class CondExpBase(CDE):
     Methods:
         train : train the neural network on a given Dataset
         graph_results : helper function to graph training and validation loss
-        predict : once the model is trained, predict for a given Dataset 
+        predict : once the model is trained, predict for a given Dataset
         evaluate : return the model's prediction loss on a Dataset
         load_parameters : load tensorflow model weights from a file into self.model
         save_parameters : save the current weights of self.model
@@ -49,19 +49,19 @@ class CondExpBase(CDE):
     def __init__(self, data_info, params, experiment_saver=None, model_name='CondExpBase'):
         ''' Initialize model and define network.
             Arguments:
-                data_info : a dictionary containing information about the data 
+                data_info : a dictionary containing information about the data
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 params : dictionary containing parameters for the model
                 experiment_saver : ExperimentSaver object for the current CFL configuration (ExperimentSaver)
                 model_name : name of the model so that the model type can be recovered from saved parameters (str)
-            
+
             Returns: None
         '''
         # set attributes
         self.model_name = model_name
         self.data_info = data_info # TODO: check that data_info is correct format
         # TODO: these default parameters should later be saved in a file
-        self.default_params = { 'batch_size'  : 32, 
+        self.default_params = { 'batch_size'  : 32,
                                 'n_epochs'    : 20,
                                 'optimizer'   : 'adam',
                                 'opt_config'  : {},
@@ -82,13 +82,13 @@ class CondExpBase(CDE):
         self.weights_loaded = False
 
         self.model = self.build_model()
-        
+
         # load model weights if specified
         if self.params['weights_path'] is not None:
             self.load_parameters(self.params['weights_path'])
             self.weights_loaded = True
             self.trained = True
-    
+
 
     def train(self, dataset, standardize, best):
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
@@ -96,16 +96,16 @@ class CondExpBase(CDE):
             Saves model weights as checkpoints.
             Arguments:
                 dataset: Dataset object containing X and Y data for this training run (Dataset)
-                standardize: whether or not to z-score X and Y (bool) 
+                standardize: whether or not to z-score X and Y (bool)
                 TODO: eventually standardize should be kept within Dataset and specify for X and Y separately
-                best: whether to use weights from epoch with best test-loss, 
+                best: whether to use weights from epoch with best test-loss,
                       or from most recent epoch for future prediction(bool)
-            Returns: 
+            Returns:
                 train_loss: array of losses on train set (or [] if model has already been trained) (np.array)
                 test_loss: array of losses on test set (or [] if model has already been trained) (np.array)
         '''
-        #TODO: do a more formalized checking that actual dimensions match expected 
-        #TODO: say what expected vs actual are 
+        #TODO: do a more formalized checking that actual dimensions match expected
+        #TODO: say what expected vs actual are
 
         if self.weights_loaded:
             print('No need to train, specified weights loaded already.')
@@ -113,7 +113,7 @@ class CondExpBase(CDE):
 
         # train-test split
         dataset.split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
-        
+
         # standardize if specified
         if standardize:
             dataset.split_data = standardize_train_test(dataset.split_data)
@@ -149,7 +149,7 @@ class CondExpBase(CDE):
             batch_size=self.params['batch_size'],
             epochs=self.params['n_epochs'],
             validation_data=(Xts,Yts),
-            callbacks=callbacks, 
+            callbacks=callbacks,
             verbose=self.params['verbose']
         )
 
@@ -158,18 +158,18 @@ class CondExpBase(CDE):
         val_loss = history.history['val_loss']
 
         if dataset.to_save:
-            self.graph_results(train_loss, val_loss, save_path=dataset.saver.get_save_path('train_val_loss'))
+            save_path=dataset.saver.get_save_path('train_val_loss')
             np.save(dataset.saver.get_save_path('train_loss'), train_loss)
             np.save(dataset.saver.get_save_path('val_loss'), val_loss)
-        else:
-            self.graph_results(train_loss, val_loss, save_path=None)
+        if self.params['show_plot']:
+            self.graph_results(train_loss, val_loss, save_path=save_path)
 
         if best and (not dataset.to_save):
             print("You have specified 'best', but the model weights associated" +
             " with the best loss can only be recovered if a DatasetSaver" +
             " is associated with this Dataset to keep track of those weights." +
             " Will proceed with final weights instead of best weights.")
-        
+
         if best and dataset.to_save:
             # load weights from epoch with lowest validation loss
             self.load_parameters(dataset.saver.get_save_path(
@@ -189,8 +189,7 @@ class CondExpBase(CDE):
         plt.legend(loc='upper right')
         if save_path is not None:
             plt.savefig(save_path)
-        if self.params['show_plot']:
-            plt.show()
+        plt.show()
 
 
     def predict(self, dataset): #put in the x and y you want to predict with
@@ -215,12 +214,12 @@ class CondExpBase(CDE):
                 dataset: Dataset object containing X and Y data for this training run (Dataset)
             Returns: the average MSE for this batch (float)
         '''
-        
+
         assert self.trained, "Remember to train the model before evaluation."
 
         Y_hat = self.predict(dataset)
         loss_fxn = tf.keras.losses.get(self.params['loss'])
-        cost = loss_fxn(dataset.Y, Y_hat) 
+        cost = loss_fxn(dataset.Y, Y_hat)
         return tf.reduce_mean(cost)
 
 
@@ -250,22 +249,22 @@ class CondExpBase(CDE):
         ''' Define the neural network based on dimensions passed in during initialization.
             Eventually, this architecture will have to become more dynamic (TODO).
 
-            Right now the architecture is optimized for visual bars 1000 10x10 images 
+            Right now the architecture is optimized for visual bars 1000 10x10 images
             Arguments: None
             Returns: the model (tf.keras.models.Model object)
         '''
         reg = tf.keras.regularizers.l2(0.0001)
         model = tf.keras.models.Sequential([
             tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],)),
-            tf.keras.layers.Dropout(rate=0.2, activity_regularizer=reg), 
-            tf.keras.layers.Dense(units=50, activation='linear', 
-                kernel_initializer='he_normal', activity_regularizer=reg), 
+            tf.keras.layers.Dropout(rate=0.2, activity_regularizer=reg),
+            tf.keras.layers.Dense(units=50, activation='linear',
+                kernel_initializer='he_normal', activity_regularizer=reg),
             tf.keras.layers.Dropout(rate=0.5, activity_regularizer=reg),
-            tf.keras.layers.Dense(units=10, activation='linear', 
-                kernel_initializer='he_normal', activity_regularizer=reg), 
+            tf.keras.layers.Dense(units=10, activation='linear',
+                kernel_initializer='he_normal', activity_regularizer=reg),
             tf.keras.layers.Dropout(rate=0.5, activity_regularizer=reg),
-            tf.keras.layers.Dense(units=self.data_info['Y_dims'][1], activation='linear', 
-                kernel_initializer='he_normal', activity_regularizer=reg), 
+            tf.keras.layers.Dense(units=self.data_info['Y_dims'][1], activation='linear',
+                kernel_initializer='he_normal', activity_regularizer=reg),
         ])
 
         return model
@@ -274,7 +273,7 @@ class CondExpBase(CDE):
     def check_save_model_params(self):
         ''' Check that all expected model parameters have been provided,
         and substitute the default if not. Remove any unused but specified parameters.
-        
+
         Arguments: None
         Returns: None
         '''
@@ -284,7 +283,7 @@ class CondExpBase(CDE):
             if k not in self.params.keys():
                 print('{} not specified in params, defaulting to {}'.format(k, self.default_params[k]))
                 self.params[k] = self.default_params[k]
-        
+
         # remove any variables that weren't supposed to be specified
         for k in self.params.keys():
             if k not in self.default_params.keys():
@@ -294,6 +293,5 @@ class CondExpBase(CDE):
         if self.experiment_saver is not None:
             self.experiment_saver.save_params(self.params, 'CDE_params')
         else:
-            print('You have not provided an ExperimentSaver. ' + 
+            print('You have not provided an ExperimentSaver. ' +
                 'Your may continue to run CFL but your configuration will not be saved.')
-        
