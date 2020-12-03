@@ -1,9 +1,9 @@
 '''
 Iman Wahle
 11/13/2020
-A somewhat random collection of data handling helper functions that
-have come up while running cfl on galaxy data. These should eventually
-be incorporated into cfl util code.
+A collection of data handling helper functions that have come up while running 
+cfl on galaxy data. These should eventually be generalized and incorporated into 
+cfl util code if they seem useful for generic datasets.
 '''
 
 import numpy as np
@@ -11,6 +11,19 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 
 def reshape_input(vec, im_no):
+    ''' This function reshapes one or both flattened galaxy images as 51x51 arrays. 
+    The input 'vec' is the concatenation of both flattened input images, and 'im_no'
+    specifies which image to return as 2D. 
+    Arguments:
+        vec : a (5202,) np.array where [:2601] is flattened image0 and [2601:] 
+              is flattened image1
+        im_no : an int indicating which image to return reshaped.
+                im_no=0: return image0
+                im_no=1: return image1
+                im_no=2: return both images horizontally concatenated.
+    Returns:
+        reshaped image(s) as np.array of shape (51,51) or (51, 102) if im_no==2
+    '''
     if im_no==0:
         return np.reshape(vec[:2601],(51,51))
     elif im_no==1:
@@ -20,8 +33,18 @@ def reshape_input(vec, im_no):
     else:
         return
 
-def calculate_arp(image): # arp = average radial profile = average 
-    # source: https://stackoverflow.com/questions/48842320/what-is-the-best-way-to-calculate-radial-average-of-the-image-with-pythonf
+# reference: https://stackoverflow.com/questions/48842320/what-is-the-best-way-to-calculate-radial-average-of-the-image-with-pythonf
+def calculate_arp(image): # arp = average radial profile
+    ''' Compute the average pixel value within epsilon of radius r from the center
+        of an 2D array. 
+        Arguments: 
+            image : 2D np.array (constants are currently optimal for array
+                    size (51,51))
+        Returns:
+            r : np.array of distance from image center for each point in mean
+            mean : average pixel value at corresponding radii specified in r
+    '''
+
     # create array of radii
     x,y = np.meshgrid(np.arange(image.shape[1]),np.arange(image.shape[0]))
     x0 = image.shape[1]//2
@@ -37,7 +60,7 @@ def calculate_arp(image): # arp = average radial profile = average
     return r,mean
 
 
-
+# source: https://stackoverflow.com/questions/38208700/matplotlib-plot-lines-with-colors-through-colormap
 def multiline(xs, ys, c, ax=None, **kwargs):
     """Plot lines with different colorings
 
