@@ -1,6 +1,7 @@
 
+from abc import ABCMeta, abstractmethod
 
-class Block():
+class Block(metaclass=ABCMeta):
     '''
     A Block is an object that can be trained and that can:
         1) be trained on a Dataset
@@ -8,19 +9,6 @@ class Block():
     Blocks are intended to be components of a graph workflow in an Experiment. 
     For example, if the graph Block_A->Block_B is constructed in an Experiment, 
     the output of Block_A.predict will provide input to Block_B.predict. 
-
-    Attributes:
-        trained : 
-        name : 
-        model :
-    
-    Methods:
-        train : 
-        predict : 
-        get_name : 
-        is_trained : 
-        get_model_by_name : 
-
     '''
 
     
@@ -35,9 +23,9 @@ class Block():
         '''
         self.trained = False
         self.name = name
-        self.model = self.get_model_by_name(name)
     
     
+    @abstractmethod
     def train(self, dataset, prev_results=None):
         '''
         Train model attribute.
@@ -46,10 +34,9 @@ class Block():
             dataset : dataset to train model with (Dataset)
             prev_results : any results needed from previous Block training (dict)
         '''
-        results = self.model.train(dataset, prev_results)
-        self.trained = True
-        return results
+        pass
     
+    @abstractmethod
     def predict(self, dataset, prev_results=None):
         '''
         Make prediction for the specified dataset with the model attribute.
@@ -58,22 +45,22 @@ class Block():
             dataset : dataset for model to predict on (Dataset)
             prev_results : any results needed from previous Block prediction (dict)
         '''
-        if self.trained:
-            return self.model.predict(dataset, prev_results)
-        else:
-            raise Exception('Block needs to be trained before prediction.')
+        pass
 
     def get_name(self):
         '''
+        Return name of model.
+
+        Arguments: None
+        Returns: name (str)    
         '''
         return self.name
 
     def is_trained(self):
         '''
+        Return whether this block has been trained yet.
+        
+        Arguments: None
+        Returns: whether the block has been trained (bool)
         '''
         return self.trained
-    
-    def get_model_by_name(self, name):
-        '''
-        '''
-        return None
