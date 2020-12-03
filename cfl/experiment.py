@@ -51,7 +51,7 @@ class Experiment():
         # build blocks from names and params
         if blocks is None:
             blocks = []
-            for bn,bp in zip(block_names, block_params):
+            for bn,bp in zip(block_names, block_params): # data_info
                 blocks.append(self.build_block(bn,bp))
         
          # TODO: make sure all blocks descend from mega-block type
@@ -137,6 +137,10 @@ class Experiment():
         dataset =  Dataset(X, Y, dataset_label=dataset_name)
         self.datasets[dataset_name] = dataset
         return dataset
+
+    def get_dataset(self, dataset_name):
+        # TODO: check name exists
+        return self.datasets[dataset_name]
     
     def load_train_results(self):
         # find directory for train_dataset results
@@ -182,5 +186,8 @@ class Experiment():
 
     def check_blocks_compatibility(self):
         # TODO: implement checks on self.blocks
+        # maybe use class registration here, i.e. Clusterer can only be
+        # preceded by CDE
         return True
+
     
