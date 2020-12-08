@@ -96,7 +96,7 @@ class KMeans(Clusterer):
         x_lbls = self._train_X_model(pyx)
 
         #find conditional probabilities P(y|Xclass) for each y #TODO: change depending on type of data
-        y_probs = _choose_Y_proxy(self, dataset)
+        y_probs = self._choose_Y_proxy(self, dataset)
 
         #train y clusters
         y_lbls = self._train_Y_model(y_probs)
@@ -131,37 +131,37 @@ class KMeans(Clusterer):
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
         """
-        x_lbls = _predict_Xs(self, prev_results)
-        y_probs = _choose_Y_proxy(dataset.get_Y(), x_lbls)
-        y_lbls = _predict_Ys(y_probs)
+        x_lbls = self._predict_Xs(self, prev_results)
+        y_probs = self._choose_Y_proxy(dataset.get_Y(), x_lbls)
+        y_lbls = self._predict_Ys(y_probs)
         return x_lbls, y_lbls
 
     def _predict_Xs(self, pyx):
-        return self.xkmeans.predict(pyx)
+        return self.xmodel.predict(pyx)
 
 
     def _predict_Ys(self, y_probs):
-        return self.ykmeans.predict(y_probs)
+        return self.ymodel.predict(y_probs)
 
 
-    def evaluate_clusters(self, dataset, prev_results):
-        """
-        Compute evaluation metric on clustering done by both
-            kmeans models on a given Dataset.
+    # def evaluate_clusters(self, dataset, prev_results):
+    #     """
+    #     Compute evaluation metric on clustering done by both
+    #         kmeans models on a given Dataset.
 
-            Arguments:
-                dataset : Dataset object containing X, Y to evaluate clustering on (Dataset)
-            Returns:
-                xscore : metric value for X partition (float)
-                yscore : metric value for Y partition (float)
-        """
+    #         Arguments:
+    #             dataset : Dataset object containing X, Y to evaluate clustering on (Dataset)
+    #         Returns:
+    #             xscore : metric value for X partition (float)
+    #             yscore : metric value for Y partition (float)
+    #     """
 
-        # generate labels on pyx and y_probs
-        x_lbls, y_lbls = self.predict_Xmacro(dataset, prev_results)
+    #     # generate labels on pyx and y_probs
+    #     x_lbls, y_lbls = self.predict_Xmacro(dataset, prev_results)
 
-        # evaluate score
-        xscore = self.cluster_metric(prev_results, x_lbls)
-        yscore = self.cluster_metric(y_probs, y_lbls)
+    #     # evaluate score
+    #     xscore = self.cluster_metric(prev_results, x_lbls)
+    #     yscore = self.cluster_metric(y_probs, y_lbls)
 
         return xscore, yscore
 
