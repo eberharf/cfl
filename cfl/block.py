@@ -12,17 +12,22 @@ class Block(metaclass=ABCMeta):
     '''
 
     
-    def __init__(self, name):
+    def __init__(self, name, data_info, params):
         '''
         Instantiate the specified model. 
 
         Arguments:
-            name : name of the model to instantiate (str)
+            model_name : name of model (str)
+            data_info : dict of information about associated datasets (dict)
+            model_params : parameters for this model (dict)
         
         Returns: None
         '''
         self.trained = False
+        # TODO: check input validity
         self.name = name
+        self.data_info = data_info
+        self.params = params
     
     
     @abstractmethod
