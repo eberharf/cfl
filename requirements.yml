@@ -19,3 +19,4 @@ dependencies:
   - pytest=6.0.1 #pytest is needed just to run tests, not to use cfl
 
 #additions: pandas (for brain mice data)
+# nibabel (for mri stuff)
