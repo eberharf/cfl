@@ -1,66 +1,12 @@
 # cfl
 
-## Set-up instructions
-
-### Clone the repository
-
-Git clone this repository onto your computer:
-```
-git clone https://github.com/eberharf/cfl.git
-```
-
-### Install Dependencies
-
-Any version of Python compatible with 3.7.4
-View full requirements (with the version we used) in the `requirements.yml` file.
-You may either manually install the required packages or follow the instructions below to generate a conda virtual environment with all the required dependencies from file.
+## Quick Instructions
+- Instructions for setting installing CFL and its dependencies can be found [here](https://github.com/eberharf/cfl/blob/master/SETUP.md)
+- A quick start guide with example code can be found ;[here](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb)
+- Complete documentation can be found here
 
 
-#### Create a conda environment
-To create a conda virtual environment with the required dependencies for `cfl` from the file `requirements.yml`, navigate into the root directory of `cfl` and run the command:
-```
-conda env create -f requirements.yml
-```
-
-Then activate the newly created environment:
-```
-conda activate cfl-env
-```
-
-(These instructions use Anaconda 4.8.4)
-
-### Add the cfl-env environment to the Jupyter notebook kernel
-
-In order to be able to access the
-```
- ipython kernel install --name cfl-env --user
-```
-
-### Add `cfl` to path
-Before running this code, add the path to the location of the respository to your **`PYTHONPATH`** variable. This will allow you to easily import the `cfl` package into any other file (regardless of the location of that file) using the statement `import cfl`.
-
-For example, on my windows machine I would add
-```
-C:\Users\Jenna\Documents\Schmidt\cfl
-```
-to the PYTHONPATH variable in my system environment variables. 
-
-On mac, open ~/.bash_profile with a text editor (i.e. `vim ~/.bash_profile` from terminal), and add the following lines to the end of the file:
-
-```
-PYTHONPATH=/path/to/cfl
-export PYTHONPATH
-```
-
-Consult Google for system-specific instructions on how to modify your environment variables.
-
-
-You should now be ready to run `cfl`.
-Check that your installation has been successful by opening a Python terminal from the cfl conda environment (or whatever environment you're using) and typing `import cfl`.
-
-
-## Contents of the Repository
-
+## Repository Contents
 ### `cfl`
 This folder contains all of the functional code for CFL. The most current documentation for the `cfl` package can be viewed using `PyDoc`. Use the following instructions to open the documentation:
 
@@ -94,14 +40,43 @@ Contains the .dvc (data version control) files associated with each file of the 
 
 ### `testing`
 This folder contains the automated test suite for checking the expected functionality of the code and preventing regression (loss of functionality).
-s
-**NOTE:** many tests not created yet
 
 
 ## Running CFL
 
 Go to the `examples` for Jupyter Notebooks that demonstrate how to use the CFL code. Check out the Quick Start Guide first if you're just getting started.
 
+
+
+
+
+## License and Citations
+
+CFL is released under a BSD-like license for non-commercial use only. The license does not require anyone to cite CFL's source, but if you use CFL in published research work we encourage you to cite this repository:
+
+```
+Causal Feature Learning (2020). https://github.com/eberharf/cfl
+```
+
+or use the BibTex reference:
+
+```
+@misc{cfl2020,
+  title = {Causal Feature Learning},
+  year = {2020},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/eberharf/cfl}}
+  }
+```
+
+## Contributors
+Krzysztof Chalupka
+Frederick Eberhardt
+Pietro Perona
+Patrick Burauel
+Jenna Kahn
+Iman Wahle
 
 
 ----------------------------------------
