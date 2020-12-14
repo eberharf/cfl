@@ -30,4 +30,4 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 To license any part of this software for commercial use, contact the Caltech
 Office of Technology Transfer and Corporate Partnerships at Innovation@caltech.edu.
 
-This project is partually funded by NSF grant number <grant number>.
+This project is partially funded by NSF grants NSF 1564330 and NSF EAGER BCS-1845958.

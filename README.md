@@ -62,21 +62,20 @@ or use the BibTex reference:
 
 ```
 @misc{cfl2020,
-  title = {Causal Feature Learning},
-  year = {2020},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/eberharf/cfl}}
+    title     = "Causal Feature Learning",
+    year      = "2020",
+    publisher = "GitHub",
+    url       = "https://github.com/eberharf/cfl"}
   }
 ```
 
 ## Contributors
-Krzysztof Chalupka
-Frederick Eberhardt
-Pietro Perona
-Patrick Burauel
-Jenna Kahn
-Iman Wahle
+Krzysztof Chalupka [cre,aut]
+Frederick Eberhardt [cre,aut]
+Pietro Perona [cre,aut]
+Patrick Burauel [ctb]
+Jenna Kahn [aut]
+Iman Wahle [aut]
 
 
 ----------------------------------------
