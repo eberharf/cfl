@@ -16,22 +16,23 @@ class Experiment():
 
     def __init__(self, Xtrain, Ytrain, data_info, block_names=None, 
                  block_params=None, blocks=None, save_path=''):
+    def __init__(self, X_train, Y_train, block_names=None, 
+                 block_params=None, blocks=None, save_path=''):
         ''' 
-        arguments example:
-            - train_dataset = Dataset(X, Y)
-            - block_names =  ['CondExpVB', 'KMeans']
-            - block_params = [CDE_params, cluster_params]
-            - blocks = None
+        Sets up and trains an Experiment.
 
-        pseudocode:
-            - make training Dataset object if passed in as raw data
-            - make an experiment saver
-            - for each thing in block_names:
-                - translate string name to class
-                - make instance of class using corresponding params from block_params
-                - put all of these into 'blocks' list
-            - for each block in blocks, check that interface matches next block
-            - train()
+        Arguments:
+            X_train : an (n_samples, n_x_features) 2D array. (np.array)
+            Y_train : an (n_samples, n_y_features) 2D array. (np.array)
+            block_names : list of block names to use (i.e. ['CondExpVB', 'KMeans']). 
+                          Full list of names can be found here: <TODO>. (str list)
+            block_params : list of dicts specifying parameters for each block specified
+                           in block_names. Default is None. (dict list)
+            blocks : list of block objects. Default is None. (Block list)
+            save_path : path to directory to save this experiment to. Default is ''. (str)
+        Note: There are two ways to specify blocks: either specify both 
+              block_names and block_params, OR specify blocks. Do not specify
+              all three of these parameters. 
         '''
         # make sure block names and params are both provided, and that 
         # blocks is left unpopulated
@@ -73,6 +74,9 @@ class Experiment():
 
         # TODO: check that interfaces match
         assert self.check_blocks_compatibility(), 'Specified blocks are incompatible'
+        
+        # save configuration parameters for each block
+        self.save_params()
 
         # train
         self.train()
@@ -99,7 +103,7 @@ class Experiment():
             results = block.train(dataset, prev_results)
             
             # save results
-            self.save(results, dataset, block)
+            self.save_results(results, dataset, block)
 
             # pass results on to next block
             prev_results = results
@@ -128,14 +132,14 @@ class Experiment():
             results = block.predict(dataset, prev_results)
             
             # save results
-            self.save(results, dataset, block)
+            self.save_results(results, dataset, block)
 
             # pass results on to next block
             prev_results = results    
 
         return results        
 
-    def save(self, results, dataset, block):
+    def save_results(self, results, dataset, block):
 
         if self.save_path is not None:
             dir_name = os.path.join(self.save_path, dataset.get_name())
@@ -150,12 +154,21 @@ class Experiment():
                 # TODO: eventually, we have to be careful about what pickle protocol 
                 # we use for compatibility across python versions
 
+    def save_params(self):
+        assert self.blocks is not None, 'self.blocks does not exist yet.'
+        for block in self.blocks():
+            fn = os.path.join(self.save_path, 'params', block.get_name())
+            j = json.dumps(block.get_params())
+            f = open(self.get_save_path(fn),"w")
+            f.write(j)
+            f.close()
 
-    def add_dataset(self, X, Y, dataset_name):
+    def register_dataset(self, X, Y, dataset_name):
         ''' 
+        think about name
         '''
         # make new Dataset, add to Experiment's dict of datasets
-        dataset =  Dataset(X, Y, name=dataset_name)
+        dataset = Dataset(X, Y, dataset_label=dataset_name)
         self.datasets[dataset_name] = dataset
         return dataset
 
