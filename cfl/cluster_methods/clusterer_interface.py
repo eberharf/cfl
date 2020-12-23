@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
+from cfl.block import Block
 
-class Clusterer(ABC):
+class Clusterer(Block):
 
     @abstractmethod
-    def __init__(self, params, save_path):
+    def __init__(self, name, data_info, params):
         ...
 
     @abstractmethod

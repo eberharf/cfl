@@ -1,9 +1,11 @@
 ''' Experiment class '''
 import pickle
+import json
 import os
 from cfl.dataset import Dataset
 import cfl.density_estimation_methods as cdem
 import cfl.cluster_methods as ccm
+from cfl.util.dir_util import get_next_dirname
 
 # TODO: this is a placeholder until we have a block registration system.
 BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB, 
@@ -14,16 +16,15 @@ BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB,
 
 class Experiment():
 
-    def __init__(self, Xtrain, Ytrain, data_info, block_names=None, 
-                 block_params=None, blocks=None, save_path=''):
-    def __init__(self, X_train, Y_train, block_names=None, 
-                 block_params=None, blocks=None, save_path=''):
+    def __init__(self, X_train, Y_train, data_info, block_names=None, 
+                 block_params=None, blocks=None, results_path=''):
         ''' 
         Sets up and trains an Experiment.
 
         Arguments:
             X_train : an (n_samples, n_x_features) 2D array. (np.array)
             Y_train : an (n_samples, n_y_features) 2D array. (np.array)
+            data_info : TODO
             block_names : list of block names to use (i.e. ['CondExpVB', 'KMeans']). 
                           Full list of names can be found here: <TODO>. (str list)
             block_params : list of dicts specifying parameters for each block specified
@@ -55,12 +56,11 @@ class Experiment():
         # configuration of a trained CFL.
         self.data_info = data_info
         self.datasets = {}
-        self.dataset_train = self.add_dataset(Xtrain, Ytrain, 'dataset_train')
+        self.dataset_train = self.register_dataset(X_train, Y_train, 'dataset_train')
         self.datasets[self.dataset_train.get_name()] = self.dataset_train
 
-        self.save_path = save_path
+        self.save_path = self.make_exp_dir(results_path)
 
-        # TODO: trigger experiment saving setup
         # TODO: check this save path early so that we fail early if it's already been populated
 
         # build blocks from names and params
@@ -143,9 +143,8 @@ class Experiment():
 
         if self.save_path is not None:
             dir_name = os.path.join(self.save_path, dataset.get_name())
-            assert not os.path.exists(dir_name), \
-                "You've already saved results for this dataset!"
-            os.mkdir(dir_name)
+            if not os.path.exists(dir_name):
+                os.mkdir(dir_name)
 
             # TODO: write get_name methods for Dataset and Block
             file_name = os.path.join(dir_name, block.get_name() + '_results.pickle')
@@ -154,21 +153,25 @@ class Experiment():
                 # TODO: eventually, we have to be careful about what pickle protocol 
                 # we use for compatibility across python versions
 
-    def save_params(self):
-        assert self.blocks is not None, 'self.blocks does not exist yet.'
-        for block in self.blocks():
-            fn = os.path.join(self.save_path, 'params', block.get_name())
-            j = json.dumps(block.get_params())
-            f = open(self.get_save_path(fn),"w")
-            f.write(j)
-            f.close()
+    def save_params(self): # TODO: change this to pickle
+        if self.save_path is not None:
+            assert self.blocks is not None, 'self.blocks does not exist yet.'
+            assert not os.path.exists(os.path.join(self.save_path, 'params')), 'Params already saved.'
+            os.mkdir(os.path.join(self.save_path, 'params'))
+            
+            for block in self.blocks:
+                fn = os.path.join(self.save_path, 'params', block.get_name())
+                j = json.dumps(block.get_params())
+                f = open(fn, "w")
+                f.write(j)
+                f.close()
 
     def register_dataset(self, X, Y, dataset_name):
         ''' 
         think about name
         '''
         # make new Dataset, add to Experiment's dict of datasets
-        dataset = Dataset(X, Y, dataset_label=dataset_name)
+        dataset = Dataset(X, Y, dataset_name)
         self.datasets[dataset_name] = dataset
         return dataset
 
@@ -224,3 +227,14 @@ class Experiment():
         return True
 
     
+    def make_exp_dir(self, results_path):
+        # make sure base_path exists, if not make it
+        if not os.path.exists(results_path):
+            print("save_path '{}' doesn't exist, creating now.".format(results_path))
+            os.makedirs(results_path)
+
+        # create dir for this run
+        save_path = os.path.join(results_path, get_next_dirname(results_path))
+        print('All results from this run will be saved to {}'.format(save_path))
+        os.mkdir(save_path)
+        return save_path

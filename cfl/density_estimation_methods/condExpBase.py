@@ -22,7 +22,7 @@ class CondExpBase(CDE):
     allows you to pass in limited architecture specifications through the params attribute.
 
     Attributes:
-        model_name : name of the model so that the model type can be recovered from saved parameters (str)
+        name : name of the model so that the model type can be recovered from saved parameters (str)
         data_info : dict with information about the dataset shape (dict)
         default_params : default parameters to fill in if user doesn't provide a given entry (dict)
         params : parameters for the CDE that are passed in by the user and corrected by check_save_model_params (dict)
@@ -41,7 +41,7 @@ class CondExpBase(CDE):
         load_parameters : load tensorflow model weights from a file into self.model
         save_parameters : save the current weights of self.model
         build_model : create and return a tensorflow model
-        check_save_model_params : fill in any parameters that weren't provided in params with
+        check_model_params : fill in any parameters that weren't provided in params with
                                   the default value, and discard any unnecessary paramaters
                                   that were provided.
     '''
@@ -60,6 +60,8 @@ class CondExpBase(CDE):
         super().__init__(name=name, data_info=data_info, params=params)
 
         # set attributes
+        self.name = name
+
         # TODO: these default parameters should later be saved in a file
         # and loaded with get_default_params in cde_interface
         self.default_params = { 'batch_size'  : 32,
@@ -73,7 +75,7 @@ class CondExpBase(CDE):
                                 'weights_path': None,
                                 'loss'        : 'mean_squared_error',
                                 'show_plot'   : True,
-                                'model_name'  : self.name,
+                                'name'  : self.name,
                                 'standardize' : False,
                                 'best'        : True,
                             }
@@ -158,6 +160,15 @@ class CondExpBase(CDE):
         # handle results
         train_loss = history.history['loss']
         val_loss = history.history['val_loss']
+        fig = self._graph_results(train_loss, val_loss, show=True)
+        pyx = self.model.predict(dataset.X)
+
+        results_dict = {'train_loss' : train_loss,
+                        'val_loss' : val_loss, 
+                        'loss_plot' : fig, 
+                        'model_weights' : self.model.get_weights(),
+                        'pyx' : pyx}
+
 
         # if dataset.to_save:
         #     save_path=dataset.saver.get_save_path('train_val_loss')
@@ -178,20 +189,23 @@ class CondExpBase(CDE):
         #             'checkpoints/best_weights'))
 
         self.trained = True
-        return train_loss, val_loss
+        return results_dict
 
 
-    def _graph_results(self, train_loss, val_loss, save_path):
+    def _graph_results(self, train_loss, val_loss, show=True):
         '''graphs the training vs testing loss across all epochs of training'''
-        plt.plot(range(len(train_loss)), train_loss, label='train_loss')
-        plt.plot(np.linspace(0,len(train_loss),len(val_loss)).astype(int), val_loss, label='val_loss')
-        plt.xlabel('Epochs')
-        plt.ylabel(self.params['loss'])
-        plt.title('Training and Test Loss')
+        fig,ax = plt.subplots()
+        ax.plot(range(len(train_loss)), train_loss, label='train_loss')
+        ax.plot(np.linspace(0,len(train_loss),len(val_loss)).astype(int), val_loss, label='val_loss')
+        ax.set_xlabel('Epochs')
+        ax.set_ylabel(self.params['loss'])
+        ax.set_title('Training and Test Loss')
         plt.legend(loc='upper right')
-        if save_path is not None:
-            plt.savefig(save_path)
-        plt.show()
+        # if save_path is not None:
+        #     plt.savefig(save_path)
+        if show:
+            plt.show()
+        return fig
 
 
     def predict(self, dataset, prev_results=None): #put in the x and y you want to predict with
@@ -205,10 +219,12 @@ class CondExpBase(CDE):
         #     raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
 
         assert self.trained, "Remember to train the model before prediction."
-        dataset.pyx = self.model.predict(dataset.X)
+        pyx = self.model.predict(dataset.X)
         # if dataset.to_save:
         #     np.save(dataset.saver.get_save_path('pyx'), dataset.pyx)
-        return dataset.pyx
+
+        results_dict = {'pyx' : pyx}
+        return results_dict
 
     def evaluate(self, dataset):
         ''' Compute the mean squared error (MSE) between ground truth and prediction.
@@ -261,3 +277,32 @@ class CondExpBase(CDE):
         ...
 
 
+    # TODO: this should be pulled out into a base class once we have one
+    def check_model_params(self):
+        ''' Check that all expected model parameters have been provided,
+            and substitute the default if not. Remove any unused but specified parameters.
+            # TODO: currently does not remove unused parameters
+
+            Arguments: None
+            Returns: None
+        '''
+
+        default_params = {  'n_Xclusters' : 4,
+                            'n_Yclusters' : 4,
+                         }
+
+        for k in default_params.keys():
+            if k not in self.params.keys():
+                print('{} not specified in model_params, defaulting to {}'.format(k, default_params[k]))
+                self.params[k] = default_params[k]
+
+        self.params['name'] = self.name
+
+        # this will now be handled by experiment
+        # if self.experiment_saver is not None:
+        #     self.experiment_saver.save_params(self.params, 'cluster_params')
+        # else:
+        #     print('You have not provided an ExperimentSaver. Your may continue to run CFL but your configuration will not be saved.')
+
+    def get_params(self):
+        return self.params

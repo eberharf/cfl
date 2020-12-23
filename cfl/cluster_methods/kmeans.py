@@ -16,11 +16,10 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
 
         Attributes:
             params : parameters for the clusterer that are passed in by the
-                     user and corrected by check_save_model_params (dict)
+                     user and corrected by check_model_params (dict)
             random_state : value of random seed to set in clustering for reproducible results
                            (None if this shouldn't be held constant) (int)
-            experiment_saver : ExperimentSaver object for the current CFL configuration (ExperimentSaver)
-            model_name : name of the model so that the model type can be recovered from saved parameters (str)
+            name : name of the model so that the model type can be recovered from saved parameters (str)
             n_Xclusters : number of X macrovariables to find (int)
             n_Yclusters : number of Y macrovariables to find (int)
 
@@ -33,33 +32,32 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
             evaluate_clusters : evaluate the goodness of clustering based on metric specified
                                 in cluster_metric()
             cluster_metric : a metric to judge the goodness of clustering (not yet implemented).
-            check_save_model_params : fill in any parameters that weren't provided in params with
+            check_model_params : fill in any parameters that weren't provided in params with
                                       the default value, and discard any unnecessary paramaters
                                       that were provided.
     '''
 
-    def __init__(self, params, random_state=None, experiment_saver=None):
+    def __init__(self, name, data_info, params, random_state=None):
         ''' Set attributes and verify supplied params.
 
             Arguments:
+                TODO: add new arguments doc
                 params : dictionary containing parameters for the model
                 random_state : value of random seed to set in clustering for reproducible results
                             (None if this shouldn't be held constant) (int)
-                experiment_saver : ExperimentSaver object for the current CFL configuration (ExperimentSaver)
 
             Returns: None
         '''
+        super().__init__(name=name, data_info=data_info, params=params)
 
-        self.params = params
+        self.name = name
         self.random_state = random_state
-        self.experiment_saver = experiment_saver
-        self.model_name = 'KMeans'
-        self.check_save_model_params()
+        self.params = self._check_model_params(params)
         self.n_Xclusters=params['n_Xclusters']
         self.n_Yclusters=params['n_Yclusters']
 
 
-    def train(self, dataset):
+    def train(self, dataset, prev_results):
         ''' Fit two kmeans models: one on P(Y|X=x), and the other on the proxy for P(Y=y|X).
 
             Arguments:
@@ -69,12 +67,15 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
         '''
-
-        assert dataset.pyx is not None, 'Generate pyx predictions with CDE before clustering.'
+        try: 
+            pyx = prev_results['pyx']
+        except: 
+            'Generate pyx predictions with CDE before clustering.'
+            return
 
         #train x clusters
         self.xkmeans = sKMeans(n_clusters=self.n_Xclusters, random_state=self.random_state)
-        x_lbls = self.xkmeans.fit_predict(dataset.pyx)
+        x_lbls = self.xkmeans.fit_predict(pyx)
 
         #find conditional probabilities P(y|Xclass) for each y
         y_probs = Y_given_Xmacro.continuous_Y(dataset.Y, x_lbls)
@@ -83,14 +84,17 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
         self.ykmeans =  sKMeans(n_clusters=self.n_Yclusters, random_state=self.random_state)
         y_lbls = self.ykmeans.fit_predict(y_probs)
 
-        #save results
-        if dataset.to_save:
-            np.save(dataset.saver.get_save_path('xlbls'), x_lbls)
-            np.save(dataset.saver.get_save_path('ylbls'), y_lbls)
-        return x_lbls, y_lbls
+        # now handled by Experiment
+        # #save results
+        # if dataset.to_save:
+        #     np.save(dataset.saver.get_save_path('xlbls'), x_lbls)
+        #     np.save(dataset.saver.get_save_path('ylbls'), y_lbls)
+        results_dict = {'x_lbls' : x_lbls,
+                        'y_lbls' : y_lbls}
+        return results_dict
 
 
-    def predict(self, dataset):
+    def predict(self, dataset, prev_results):
         ''' Assign new datapoints to clusters found in training.
 
             Arguments:
@@ -100,15 +104,24 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
         '''
+        try: 
+            pyx = prev_results['pyx']
+        except: 
+            'Generate pyx predictions with CDE before clustering.'
+            return
 
-        x_lbls = self.xkmeans.predict(dataset.pyx)
+        x_lbls = self.xkmeans.predict(pyx)
         y_probs = Y_given_Xmacro.continuous_Y(dataset.Y, x_lbls)
         y_lbls = self.ykmeans.predict(y_probs)
-        if dataset.to_save:
-            np.save(dataset.saver.get_save_path('xlbls'), x_lbls)
-            np.save(dataset.saver.get_save_path('ylbls'), y_lbls)
-        return x_lbls, y_lbls
+        # now handled by Experiment
+        # if dataset.to_save:
+        #     np.save(dataset.saver.get_save_path('xlbls'), x_lbls)
+        #     np.save(dataset.saver.get_save_path('ylbls'), y_lbls)
+        results_dict = {'x_lbls' : x_lbls,
+                        'y_lbls' : y_lbls}
+        return results_dict
 
+    # TODO: move this out eventually?
     def save_model(self, dir_path):
         ''' Save both kmeans models to compressed files.
 
@@ -160,7 +173,7 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
         return 0 #TODO: implement
 
     # TODO: this should be pulled out into a base class once we have one
-    def check_save_model_params(self):
+    def _check_model_params(self, params):
         ''' Check that all expected model parameters have been provided,
             and substitute the default if not. Remove any unused but specified parameters.
             # TODO: currently does not remove unused parameters
@@ -174,13 +187,18 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
                          }
 
         for k in default_params.keys():
-            if k not in self.params.keys():
+            if k not in params.keys():
                 print('{} not specified in model_params, defaulting to {}'.format(k, default_params[k]))
-                self.params[k] = default_params[k]
+                params[k] = default_params[k]
 
-        self.params['model_name'] = self.model_name
+        params['name'] = self.name
 
-        if self.experiment_saver is not None:
-            self.experiment_saver.save_params(self.params, 'cluster_params')
-        else:
-            print('You have not provided an ExperimentSaver. Your may continue to run CFL but your configuration will not be saved.')
+        # this will now be handled by experiment
+        # if self.experiment_saver is not None:
+        #     self.experiment_saver.save_params(self.params, 'cluster_params')
+        # else:
+        #     print('You have not provided an ExperimentSaver. Your may continue to run CFL but your configuration will not be saved.')
+        return params
+
+    def get_params(self):
+        return self.params

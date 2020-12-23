@@ -34,7 +34,7 @@ def continuous_Y(Y_data, x_lbls):
     the corresponding class of that column
 
     '''
-    assert Y_data.shape[0] == x_lbls.shape[0], "The Y data and x_lbls arrays passed through continuous_Y should have the same length"
+    assert Y_data.shape[0] == x_lbls.shape[0], "The Y data and x_lbls arrays passed through continuous_Y should have the same length. Actual shapes: {},{}".format(Y_data.shape[0],x_lbls.shape[0])
 
     # x_lbl_indices is a list of np arrays, where each array pertains to a
     # different x class, and each array contains all the indices from x_lbls

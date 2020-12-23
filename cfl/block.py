@@ -25,9 +25,7 @@ class Block(metaclass=ABCMeta):
         '''
         self.trained = False
         # TODO: check input validity
-        self.name = name
         self.data_info = data_info
-        self.params = params
     
     
     @abstractmethod
