@@ -52,30 +52,25 @@ Go to the `examples` for Jupyter Notebooks that demonstrate how to use the CFL c
 
 ## License and Citations
 
-CFL is released under a BSD-like license for non-commercial use only. The license does not require anyone to cite CFL's source, but if you use CFL in published research work we encourage you to cite this repository:
+CFL is released under a BSD-like license for non-commercial use only. If you use CFL in published research work, we encourage you to cite this repository:
 
 ```
-Causal Feature Learning (2020). https://github.com/eberharf/cfl
+Causal Feature Learning (2021). https://github.com/eberharf/cfl
 ```
 
 or use the BibTex reference:
 
 ```
-@misc{cfl2020,
+@misc{cfl2021,
     title     = "Causal Feature Learning",
-    year      = "2020",
+    year      = "2021",
     publisher = "GitHub",
     url       = "https://github.com/eberharf/cfl"}
   }
 ```
 
 ## Contributors
-Krzysztof Chalupka [cre,aut]
-Frederick Eberhardt [cre,aut]
-Pietro Perona [cre,aut]
-Patrick Burauel [ctb]
-Jenna Kahn [aut]
-Iman Wahle [aut]
+
 
 
 ----------------------------------------
