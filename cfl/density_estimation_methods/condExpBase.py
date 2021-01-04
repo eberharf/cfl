@@ -111,9 +111,9 @@ class CondExpBase(CDE):
         #TODO: say what expected vs actual are
 
         if self.weights_loaded:
-            print('No need to train, specified weights loaded already.')
-            return [],[]
-
+            print('No need to train CDE, specified weights loaded already.')
+            return {'pyx' : self.model.predict(dataset.X)}
+         
         # train-test split
         dataset.split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
 
