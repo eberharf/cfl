@@ -71,7 +71,18 @@ or use the BibTex reference:
 
 ## Contributors
 
+Jenna Kahn & Iman Wahle [first authors; order chosen randomly]
+Krzysztof Chalupka
+Patrick Burauel
+Pietro Perona
+Frederick Eberhardt
 
+
+Jenna Kahn and Iman Wahle designed the software and wrote the code in this repository.
+
+Krzysztof Chalupka, Pietro Perona and Frederick Eberhardt developed the original theory for CFL. Krzysztof also wrote the original code upon which this software is based.
+
+Code development benefitted from regular discussions with Patrick Burauel.
 
 ----------------------------------------
 ## Parameter Details
