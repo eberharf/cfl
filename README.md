@@ -1,92 +1,25 @@
 # cfl
 
-## Set-up instructions
-
-### Clone the repository
-
-Git clone this repository onto your computer:
-```
-git clone https://github.com/eberharf/cfl.git
-```
-
-### Install Dependencies
-
-This package was developed with Python 3.7.4 and requires a version of Python compatible with that.
-
-You may either manually install the required packages or follow the instructions below to generate a conda virtual environment with all the required dependencies from file. We recommend using a conda virtual environment (see next section), because we can provide the most assistance for this method.
-
-If you do not already have conda, see [this documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) for information on how to install it. For our purposes, I think either the full Anaconda distribution or the smaller Miniconda should work fine.  
+## Quick Instructions
+- Instructions for setting installing CFL and its dependencies can be found [here](https://github.com/eberharf/cfl/blob/master/SETUP.md)
+- A quick start guide with example code can be found ;[here](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb)
+- Complete documentation can be found here
 
 
-View full list of required packages in the `requirements.yml` file.  
-
-
-
-#### Create a conda environment
-
-These instructions are for use with conda 4.8.4 (or a compatible version).  
-
-To create a conda virtual environment with the required dependencies for `cfl` from the file `requirements.yml`, navigate into the root directory of `cfl` and run the command:
-```
-conda env create -f requirements.yml
-```
-
-Then activate the newly created environment, named `cfl-env`:
-```
-conda activate cfl-env
-```
-
-### Add the cfl environment to the Jupyter notebook kernel
-
-In order to be able to access the dependencies we just installed when running a Jupyter notebook, we need to add the conda virtual environment to the iPython kernel. Do this by running the following command:
-
-```
- ipython kernel install --name cfl-env --user
-```
-
-
-### Add `cfl` to path
-Before running code, add the path to the respository to your `PYTHONPATH` variable. This will allow you to easily import the `cfl` package into any file (regardless of the location of that file) using the statement `import cfl`.
-
-Consult Google for system-specific instructions on how to modify your environment variables. For example, on my Windows machine I would open the System Environment Variables and add
-```
-C:\Users\Jenna\Documents\Schmidt\cfl
-```
-to the PYTHONPATH variable.
-
-
-You should now be ready to run `cfl`.
-Check that your installation has been successful by opening a terminal window. Make sure your cfl conda environment is active, and open a Python interpreter. Then, from within Python, run the command `import cfl`:  
-```
-python 
->>> import `cfl` 
->>>
-```
-If this command executes with no errors, then the set-up has been successful. 
-
-
-## Running CFL
-
-Go to the `examples` for Jupyter Notebooks that demonstrate how to use the CFL code. If you're just getting started, check out the Quick Start Guide first.
-
-
-
-## Contents of the Repository
-
-
+## Repository Contents
 ### `cfl`
 This folder contains all of the functional code for CFL. The most current documentation for the `cfl` package can be viewed using `PyDoc`. Use the following instructions to open the documentation:
 
 1. First, make sure that you have a local copy of the `cfl` repository installed on your machine according to the above instructions.
 
 2. Open a terminal window.
-Start a `PyDoc` server on the HTTP port 1234 by typing:
+Start a PyDoc server on the HTTP port 1234 by typing:
 ```
 python -m pydoc -p 1234
 ```
 
 3. Press `b` to open the webpage in your browser.
-3. Scroll past the `Built-In Modules` to the link to **`cfl`** `(package)`. Click on this link to view the various sub-modules in `cfl` and see details about each module.
+3. Scroll past the Built-In Modules to the link to **`cfl`** `(package)`. Click on this link to view the various sub-modules in `cfl` and see details about each module.
 
 
 ### `examples`
@@ -106,11 +39,50 @@ Contains the .dvc (data version control) files associated with each file of the 
 **NOTE:** Instructions on how to use .dvc will be added soon. In the meantime, ask Iman if you have any questions.
 
 ### `testing`
-This folder contains the automated test suite for checking the expected functionality of the code and preventing regression (loss of functionality).  
-
-**NOTE:** many tests not created yet
+This folder contains the automated test suite for checking the expected functionality of the code and preventing regression (loss of functionality).
 
 
+## Running CFL
+
+Go to the `examples` for Jupyter Notebooks that demonstrate how to use the CFL code. Check out the Quick Start Guide first if you're just getting started.
+
+
+
+
+
+## License and Citations
+
+CFL is released under a BSD-like license for non-commercial use only. If you use CFL in published research work, we encourage you to cite this repository:
+
+```
+Causal Feature Learning (2021). https://github.com/eberharf/cfl
+```
+
+or use the BibTex reference:
+
+```
+@misc{cfl2021,
+    title     = "Causal Feature Learning",
+    year      = "2021",
+    publisher = "GitHub",
+    url       = "https://github.com/eberharf/cfl"}
+  }
+```
+
+## Contributors
+
+Jenna Kahn & Iman Wahle [first authors; order chosen randomly]
+Krzysztof Chalupka
+Patrick Burauel
+Pietro Perona
+Frederick Eberhardt
+
+
+Jenna Kahn and Iman Wahle designed the software and wrote the code in this repository.
+
+Krzysztof Chalupka, Pietro Perona and Frederick Eberhardt developed the original theory for CFL. Krzysztof also wrote the original code upon which this software is based.
+
+Code development benefitted from regular discussions with Patrick Burauel.
 
 ----------------------------------------
 ## Parameter Details
