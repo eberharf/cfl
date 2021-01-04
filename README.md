@@ -71,11 +71,12 @@ or use the BibTex reference:
 
 ## Contributors
 
-Jenna Kahn & Iman Wahle [first authors; order chosen randomly]
-Krzysztof Chalupka
-Patrick Burauel
-Pietro Perona
-Frederick Eberhardt
+- Jenna Kahn & Iman Wahle [first authors; order chosen randomly]
+- Krzysztof Chalupka
+- Patrick Burauel
+- Pietro Perona
+- Frederick Eberhardt
+
 
 
 Jenna Kahn and Iman Wahle designed the software and wrote the code in this repository.
