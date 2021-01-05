@@ -2,8 +2,8 @@ from sklearn.cluster import KMeans as sKMeans
 from cfl.cluster_methods import Y_given_Xmacro
 from cfl.cluster_methods.clusterer_interface import Clusterer
 import numpy as np
+import pickle
 
-import joblib
 import os #save, load model
 
 class KMeans(Clusterer): #pylint says there's an issue here but there isn't
@@ -129,9 +129,12 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
                 dir_path : directory in which to save models (str)
             Returns: None
         '''
-
-        joblib.dump(self.xkmeans, os.path.join(dir_path, 'xkmeans'))
-        joblib.dump(self.ykmeans, os.path.join(dir_path, 'ykmeans'))
+        model_dict = {}
+        model_dict['xkmeans'] = self.xkmeans
+        model_dict['ykmeans'] = self.ykmeans
+        
+        with open(dir_path, 'wb') as f:
+            pickle.dump(model_dict, f)
 
     def load_model(self, dir_path):
         ''' Load both kmeans models from directory path.
@@ -142,8 +145,11 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
         '''
 
         # TODO: error handling for file not found
-        self.xkmeans = joblib.load(os.path.join(dir_path, 'xkmeans'))
-        self.ykmeans = joblib.load(os.path.join(dir_path, 'ykmeans'))
+        with open(dir_path, 'rb') as f:
+            model_dict = pickle.load(f)
+
+        self.xkmeans = model_dict['xkmeans']
+        self.ykmeans = model_dict['ykmeans']
 
 
     def evaluate_clusters(self, dataset):
@@ -202,3 +208,9 @@ class KMeans(Clusterer): #pylint says there's an issue here but there isn't
 
     def get_params(self):
         return self.params
+
+    def save_block(self, path):
+        self.save_model(path)
+
+    def load_block(self, path):
+        self.load_model(path)

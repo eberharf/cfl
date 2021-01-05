@@ -93,6 +93,14 @@ class CondExpBase(CDE):
             self.trained = True
 
 
+    def load_block(self, path):
+        self.load_parameters(path)
+        self.trained = True
+
+    def save_block(self, path):
+        self.save_parameters(path)
+
+
     def train(self, dataset, prev_results=None):
         ''' Full training loop. Constructs t.data.Dataset for training and testing,
             updates model weights each epoch and evaluates on test set periodically.

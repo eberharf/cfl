@@ -16,8 +16,9 @@ BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB,
 
 class Experiment():
 
-    def __init__(self, X_train, Y_train, data_info, block_names=None, 
-                 block_params=None, blocks=None, results_path=''):
+    def __init__(self, X_train, Y_train, data_info, past_exp_path=None,
+                 block_names=None, block_params=None, blocks=None, 
+                 results_path=''):
         ''' 
         Sets up and trains an Experiment.
 
@@ -25,32 +26,46 @@ class Experiment():
             X_train : an (n_samples, n_x_features) 2D array. (np.array)
             Y_train : an (n_samples, n_y_features) 2D array. (np.array)
             data_info : TODO
+            past_exp_path : path to directory associated with a previously
+                            trained Experiment (str)
             block_names : list of block names to use (i.e. ['CondExpVB', 'KMeans']). 
                           Full list of names can be found here: <TODO>. (str list)
             block_params : list of dicts specifying parameters for each block specified
                            in block_names. Default is None. (dict list)
             blocks : list of block objects. Default is None. (Block list)
             save_path : path to directory to save this experiment to. Default is ''. (str)
-        Note: There are two ways to specify blocks: either specify both 
-              block_names and block_params, OR specify blocks. Do not specify
-              all three of these parameters. 
+        Note: There are three ways to specify blocks: 
+                1) specify past_exp_path
+                2) specify both block_names and block_params
+                3) specify blocks. 
+              Do not specify all four of these parameters. 
         '''
-        # make sure block names and params are both provided, and that 
-        # blocks is left unpopulated
-        if (block_names is not None) or (block_params is not None):
-            assert (block_names is not None) and (block_params is not None)
-            assert blocks is None
-        
-        # make sure that only blocks is provided
-        if blocks is not None:
-            assert (block_names is None) and (block_params is None)
-        
-        # make sure one of the two block definitions is supplied
-        assert ((block_names is not None) and (block_params is not None)) or \
-            (blocks is not None), 'Must provide block definition.'
 
-        # TODO: for now, assume they will build train dataset on their own
-        # later, we need to handle them just passing in raw data. 
+        # if loading from past experiment, make sure no other block
+        # specifications are provided ...
+        if past_exp_path is not None:
+            assert (block_names is None), 'block_names should not be specified.'
+            assert (block_params is None), 'block_params should not be specified.'
+            assert (blocks is None), 'blocks should not be specified.'
+
+        # otherwise, make sure block names and params are both provided, and that 
+        # blocks is left unpopulated ...
+        if (block_names is not None) or (block_params is not None):
+            assert (block_names is not None), 'block_names should be specified.'
+            assert (block_params is not None), 'block_params should be specified.'
+            assert (blocks is None), 'blocks should not be specified.'
+        
+        # otherwise, make sure that only blocks is provided.
+        if blocks is not None:
+            assert (block_names is None), 'block_names should not be specified.'
+            assert (block_params is None), 'block_params should not be specified.'
+
+        # make sure one of the three Experiment definitions is supplied
+        assert (past_exp_path is not None) or \
+               ((block_names is not None) and (block_params is not None)) or \
+               (blocks is not None), 'Must provide one of the Experiment definitions.'
+
+        # build and track training dataset
         # Note: explicitly stating one dataset for training as an Experiment
         # attribute enforces the definition that an Experiment is a unique 
         # configuration of a trained CFL.
@@ -59,27 +74,41 @@ class Experiment():
         self.dataset_train = self.register_dataset(X_train, Y_train, 'dataset_train')
         self.datasets[self.dataset_train.get_name()] = self.dataset_train
 
+        # build experiment directory
         self.save_path = self.make_exp_dir(results_path)
-
         # TODO: check this save path early so that we fail early if it's already been populated
 
-        # build blocks from names and params
+        # load in params from past experiment if provided
+        if past_exp_path is not None:
+            block_names, block_params = self.load_params(os.path.join(past_exp_path, 'params'))
+
+        # build blocks from names and params if blocks not provided
         if blocks is None:
             blocks = []
             for bn,bp in zip(block_names, block_params): # data_info
                 blocks.append(self.build_block(bn,bp))
         
-         # TODO: make sure all blocks descend from mega-block type
+        # load in trained block info if past experiment provided
+        if past_exp_path is not None:
+            for block in blocks:
+                fn = os.path.join(past_exp_path, 'trained_blocks', block.get_name())
+                block.load_block(fn)
+
+        # TODO: make sure all blocks descend from mega-block type
         self.blocks = blocks
 
         # TODO: check that interfaces match
+        # TODO: assert in the function itself so we can give more info
+        # about what exactly is incompatible
         assert self.check_blocks_compatibility(), 'Specified blocks are incompatible'
         
         # save configuration parameters for each block
         self.save_params()
 
-        # train
-        self.train()
+        # train if creating new experiment from scratch
+        if past_exp_path is None:
+            self.train()
+
 
 
     def train(self, dataset=None, prev_results=None):
@@ -94,6 +123,8 @@ class Experiment():
                 - save(results)
                 - prev_results = results
         '''
+
+        # TODO: check if already trained from past experiment
         print('Training CFL pipeline.')
         if dataset is None:
             dataset = self.dataset_train
@@ -105,8 +136,13 @@ class Experiment():
             # save results
             self.save_results(results, dataset, block)
 
+            # save trained block
+            fn = os.path.join(self.save_path, 'trained_blocks', block.get_name())
+            block.save_block(fn)
+            
             # pass results on to next block
             prev_results = results
+
 
         # TODO: should we return anything here?
     
@@ -159,12 +195,29 @@ class Experiment():
             assert not os.path.exists(os.path.join(self.save_path, 'params')), 'Params already saved.'
             os.mkdir(os.path.join(self.save_path, 'params'))
             
+            block_graph = []
             for block in self.blocks:
+                block_graph.append(block.get_name())
                 fn = os.path.join(self.save_path, 'params', block.get_name())
-                j = json.dumps(block.get_params())
-                f = open(fn, "w")
-                f.write(j)
-                f.close()
+                with open(fn, 'wb') as f:
+                    pickle.dump(block.get_params(), f)
+                # j = json.dumps(block.get_params())
+                # f = open(fn, "w")
+                # f.write(j)
+                # f.close()
+            fn = os.path.join(self.save_path, 'params', 'block_graph')
+            with open(fn, 'wb') as f:
+                pickle.dump(block_graph, f)
+    
+    def load_params(self, params_path): # TODO: change this to pickle
+        with open(os.path.join(params_path, 'block_graph'), 'rb') as f:
+            block_graph = pickle.load(f)
+        block_params = []
+        for bn in block_graph:
+            with open(os.path.join(params_path, bn), 'rb') as f:
+                block_params.append(pickle.load(f))
+        return block_graph, block_params
+
 
     def register_dataset(self, X, Y, dataset_name):
         ''' 

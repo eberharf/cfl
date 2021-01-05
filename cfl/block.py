@@ -27,7 +27,28 @@ class Block(metaclass=ABCMeta):
         # TODO: check input validity
         self.data_info = data_info
     
+    @abstractmethod
+    def load_block(self, path):
+        '''
+        Load a Block that has already been trained in a previous Experiment.
+
+        Arguments:
+            path : path to load from
+        
+        Returns: None
+        '''
     
+    def save_block(self, path):
+        '''
+        Save a Block that has been trained so that in can be reconstructed
+        using load_block.
+
+        Arguments:
+            path : path to save at 
+
+        Returns: None
+        '''
+
     @abstractmethod
     def train(self, dataset, prev_results=None):
         '''
