@@ -13,18 +13,17 @@ class CondExpMod(CondExpBase):
         See CondExpBase documentation for more details. 
     
     '''
-    def __init__(self, data_info, params, experiment_saver=None):
+    def __init__(self, name, data_info, params):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data that will be passed in
                 params : dictionary containing parameters for the model
 
         '''
-        self.model_name = 'CondExpMod'
-        super().__init__(data_info, params, experiment_saver, self.model_name)
+        super().__init__(name=name, data_info=data_info, params=params)
 
 
-    def build_model(self):
+    def _build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
             This model takes specifications through the self.params dict to define
             it's architecture.

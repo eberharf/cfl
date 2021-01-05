@@ -1,12 +1,13 @@
 from abc import ABCMeta, abstractmethod
+from cfl.block import Block
 
 #TODO: next step: add very clear documentation about how to add new module. Include:
 # - demo code?
 # - tests to run with new module to ensure that it works right?
-class Clusterer(metaclass=ABCMeta):
+class Clusterer(Block):
 
     @abstractmethod
-    def __init__(self, params, random_state):
+    def __init__(self, name, data_info, params, random_state=42):
         """
         initialize Clusterer object
 

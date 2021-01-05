@@ -6,6 +6,9 @@ from sklearn.metrics import silhouette_score
 
 from cfl.cluster_methods.clusterer_interface import Clusterer #abstract base class
 from cfl.cluster_methods import Y_given_Xmacro #calculate P(Y|Xmacro)
+import pickle
+
+import os #save, load model
 
 class KMeans(Clusterer):
     """ This class uses K-Means to form the observational partition that CFL
@@ -22,7 +25,7 @@ class KMeans(Clusterer):
             y_data_type : whether the y data is categorical or continuous (str)
             random_state : value of random seed to set in clustering for reproducible results
                            (None if this shouldn't be held constant) (int)
-            model_name : name of the model so that the model type can be recovered from saved parameters (str) #TODO: I think this is not used
+            name : name of the model so that the model type can be recovered from saved parameters (str)
             n_Xclusters : number of X macrovariables to find (int)
             n_Yclusters : number of Y macrovariables to find (int)
 
@@ -38,26 +41,26 @@ class KMeans(Clusterer):
                                       that were provided.
     """
 
-    def __init__(self, params, data_info, random_state=None):
-        """ Set attributes and verify supplied params.
+    def __init__(self, name, data_info, params, random_state=None):
+        ''' Set attributes and verify supplied params.
 
             Arguments:
+                TODO: add new arguments doc
                 params : dictionary containing parameters for the model. For Kmeans, these parameters should
                 be 'n_Xclusters' and 'n_Yclusters' (the number of clusters to produce for x and y, respectively)
                 random_state : value of random seed to set in clustering for reproducible results
                             (None if this shouldn't be held constant) (int)
 
             Returns: None
-        """
-        super(KMeans, self).__init__(params, random_state) #calls ABC's constructor #TODO: nothing of importance done here
+        '''
+
+        super(KMeans, self).__init__(name=name, data_info=data_info, params=params, random_state=random_state) #calls ABC's constructor #TODO: nothing of importance done here
 
         self.Y_type = data_info['Y_type']
         assert self.Y_type in ["categorical", "continuous"], "Y_type in data_info should be 'categorical' or 'continouous' but is {}".format(self.Y_type)
 
-        self.model_name = 'KMeans'
-
+        self.name = name
         self.params = self._check_model_params(params)
-
         self.random_state = random_state
 
         self.xmodel = sKMeans(n_clusters=self.params['n_Xclusters'], random_state=self.random_state)
@@ -72,8 +75,8 @@ class KMeans(Clusterer):
                           }
         return default_params
 
-    def train(self, dataset, pyx):
-        """ Fit two kmeans models: one on P(Y|X=x), and the other on (a proxy for) P(Y=y|X).
+    def train(self, dataset, prev_results):
+        ''' Fit two kmeans models: one on P(Y|X=x), and the other on the proxy for P(Y=y|X).
 
             Arguments:
                 dataset : Dataset object containing X and Y data for fitting the clusterers (Dataset)
@@ -82,7 +85,15 @@ class KMeans(Clusterer):
             Returns:
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
-        """
+            # TODO: update documentation
+
+        '''
+        try: 
+            pyx = prev_results['pyx']
+        except: 
+            'Generate pyx predictions with CDE before clustering.'
+            return
+
         #train x clusters
         x_lbls = self._train_X_model(pyx)
 
@@ -92,7 +103,9 @@ class KMeans(Clusterer):
         #train y clusters
         y_lbls = self._train_Y_model(y_probs)
 
-        return x_lbls, y_lbls
+        results_dict = {'x_lbls' : x_lbls,
+                        'y_lbls' : y_lbls}
+        return results_dict
 
     def _train_X_model(self, pyx):
         return self.xmodel.fit_predict(pyx)
@@ -126,9 +139,8 @@ class KMeans(Clusterer):
             y_probs = Y_given_Xmacro.categorical_Y(Y, x_lbls)
         return y_probs
 
-    def predict_Xmacro(self, dataset, pyx):
-        """
-        Assign new datapoints to clusters found in training.
+    def predict(self, dataset, prev_results):
+        ''' Assign new datapoints to clusters found in training.
 
             Arguments:
                 dataset : Dataset object containing X, Y and pyx data to assign parition labels to (Dataset)
@@ -136,11 +148,20 @@ class KMeans(Clusterer):
             Returns:
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
-        """
+        '''
+        try: 
+            pyx = prev_results['pyx']
+        except: 
+            'Generate pyx predictions with CDE before clustering.'
+            return
+
         x_lbls = self._predict_Xs(pyx)
         y_probs = self._sample_Y_dist(dataset, x_lbls)
         y_lbls = self._predict_Ys(y_probs)
-        return x_lbls, y_lbls
+        
+        results_dict = {'x_lbls' : x_lbls,
+                        'y_lbls' : y_lbls}
+        return results_dict
 
     def _predict_Xs(self, pyx):
         return self.xmodel.predict(pyx)
@@ -167,7 +188,7 @@ class KMeans(Clusterer):
         for param in input_params:
             if param not in default_params.keys():
                 paramsToRemove.append(param)
-                print('{} specified but not used by {} clusterer'.format(param, self.model_name))
+                print('{} specified but not used by {} clusterer'.format(param, self.name))
 
         # remove unnecessary parameters after we're done iterating
         # to not cause problems
@@ -180,6 +201,8 @@ class KMeans(Clusterer):
             if param not in input_params.keys():
                 print('{} not specified in input, defaulting to {}'.format(param, default_params[param]))
                 input_params[param] = default_params[param]
+        
+        input_params['name'] = self.name
 
         return input_params
 
@@ -207,3 +230,40 @@ class KMeans(Clusterer):
     # def cluster_metric(self, probs, lbls):
     #     '''calculate silhouette score (intrinsic metric for clustering quality)'''
     #     return silhouette_score(probs, lbls)
+
+
+    # TODO: move this out eventually?
+    def save_model(self, dir_path):
+        ''' Save both kmeans models to compressed files.
+
+            Arguments:
+                dir_path : directory in which to save models (str)
+            Returns: None
+        '''
+        model_dict = {}
+        model_dict['xkmeans'] = self.xkmeans
+        model_dict['ykmeans'] = self.ykmeans
+        
+        with open(dir_path, 'wb') as f:
+            pickle.dump(model_dict, f)
+
+    def load_model(self, dir_path):
+        ''' Load both kmeans models from directory path.
+
+            Arguments:
+                dir_path : directory in which to save models (str)
+            Returns: None
+        '''
+
+        # TODO: error handling for file not found
+        with open(dir_path, 'rb') as f:
+            model_dict = pickle.load(f)
+
+        self.xkmeans = model_dict['xkmeans']
+        self.ykmeans = model_dict['ykmeans']
+
+    def save_block(self, path):
+        self.save_model(path)
+
+    def load_block(self, path):
+        self.load_model(path)
