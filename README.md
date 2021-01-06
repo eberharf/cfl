@@ -1,66 +1,52 @@
 # cfl
 
-## Set-up instructions
+## Set-up Instructions 
+Instructions for setting installing CFL and its dependencies can be found [here](https://github.com/eberharf/cfl/blob/master/SETUP.md)
+- A quick start guide with example code can be found [here](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb)
+- Complete documentation can be found here
 
-### Clone the repository
+## Running CFL
 
-Git clone this repository onto your computer:
-```
-git clone https://github.com/eberharf/cfl.git
-```
+Go to the [examples](https://github.com/eberharf/cfl/blob/master/examples) folder to find Jupyter Notebooks that demonstrate how to use the CFL code. Check out the [Quick Start Guide](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb first if you're just getting started.
 
-### Install Dependencies
+--------------------------------------
+## License and Citations
 
-Any version of Python compatible with 3.7.4
-View full requirements (with the version we used) in the `requirements.yml` file.
-You may either manually install the required packages or follow the instructions below to generate a conda virtual environment with all the required dependencies from file.
-
-
-#### Create a conda environment
-To create a conda virtual environment with the required dependencies for `cfl` from the file `requirements.yml`, navigate into the root directory of `cfl` and run the command:
-```
-conda env create -f requirements.yml
-```
-
-Then activate the newly created environment:
-```
-conda activate cfl-env
-```
-
-(These instructions use Anaconda 4.8.4)
-
-### Add the cfl-env environment to the Jupyter notebook kernel
-
-In order to be able to access the
-```
- ipython kernel install --name cfl-env --user
-```
-
-### Add `cfl` to path
-Before running this code, add the path to the location of the respository to your **`PYTHONPATH`** variable. This will allow you to easily import the `cfl` package into any other file (regardless of the location of that file) using the statement `import cfl`.
-
-For example, on my windows machine I would add
-```
-C:\Users\Jenna\Documents\Schmidt\cfl
-```
-to the PYTHONPATH variable in my system environment variables. 
-
-On mac, open ~/.bash_profile with a text editor (i.e. `vim ~/.bash_profile` from terminal), and add the following lines to the end of the file:
+CFL is released under a BSD-like license for non-commercial use only. If you use CFL in published research work, we encourage you to cite this repository:
 
 ```
-PYTHONPATH=/path/to/cfl
-export PYTHONPATH
+Causal Feature Learning (2021). https://github.com/eberharf/cfl
 ```
 
-Consult Google for system-specific instructions on how to modify your environment variables.
+or use the BibTex reference:
+
+```
+@misc{cfl2021,
+    title     = "Causal Feature Learning",
+    year      = "2021",
+    publisher = "GitHub",
+    url       = "https://github.com/eberharf/cfl"}
+  }
+```
+--------------------------------------------
+## Contributors
+
+- Jenna Kahn & Iman Wahle [first authors; order chosen randomly]
+- Krzysztof Chalupka
+- Patrick Burauel
+- Pietro Perona
+- Frederick Eberhardt
 
 
-You should now be ready to run `cfl`.
-Check that your installation has been successful by opening a Python terminal from the cfl conda environment (or whatever environment you're using) and typing `import cfl`.
+Jenna Kahn and Iman Wahle designed the software and wrote the code in this repository.
+
+Krzysztof Chalupka, Pietro Perona and Frederick Eberhardt developed the original theory for CFL. Krzysztof also wrote the original code upon which this software is based.
+
+Code development benefitted from regular discussions with Patrick Burauel.
 
 
-## Contents of the Repository
-
+----------------------------------------------------------
+## Repository Contents
 ### `cfl`
 This folder contains all of the functional code for CFL. The most current documentation for the `cfl` package can be viewed using `PyDoc`. Use the following instructions to open the documentation:
 
@@ -94,90 +80,6 @@ Contains the .dvc (data version control) files associated with each file of the 
 
 ### `testing`
 This folder contains the automated test suite for checking the expected functionality of the code and preventing regression (loss of functionality).
-s
-**NOTE:** many tests not created yet
-
-
-## Running CFL
-
-Go to the `examples` for Jupyter Notebooks that demonstrate how to use the CFL code. Check out the Quick Start Guide first if you're just getting started.
 
 
 
-----------------------------------------
-## Parameter Details
-
-### Configuring CDE `model_params`
-When constructing a new CDE object, you can specify a `model_params` dictionary.
-This allows you to specify the configuration of your CDE model during instantiation.
-Here are the current variables you can set:
-
-- `'batch_size'`
-    - What is it: batch size for neural network training
-    - Valid values: int
-    - Required: no
-    - Default: `32`
-    - Applies to: all `CondExpBase` children
-
-- `'n_epochs'`
-    - What is it: number of epochs to train for
-    - Valid values:
-    - Required: no
-    - Default: `20`
-    - Applies to: all `CondExpBase` children
-
-- `'optimizer'`
-    - What is it: which optimizer to use in training (https://www.tensorflow.org/api_docs/python/tf/keras/optimizers)
-    - Valid values: string (i.e. 'adam', 'sgd', etc.)
-    - Required: no
-    - Default: `'adam'`
-    - Applies to: all `CondExpBase` children
-
-- `'opt_config'`
-    - What is it: a dictionary of optimizer parameters
-    - Valid values: python dict. Lookup valid parameters for your optimizer here: https://www.tensorflow.org/api_docs/python/tf/keras/optimizers
-    - Required: no
-    - Default: `{}`
-    - Applies to: all `CondExpBase` children
-
-- `'verbose'`
-    - What is it: whether to print run updates (currently does this no matter what)
-    - Valid values: bool
-    - Required: no
-    - Default: `True`
-    - Applies to: all `CondExpBase` children
-
-- `'dense_units'`
-    - What is it: list of tf.keras.Dense layer sizes
-    - Valid values: int list
-    - Required: no
-    - Default: `[50, data_info['Y_dims'][1]]`
-    - Applies to: `CondExpMod`
-
-- `'activations'`
-    - What is it: list of activation functions corresponding to layers specified in 'dense_units'
-    - Valid values: string list. See valid activations here: https://www.tensorflow.org/api_docs/python/tf/keras/activations
-    - Required: no
-    - Default: `['relu', 'linear']`
-    - Applies to: `CondExpMod`
-
-- `'dropouts'`
-    - What is it: list of dropout rates after each layer specified in 'dense_units'
-    - Valid values: float (from 0 to 1) list.
-    - Required: no
-    - Default: `[0, 0]`
-    - Applies to: `CondExpMod`
-
-- `'weights_path'`
-    - What is it: path to saved keras model checkpoint to load in to model
-    - Valid values: string
-    - Required: no
-    - Default: `None`
-    - Applies to: all `CondExpBase` children
-
-- `'loss'`
-    - What is it: which loss function to optimize network with respect to (https://www.tensorflow.org/api_docs/python/tf/keras/losses)
-    - Valid values: string
-    - Required: no
-    - Default: `mean_squared_error`
-    - Applies to: all `CondExpBase` children
