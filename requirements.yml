@@ -1,20 +1,31 @@
 # this file contains the requirements for the cfl package
 
-# to create a conda environment from this file, run the commands: 
-# conda env create -f conda-specs.yml
-# conda activate cfl-env
+# to create a conda environment from this file, run the commands:
+#     conda env create -f requirements.yml
+#     conda activate cfl-env
 
+# to generate a new version of this file from the current environment, run the command:
+#     conda env export --from-history > requirementsNEW.yml
 
 name: cfl-env
 channels:
   - defaults
 dependencies:
-  - tqdm
-  - pytest=6.0.1
-  - matplotlib=3.3.1
-  - tensorflow
-  - numpy=1.19.2
-  - joblib=0.16.0
-  - scikit-learn=0.23.2
-  - jupyter
-  - pytest=6.0.1 #pytest is needed just to run tests, not to use cfl 
+  - tqdm # progress bar
+  - matplotlib=3.3.1  # creates plots (used for visualization)
+  - tensorflow  # machine learning
+  - numpy=1.19.2 # array manipulation and fast computing
+  - joblib=0.16.0 # used to save/load data primarily for el nino example
+  - scikit-learn=0.23.2 # used to import clustering methods, other algorithms/metrics
+  - jupyter # for jupyter notebooks
+  - ipykernel # to add dependencies to kernel during set-up
+
+
+# # the following packages are not required to use the basic
+# # cfl code, but may be needed to run some of the example notebooks
+# # or testing code.
+  - pytest=6.0.1 # to run regression tests
+  - pandas # for formatting data frames (eg used for fear mice data)
+  - nibabel # for reading/writing MRIs
+  - jupyter_nbextensions_configurator # for interactive widgets
+  - ipywidgets
