@@ -80,7 +80,8 @@ class KMeans(Clusterer):
 
             Arguments:
                 dataset : Dataset object containing X and Y data for fitting the clusterers (Dataset)
-                pyx : Conditional probability densities (these are results from the CDE step of CFL)
+                prev_results : dictionary that contains a key called 'pyx', whose value is an array of
+                probabilities
 
             Returns:
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
@@ -88,9 +89,9 @@ class KMeans(Clusterer):
             # TODO: update documentation
 
         '''
-        try: 
+        try:
             pyx = prev_results['pyx']
-        except: 
+        except:
             'Generate pyx predictions with CDE before clustering.'
             return
 
@@ -144,21 +145,22 @@ class KMeans(Clusterer):
 
             Arguments:
                 dataset : Dataset object containing X, Y and pyx data to assign parition labels to (Dataset)
-
+                prev_results : dictionary that contains a key called 'pyx', whose value is an array of
+                probabilities
             Returns:
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
         '''
-        try: 
+        try:
             pyx = prev_results['pyx']
-        except: 
+        except:
             'Generate pyx predictions with CDE before clustering.'
             return
 
         x_lbls = self._predict_Xs(pyx)
         y_probs = self._sample_Y_dist(dataset, x_lbls)
         y_lbls = self._predict_Ys(y_probs)
-        
+
         results_dict = {'x_lbls' : x_lbls,
                         'y_lbls' : y_lbls}
         return results_dict
@@ -201,7 +203,7 @@ class KMeans(Clusterer):
             if param not in input_params.keys():
                 print('{} not specified in input, defaulting to {}'.format(param, default_params[param]))
                 input_params[param] = default_params[param]
-        
+
         input_params['name'] = self.name
 
         return input_params
@@ -243,7 +245,7 @@ class KMeans(Clusterer):
         model_dict = {}
         model_dict['xmodel'] = self.xmodel
         model_dict['ymodel'] = self.ymodel
-        
+
         with open(dir_path, 'wb') as f:
             pickle.dump(model_dict, f)
 
