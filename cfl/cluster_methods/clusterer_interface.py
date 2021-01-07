@@ -34,8 +34,8 @@ class Clusterer(Block):
         pass
 
     @abstractmethod
-    def predict_Xmacro(self, dataset, prev_results):
-        """predicts X macrovariables from data, without modifying the parameters
+    def predict(self, dataset, prev_results):
+        """predicts X,Y macrovariables from data, without modifying the parameters
         of the clustering algorithm"""
         pass
 

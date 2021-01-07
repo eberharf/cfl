@@ -241,8 +241,8 @@ class KMeans(Clusterer):
             Returns: None
         '''
         model_dict = {}
-        model_dict['xkmeans'] = self.xkmeans
-        model_dict['ykmeans'] = self.ykmeans
+        model_dict['xmodel'] = self.xmodel
+        model_dict['ymodel'] = self.ymodel
         
         with open(dir_path, 'wb') as f:
             pickle.dump(model_dict, f)
@@ -259,8 +259,8 @@ class KMeans(Clusterer):
         with open(dir_path, 'rb') as f:
             model_dict = pickle.load(f)
 
-        self.xkmeans = model_dict['xkmeans']
-        self.ykmeans = model_dict['ykmeans']
+        self.xmodel = model_dict['xmodel']
+        self.ymodel = model_dict['ymodel']
 
     def save_block(self, path):
         self.save_model(path)

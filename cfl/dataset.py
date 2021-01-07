@@ -25,3 +25,9 @@ class Dataset():
 
     def get_name(self):
         return self.name
+    
+    def get_X(self):
+        return self.X
+
+    def get_Y(self):
+        return self.Y
