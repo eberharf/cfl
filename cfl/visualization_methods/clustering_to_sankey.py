@@ -17,6 +17,8 @@ fig.update_layout(title_text="Sample Sankey", font_size=10)
 fig.show()
 '''
 
+import numpy as np
+
 def convert_lbls_to_sankey_nodes(x_lbls_L):
     '''convert cluster labels into source, target, and value information
 
