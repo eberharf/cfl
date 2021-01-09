@@ -1,4 +1,4 @@
-# cfl
+# Causal Feature Learning (CFL)
 
 ## Set-up Instructions 
 Instructions for setting installing CFL and its dependencies can be found [here](https://github.com/eberharf/cfl/blob/master/SETUP.md)
