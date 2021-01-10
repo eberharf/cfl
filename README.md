@@ -45,6 +45,10 @@ Krzysztof Chalupka, Pietro Perona and Frederick Eberhardt developed the original
 Code development benefitted from regular discussions with Patrick Burauel.
 
 
+--------------------------------------------
+## Funding
+This project is supported in part by NSF grants NSF 1564330, NSF BCS-1845958 and BCS-1840756, and the Schmidt Academy fellows program.
+
 ----------------------------------------------------------
 ## Repository Contents
 ### `cfl`
