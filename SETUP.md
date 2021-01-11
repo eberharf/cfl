@@ -1,5 +1,18 @@
 ## Set-up instructions
 
+### Clone the repository
+
+First, we will download a local copy of the `cfl` repository. Before starting this step, make sure you have [Git](https://git-scm.com/) installed on your computer.
+
+Open a terminal window. Navigate to the location where you would like the repository to be located, and use the
+following command to clone the repository onto your computer:
+```
+git clone https://github.com/eberharf/cfl.git
+```
+
+You should now see a folder named `cfl` on your computer that contains all of the code for this project.
+
+
 ### Install Dependencies
 
 This package was developed with Python 3.7.4 and requires a compatible version of Python.
@@ -43,19 +56,6 @@ conda activate cfl-env
 ```
 
 You should see the environment name (in parentheses, at the very beginning of the current line in the terminal) change to `(cfl-env)`. If no error messages result from this command, then you have successfully activated the new environment. 
-
-### Clone the repository
-
-Now we will download a local copy of the `cfl` repository. Before starting this step, make sure you have [Git](https://git-scm.com/) installed on your computer.
-
-Open a terminal window. Navigate to the location where you would like the repository to be located, and use the
-following command to clone the repository onto your computer:
-```
-git clone https://github.com/eberharf/cfl.git
-```
-
-You should now see a folder named `cfl` on your computer that contains all of the code for this project.
-
 
 ### Add `cfl` to path
 Before trying to run any code, add the path to the respository to your computer's `PYTHONPATH` variable. This will allow you to easily import the `cfl` package to use in any file, regardless of the location of that file.
