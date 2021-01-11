@@ -10,6 +10,7 @@
 name: cfl-env
 channels:
   - defaults
+  - conda-forge
 dependencies:
   - tqdm # progress bar
   - matplotlib=3.3.1  # creates plots (used for visualization)
@@ -19,6 +20,7 @@ dependencies:
   - scikit-learn=0.23.2 # used to import clustering methods, other algorithms/metrics
   - jupyter # for jupyter notebooks
   - ipykernel # to add dependencies to kernel during set-up
+  - keras
 
 
 # # the following packages are not required to use the basic
@@ -27,5 +29,5 @@ dependencies:
   - pytest=6.0.1 # to run regression tests
   - pandas # for formatting data frames (eg used for fear mice data)
   - nibabel # for reading/writing MRIs
-  - jupyter_nbextensions_configurator # for interactive widgets
-  - ipywidgets
+  - ipywidgets  # for interactive widgets
+  - jupyter_nbextensions_configurator
