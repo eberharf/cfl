@@ -1,11 +1,11 @@
 # Causal Feature Learning (CFL)
 
-## Set-up Instructions 
-Instructions for setting installing CFL and its dependencies can be found [here](https://github.com/eberharf/cfl/blob/master/SETUP.md)
-- A quick start guide with example code can be found [here](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb)
-- Complete documentation can be found here
+# Quick Links 
 
-## Running CFL
+### Set-up 
+Instructions for setting up CFL and its dependencies can be found [here](https://github.com/eberharf/cfl/blob/master/SETUP.md)
+
+### Running CFL
 
 Go to the [examples](https://github.com/eberharf/cfl/blob/master/examples) folder to find Jupyter Notebooks that demonstrate how to use the CFL code. Check out the [Quick Start Guide](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb) first if you're just getting started.
 
