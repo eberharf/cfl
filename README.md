@@ -7,7 +7,7 @@ Instructions for setting installing CFL and its dependencies can be found [here]
 
 ## Running CFL
 
-Go to the [examples](https://github.com/eberharf/cfl/blob/master/examples) folder to find Jupyter Notebooks that demonstrate how to use the CFL code. Check out the [Quick Start Guide](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb first if you're just getting started.
+Go to the [examples](https://github.com/eberharf/cfl/blob/master/examples) folder to find Jupyter Notebooks that demonstrate how to use the CFL code. Check out the [Quick Start Guide](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb) first if you're just getting started.
 
 --------------------------------------
 ## License and Citations
