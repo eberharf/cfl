@@ -9,11 +9,15 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
     ''' A child class of CondExpBase that defines a model specialized
         for the visual bars dataset.
 
+
+        IT DOES NOT WORK WELL ON VB DATA USE AT YOUR OWN RISK
+
         See CondExpBase documentation for more details.
 
     '''
 
-    def __init__(self, name, data_info, params, experiment_saver=None):
+    def __init__(self, name, data_info, params):
+
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data

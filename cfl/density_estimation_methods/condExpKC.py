@@ -6,23 +6,23 @@ import matplotlib.pyplot as plt
 from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class CondExpKC(CondExpBase):
-    ''' A child class of CondExpBase that loosely recreates the 
+    ''' A child class of CondExpBase that loosely recreates the
         model construted in Chalupka 2015 visual bars code.
-        
-        See CondExpBase documentation for more details. 
-    
+
+        See CondExpBase documentation for more details.
+
     '''
-    def __init__(self, data_info, params, experiment_saver=None):
+    def __init__(self, name, data_info, params):
         ''' Initialize model and define network.
             Arguments:
-                data_info : a dictionary containing information about the data 
+                data_info : a dictionary containing information about the data
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 params : dictionary containing parameters for the model
         '''
         self.model_name = 'CondExpKC'
-        super().__init__(data_info, params, experiment_saver, self.model_name)
+        super().__init__(self.model_name, data_info, params)
 
-    def build_model(self):
+    def _build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
             This model is roughly modeled off of Chalupka 2015 visual bars code.
 
