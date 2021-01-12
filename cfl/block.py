@@ -31,6 +31,9 @@ class Block(metaclass=ABCMeta):
     def load_block(self, path):
         '''
         Load a Block that has already been trained in a previous Experiment.
+        All Blocks should be load-able with just a path name. The specific
+        Block type is responsible for making sure it's loaded all relevant
+        fields. 
 
         Arguments:
             path : path to load from

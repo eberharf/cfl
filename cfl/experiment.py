@@ -71,7 +71,7 @@ class Experiment():
         # configuration of a trained CFL.
         self.data_info = data_info
         self.datasets = {}
-        self.dataset_train = self.register_dataset(X_train, Y_train, 'dataset_train')
+        self.dataset_train = self.add_dataset(X_train, Y_train, 'dataset_train')
         self.datasets[self.dataset_train.get_name()] = self.dataset_train
 
         # build experiment directory
@@ -182,14 +182,13 @@ class Experiment():
             if not os.path.exists(dir_name):
                 os.mkdir(dir_name)
 
-            # TODO: write get_name methods for Dataset and Block
             file_name = os.path.join(dir_name, block.get_name() + '_results.pickle')
             with open(file_name, 'wb') as f:
                 pickle.dump(results, f) 
                 # TODO: eventually, we have to be careful about what pickle protocol 
                 # we use for compatibility across python versions
 
-    def save_params(self): # TODO: change this to pickle
+    def save_params(self):
         if self.save_path is not None:
             assert self.blocks is not None, 'self.blocks does not exist yet.'
             assert not os.path.exists(os.path.join(self.save_path, 'params')), 'Params already saved.'
@@ -201,15 +200,12 @@ class Experiment():
                 fn = os.path.join(self.save_path, 'params', block.get_name())
                 with open(fn, 'wb') as f:
                     pickle.dump(block.get_params(), f)
-                # j = json.dumps(block.get_params())
-                # f = open(fn, "w")
-                # f.write(j)
-                # f.close()
+
             fn = os.path.join(self.save_path, 'params', 'block_graph')
             with open(fn, 'wb') as f:
                 pickle.dump(block_graph, f)
     
-    def load_params(self, params_path): # TODO: change this to pickle
+    def load_params(self, params_path):
         with open(os.path.join(params_path, 'block_graph'), 'rb') as f:
             block_graph = pickle.load(f)
         block_params = []
@@ -219,7 +215,7 @@ class Experiment():
         return block_graph, block_params
 
 
-    def register_dataset(self, X, Y, dataset_name):
+    def add_dataset(self, X, Y, dataset_name):
         ''' 
         think about name
         '''
@@ -269,8 +265,6 @@ class Experiment():
         ''' for now, I will just implement this using the dict translation
         method. Once we have time, we can look into using the registration
         method.'''
-        # TODO: right now, some blocks take in more arguments in addition to
-        # a params dict. We need to standardize this.
         return BLOCK_KEY[block_name](name=block_name, data_info=self.data_info, params=block_param)
 
     def check_blocks_compatibility(self):
@@ -291,3 +285,6 @@ class Experiment():
         print('All results from this run will be saved to {}'.format(save_path))
         os.mkdir(save_path)
         return save_path
+
+
+        

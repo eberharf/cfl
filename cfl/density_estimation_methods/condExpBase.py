@@ -1,5 +1,6 @@
 from abc import abstractmethod
 import os
+import shutil
 # TODO: add GPU support
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import numpy as np
@@ -142,17 +143,16 @@ class CondExpBase(CDE):
         )
 
         # specify checkpoint save callback
-        # TODO: convert this to new saving setup
         callbacks = []
-        # if dataset.to_save:
-        #     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        #         filepath=dataset.saver.get_save_path(
-        #             'checkpoints/best_weights'),
-        #         save_weights_only=True,
-        #         monitor='val_loss',
-        #         mode='min',
-        #         save_best_only=True)
-        #     callbacks = [model_checkpoint_callback]
+        if self.params['best']:
+            os.mkdir('tmp_checkpoints')
+            model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+                filepath='tmp_checkpoints/best_weights',
+                save_weights_only=True,
+                monitor='val_loss',
+                mode='min',
+                save_best_only=True)
+            callbacks = [model_checkpoint_callback]
             
 
         # train model
@@ -170,6 +170,12 @@ class CondExpBase(CDE):
         val_loss = history.history['val_loss']
         fig = self._graph_results(train_loss, val_loss, show=True)
         pyx = self.model.predict(dataset.X)
+
+        # load in best weights if specified
+        if self.params['best']:
+            self.load_parameters('tmp_checkpoints/best_weights')
+            shutil.rmtree('tmp_checkpoints')
+
 
         results_dict = {'train_loss' : train_loss,
                         'val_loss' : val_loss, 
@@ -195,6 +201,7 @@ class CondExpBase(CDE):
         #     # load weights from epoch with lowest validation loss
         #     self.load_parameters(dataset.saver.get_save_path(
         #             'checkpoints/best_weights'))
+
 
         self.trained = True
         return results_dict

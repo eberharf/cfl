@@ -8,10 +8,6 @@ class Dataset():
         self.X = X
         self.Y = Y
         self.name = name
-        # self.to_save = experiment_saver is not None
-        self.saver = None
-        # if self.to_save:
-        #     self.saver = experiment_saver.get_new_dataset_saver(name)
         self.pyx = None
 
     # TODO: add other attributes/methods that would be helpful to keep together with a dataset
