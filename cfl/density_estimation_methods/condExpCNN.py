@@ -8,26 +8,26 @@ from cfl.density_estimation_methods.condExpBase import CondExpBase
 class CondExpCNN(CondExpBase):
     ''' A child class of CondExpBase that defines a model specialized
         for the visual bars dataset and uses 2D convolutional layers instead
-        of flattening the image data. 
-    
-        See CondExpBase documentation for more details. 
+        of flattening the image data.
+
+        See CondExpBase documentation for more details.
 
     '''
-    def __init__(self, data_info, params, experiment_saver=None):
+    def __init__(self, name, data_info, params):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data that will be passed in
                 params : dictionary containing parameters for the model
         '''
-        self.model_name='CondExpBase'
-        super().__init__(data_info, params, experiment_saver, self.model_name)
+        self.model_name='CondExpCNN'
+        super().__init__(name, data_info, params)
 
 
-    def build_model(self):
+    def _build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
             Eventually, this architecture will have to become more dynamic (TODO).
 
-            Right now the architecture is optimized for visual bars 1000 10x10 images 
+            Right now the architecture is optimized for visual bars 1000 10x10 images
             Arguments: None
             Returns: the model (tf.keras.models.Model object)
         '''
@@ -41,7 +41,7 @@ class CondExpCNN(CondExpBase):
             tf.keras.layers.Dense(64, activation='relu'),
             tf.keras.layers.Dense(1),
         ])
-        
+
         return model
 
 
