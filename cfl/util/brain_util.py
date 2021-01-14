@@ -183,7 +183,7 @@ def coarsen(x, n_voxels, brain_dims, method='majority'):
                 if method == 'majority':
                     # the most common value in the previous cube of voxels is
                     # the value of the new voxel
-                    new_x[i, j, k] = mode(np.sample, axis=None)[0][0]
+                    new_x[i, j, k] = mode(sample, axis=None)[0][0]
 
                     # take a vote
                     # new_x[i, j, k] = np.sum(sample == 1) > np.sum(sample == 0)
