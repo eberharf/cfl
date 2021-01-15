@@ -33,7 +33,7 @@ class Experiment():
             block_params : list of dicts specifying parameters for each block specified
                            in block_names. Default is None. (dict list)
             blocks : list of block objects. Default is None. (Block list)
-            save_path : path to directory to save this experiment to. Default is ''. (str)
+            results_path : path to directory to save this experiment to. Default is ''. (str)
         Note: There are three ways to specify blocks: 
                 1) specify past_exp_path
                 2) specify both block_names and block_params
@@ -145,7 +145,7 @@ class Experiment():
             prev_results = results
 
 
-        # TODO: should we return anything here?
+        return results
     
     def predict(self, dataset, prev_results=None):
         ''' 
