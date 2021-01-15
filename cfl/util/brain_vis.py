@@ -13,7 +13,7 @@ import pandas as pd
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from ipywidgets import interact, fixed, IntSlider
 
-import cfl_examples.lesion_mapping.brain_util as BU
+import cfl.util.brain_util as BU
 # %matplotlib inline
 
 # global variables
