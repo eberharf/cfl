@@ -69,6 +69,7 @@ class Experiment():
         # Note: explicitly stating one dataset for training as an Experiment
         # attribute enforces the definition that an Experiment is a unique 
         # configuration of a trained CFL.
+        self.is_trained = False
         self.validate_data_info(data_info)
         self.data_info = data_info
         self.datasets = {}
@@ -94,6 +95,7 @@ class Experiment():
             for block in blocks:
                 fn = os.path.join(past_exp_path, 'trained_blocks', block.get_name())
                 block.load_block(fn)
+            self.is_trained = True
 
         # TODO: make sure all blocks descend from mega-block type
         self.blocks = blocks
@@ -106,11 +108,9 @@ class Experiment():
         # save configuration parameters for each block
         self.save_params()
 
-        # train if creating new experiment from scratch
-        if past_exp_path is None:
-            self.train()
-
-
+        # # train if creating new experiment from scratch
+        # if past_exp_path is None:
+        #     self.train()
 
     def train(self, dataset=None, prev_results=None):
         ''' 
@@ -125,27 +125,26 @@ class Experiment():
                 - prev_results = results
         '''
 
-        # TODO: check if already trained from past experiment
-        print('Training CFL pipeline.')
-        if dataset is None:
-            dataset = self.dataset_train
+        if not self.is_trained:
+            print('Training CFL pipeline.')
+            if dataset is None:
+                dataset = self.dataset_train
 
-        for block in self.blocks:
-            # train current block
-            results = block.train(dataset, prev_results)
-            
-            # save results
-            self.save_results(results, dataset, block)
+            for block in self.blocks:
+                # train current block
+                results = block.train(dataset, prev_results)
+                
+                # save results
+                self.save_results(results, dataset, block)
 
-            # save trained block
-            fn = os.path.join(self.save_path, 'trained_blocks', block.get_name())
-            block.save_block(fn)
-            
-            # pass results on to next block
-            prev_results = results
+                # save trained block
+                fn = os.path.join(self.save_path, 'trained_blocks', block.get_name())
+                block.save_block(fn)
+                
+                # pass results on to next block
+                prev_results = results
 
-
-        return results
+            return results
     
     def predict(self, dataset, prev_results=None):
         ''' 
