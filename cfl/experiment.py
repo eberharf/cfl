@@ -132,10 +132,12 @@ class Experiment():
             elif type(dataset)==str:
                 dataset = self.get_dataset(dataset)
 
+            all_results = {}
             for block in self.blocks:
                 # train current block
                 results = block.train(dataset, prev_results)
-                
+                all_results[block.get_name()] = results
+
                 # save results
                 self.save_results(results, dataset, block)
 
@@ -146,7 +148,7 @@ class Experiment():
                 # pass results on to next block
                 prev_results = results
 
-            return results
+            return all_results
     
     def predict(self, dataset, prev_results=None):
         ''' 
@@ -165,17 +167,19 @@ class Experiment():
             assert block.is_trained, 'Block {} has not been trained yet.'.format(bi)
             # TODO: this means all block objects should have an 'is_trained' attribute
 
+        all_results = {}
         for block in self.blocks:
             # predict with current block
             results = block.predict(dataset, prev_results)
-            
+            all_results[block.get_name()] = results
+
             # save results
             self.save_results(results, dataset, block)
 
             # pass results on to next block
             prev_results = results    
 
-        return results        
+        return all_results        
 
     def save_results(self, results, dataset, block):
 
