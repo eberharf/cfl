@@ -114,22 +114,23 @@ class Experiment():
         #     self.train()
 
     def train(self, dataset=None, prev_results=None):
-        ''' 
-        mega cfl block class?
-        print everytime block is processed
+        ''' Train the CFL pipeline. 
 
-        pseudocode:
-            - prev_results = None
-            - for each block in blocks:
-                - results = block.train(dataset, prev_results)
-                - save(results)
-                - prev_results = results
+            Arguments:
+                dataset : dataset name or object. (str or Dataset)
+                prev_results : dict of results to pass to first Block to be
+                               trained, if needed. (dict)
+
+            Returns: 
+                results : results dict of last Block. (dict)
         '''
 
         if not self.is_trained:
             print('Training CFL pipeline.')
             if dataset is None:
                 dataset = self.dataset_train
+            elif type(dataset)==str:
+                dataset = self.get_dataset(dataset)
 
             for block in self.blocks:
                 # train current block
