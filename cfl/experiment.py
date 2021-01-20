@@ -231,7 +231,8 @@ class Experiment():
         return dataset
 
     def get_dataset(self, dataset_name):
-        # TODO: check name exists
+        assert dataset_name in self.datasets.keys(), "No dataset with the " + \
+            "name 'dataset_name' has been added to this Experiment yet."
         return self.datasets[dataset_name]
     
     def load_train_results(self):
