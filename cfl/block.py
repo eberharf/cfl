@@ -52,6 +52,7 @@ class Block(metaclass=ABCMeta):
 
         Returns: None
         '''
+        ...
 
     @abstractmethod
     def save_block(self, path):
@@ -64,6 +65,7 @@ class Block(metaclass=ABCMeta):
 
         Returns: None
         '''
+        ...
 
     @abstractmethod
     def train(self, dataset, prev_results=None):
@@ -74,7 +76,7 @@ class Block(metaclass=ABCMeta):
             dataset : dataset to train model with (Dataset)
             prev_results : any results needed from previous Block training (dict)
         '''
-        pass
+        ...
 
     @abstractmethod
     def predict(self, dataset, prev_results=None):
@@ -85,7 +87,7 @@ class Block(metaclass=ABCMeta):
             dataset : dataset for model to predict on (Dataset)
             prev_results : any results needed from previous Block prediction (dict)
         '''
-        pass
+        ...
 
     def get_name(self):
         '''

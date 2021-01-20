@@ -106,6 +106,8 @@ class KMeans(Clusterer):
 
         results_dict = {'x_lbls' : x_lbls,
                         'y_lbls' : y_lbls}
+
+        self.trained = True
         return results_dict
 
     def _train_X_model(self, pyx):
@@ -151,6 +153,9 @@ class KMeans(Clusterer):
                 x_lbls : X macrovariable class assignments for this Dataset (np.array)
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
         '''
+
+        assert self.trained, "Remember to train the model before prediction."
+
         try:
             pyx = prev_results['pyx']
         except:
@@ -184,6 +189,7 @@ class KMeans(Clusterer):
     #             xscore : metric value for X partition (float)
     #             yscore : metric value for Y partition (float)
     #     """
+    #     assert self.trained, "Remember to train the model before prediction."
 
     #     # generate labels on  and y_probs
     #     x_lbls, y_lbls = self.predict_Xmacro(dataset, pyx)
@@ -228,9 +234,11 @@ class KMeans(Clusterer):
 
         self.xmodel = model_dict['xmodel']
         self.ymodel = model_dict['ymodel']
+        self.trained = True
 
     def save_block(self, path):
         self.save_model(path)
 
     def load_block(self, path):
         self.load_model(path)
+        self.trained = True
