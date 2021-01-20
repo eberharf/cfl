@@ -128,7 +128,7 @@ class Experiment():
         if not self.is_trained:
             print('Training CFL pipeline.')
             if dataset is None:
-                dataset = self.dataset_train
+                dataset = self.get_dataset('dataset_train')
             elif type(dataset)==str:
                 dataset = self.get_dataset(dataset)
 
@@ -159,7 +159,7 @@ class Experiment():
         '''
 
         if type(dataset)==str:
-            dataset = self.datasets[dataset]
+            dataset = self.get_dataset(dataset)
 
         for bi,block in enumerate(self.blocks):
             assert block.is_trained, 'Block {} has not been trained yet.'.format(bi)
