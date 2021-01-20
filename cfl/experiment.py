@@ -6,6 +6,7 @@ from cfl.dataset import Dataset
 import cfl.density_estimation_methods as cdem
 import cfl.cluster_methods as ccm
 from cfl.util.dir_util import get_next_dirname
+from cfl.util.arg_validation_util import validate_data_info
 
 # TODO: this is a placeholder until we have a block registration system.
 BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB, 
@@ -70,7 +71,7 @@ class Experiment():
         # attribute enforces the definition that an Experiment is a unique 
         # configuration of a trained CFL.
         self.is_trained = False
-        self.validate_data_info(data_info)
+        validate_data_info(data_info)
         self.data_info = data_info
         self.datasets = {}
         self.dataset_train = self.add_dataset(X_train, Y_train, 'dataset_train')
@@ -285,23 +286,3 @@ class Experiment():
         print('All results from this run will be saved to {}'.format(save_path))
         os.mkdir(save_path)
         return save_path
-
-
-        
-    def validate_data_info(self, data_info):
-        ''' Make sure all information about data is correctly specified.'''
-
-        # CFL expects the following entries in data_info:
-        #   - X_dims: (n_examples X, n_features X)
-        #   - Y_dims: (n_examples Y, n_featuers Y)
-        #   - Y_type: 'continuous' or 'categorical'
-        correct_keys = ['X_dims', 'Y_dims', 'Y_type']
-        assert set(correct_keys) == set(data_info.keys()), \
-            'data_info must specify values for the following set of keys exactly: {}'.format(correct_keys)
-        
-        assert type(data_info['X_dims'])==tuple, 'X_dims should specify a 2-tuple.'
-        assert type(data_info['Y_dims'])==tuple, 'Y_dims should specify a 2-tuple.'
-        assert len(data_info['X_dims'])==2, 'X_dims should specify a 2-tuple.'
-        assert len(data_info['Y_dims'])==2, 'Y_dims should specify a 2-tuple.'
-        correct_Y_types = ['continuous', 'categorical']
-        assert data_info['Y_type'] in correct_Y_types, 'Y_type can take the following values: {}'.format(correct_Y_types)

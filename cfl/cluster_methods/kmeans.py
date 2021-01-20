@@ -59,9 +59,9 @@ class KMeans(Clusterer):
         self.Y_type = data_info['Y_type']
         assert self.Y_type in ["categorical", "continuous"], "Y_type in data_info should be 'categorical' or 'continouous' but is {}".format(self.Y_type)
 
-        self.name = name
-        self.params = self._check_model_params(params)
-        self.random_state = random_state
+        # self.name = name
+        # self.params = self._check_model_params(params)
+        # self.random_state = random_state
 
         self.xmodel = sKMeans(n_clusters=self.params['n_Xclusters'], random_state=self.random_state)
         self.ymodel = sKMeans(n_clusters=self.params['n_Yclusters'], random_state=self.random_state)
@@ -69,7 +69,7 @@ class KMeans(Clusterer):
     def get_params(self):
         return self.params
 
-    def get_default_params(self):
+    def _get_default_params(self):
         default_params =  {'n_Xclusters' : 4,
                            'n_Yclusters' : 4,
                           }
@@ -172,41 +172,6 @@ class KMeans(Clusterer):
     def _predict_Ys(self, y_probs):
         return self.ymodel.predict(y_probs)
 
-
-    def _check_model_params(self, input_params):
-        """
-         Check that all expected model parameters have been provided,
-            and substitute the default if not. Remove any unused but
-            specified parameters.
-            Arguments: Params (dictionary, where keys are parameter names)
-            Returns: Verified parameter dictionary
-        """
-        # dictionary of default values for each parameter
-        default_params = self.get_default_params()
-
-        # check for parameters that are provided but not needed
-        # remove if found
-        paramsToRemove = []
-        for param in input_params:
-            if param not in default_params.keys():
-                paramsToRemove.append(param)
-                print('{} specified but not used by {} clusterer'.format(param, self.name))
-
-        # remove unnecessary parameters after we're done iterating
-        # to not cause problems
-        for param in paramsToRemove:
-            input_params.pop(param)
-
-        # check for needed parameters
-        # add if not found
-        for param in default_params:
-            if param not in input_params.keys():
-                print('{} not specified in input, defaulting to {}'.format(param, default_params[param]))
-                input_params[param] = default_params[param]
-
-        input_params['name'] = self.name
-
-        return input_params
 
     # def evaluate_clusters(self, dataset, pyx):
     #     """

@@ -26,7 +26,12 @@ class Clusterer(Block):
         # self.model_name
         # self.random_state
 
-        pass
+        # pass
+        
+        super().__init__(name=name, data_info=data_info, params=params)
+        assert type(random_state) in [int, type(None)], 'random_state should be of type int or NoneType.'
+        self.random_state = random_state
+
 
     @abstractmethod
     def train(self, dataset, prev_results):
@@ -41,26 +46,6 @@ class Clusterer(Block):
 
     # def predict_Ymacro(self, dataset):
         # pass
-
-    @abstractmethod
-    def get_default_params(self):
-        """
-        Returns a dictionary containing default values for all parameters that must be passed in to create a clusterer
-        """
-        pass
-
-
-    def _check_model_params(self, input_params):
-        """
-         Check that all expected model parameters have been provided,
-            and substitute the default if not. Remove any unused but
-            specified parameters.
-            Arguments: Params (dictionary, where keys are parameter names)
-            Returns: Verified parameter dictionary
-        """
-
-        pass
-
 
 
 
