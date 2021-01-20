@@ -78,12 +78,12 @@ class Experiment():
         self.datasets[self.dataset_train.get_name()] = self.dataset_train
 
         # build experiment directory
-        self.save_path = self.make_exp_dir(results_path)
+        self.save_path = self._make_exp_dir(results_path)
         # TODO: check this save path early so that we fail early if it's already been populated
 
         # load in params from past experiment if provided
         if past_exp_path is not None:
-            block_names, block_params = self.load_params(os.path.join(past_exp_path, 'params'))
+            block_names, block_params = self._load_params(os.path.join(past_exp_path, 'params'))
 
         # build blocks from names and params if blocks not provided
         if blocks is None:
@@ -107,7 +107,7 @@ class Experiment():
         assert self.check_blocks_compatibility(), 'Specified blocks are incompatible'
         
         # save configuration parameters for each block
-        self.save_params()
+        self._save_params()
 
         # # train if creating new experiment from scratch
         # if past_exp_path is None:
@@ -122,7 +122,7 @@ class Experiment():
                                trained, if needed. (dict)
 
             Returns: 
-                results : results dict of last Block. (dict)
+                all_results : dict of results dicts from all Blocks. (dict dict)
         '''
 
         if not self.is_trained:
@@ -139,7 +139,7 @@ class Experiment():
                 all_results[block.get_name()] = results
 
                 # save results
-                self.save_results(results, dataset, block)
+                self._save_results(results, dataset, block)
 
                 # save trained block
                 fn = os.path.join(self.save_path, 'trained_blocks', block.get_name())
@@ -151,13 +151,15 @@ class Experiment():
             return all_results
     
     def predict(self, dataset, prev_results=None):
-        ''' 
-        pseudocode:
-            - make sure blocks have been fully trained
-            - for each block in blocks:
-                - results = block.predict(dataset, prev_results)
-                - save(results)
-                - prev_results = results
+        ''' Predict using the trained CFL pipeline. 
+
+            Arguments:
+                dataset : dataset name or object. (str or Dataset)
+                prev_results : dict of results to pass to first Block to
+                               predict with, if needed. (dict)
+
+            Returns: 
+                all_results : dict of results dicts from all Blocks. (dict dict)
         '''
 
         if type(dataset)==str:
@@ -174,15 +176,23 @@ class Experiment():
             all_results[block.get_name()] = results
 
             # save results
-            self.save_results(results, dataset, block)
+            self._save_results(results, dataset, block)
 
             # pass results on to next block
             prev_results = results    
 
         return all_results        
 
-    def save_results(self, results, dataset, block):
+    def _save_results(self, results, dataset, block):
+        ''' Save results for a given dataset and block. 
+            Arguments: 
+                results : dictionary of results from running block on dataset. 
+                          (dict)
+                dataset : dataset object to run block on. (Dataset)
+                block : block to run on dataset. (Block)
 
+            Returns: None
+        '''
         if self.save_path is not None:
             dir_name = os.path.join(self.save_path, dataset.get_name())
             if not os.path.exists(dir_name):
@@ -191,10 +201,15 @@ class Experiment():
             file_name = os.path.join(dir_name, block.get_name() + '_results.pickle')
             with open(file_name, 'wb') as f:
                 pickle.dump(results, f) 
-                # TODO: eventually, we have to be careful about what pickle protocol 
-                # we use for compatibility across python versions
+                # TODO: eventually, we have to be careful about what pickle 
+                # protocol we use for compatibility across python versions
 
-    def save_params(self):
+    def _save_params(self):
+        ''' Helper function to save params associated with each block in 
+            self.blocks. Primarily used in Experiment initialization. 
+            Arguments: None
+            Returns: None
+        '''
         if self.save_path is not None:
             assert self.blocks is not None, 'self.blocks does not exist yet.'
             assert not os.path.exists(os.path.join(self.save_path, 'params')), 'Params already saved.'
@@ -211,7 +226,25 @@ class Experiment():
             with open(fn, 'wb') as f:
                 pickle.dump(block_graph, f)
     
-    def load_params(self, params_path):
+
+    def _load_params(self, params_path):
+        ''' Helper function to load params from a specified previous
+            experiment to be used in this experiment. Primarily used in 
+            Experiment initialization. 
+            
+            Arguments: 
+                params_path : path to where params are saved in previous 
+                              Experiment. (str)
+            
+            Returns: 
+                block_graph : ordered list of blocks used in previous
+                              Experiment. Blocks identified by name (should be
+                              the same name that block.get_name() returns). 
+                              (str list)
+                block_params : ordered list of params dictionaries associated 
+                               with each block. (dict list)
+        '''
+                             
         with open(os.path.join(params_path, 'block_graph'), 'rb') as f:
             block_graph = pickle.load(f)
         block_params = []
@@ -222,20 +255,42 @@ class Experiment():
 
 
     def add_dataset(self, X, Y, dataset_name):
-        ''' 
-        think about name
+        ''' Add a new dataset to be tracked by this Experiment. 
+            
+            Arguments: 
+                X : X data of shape (n_samples, n_x_features) associated with 
+                    this Dataset. (np.array)
+                Y : Y data of shape (n_samples, n_y_features) associated with
+                    this Dataset. (np.array)
+                dataset_name : name associated with this Dataset. This will be
+                               the name used to retrieve a dataset using the
+                               Experiment.get_dataset method. (str)
+            
+            Returns:
+                dataset : the newly constructed Dataset object. (Dataset)
         '''
+
         # make new Dataset, add to Experiment's dict of datasets
         dataset = Dataset(X, Y, dataset_name)
         self.datasets[dataset_name] = dataset
         return dataset
 
     def get_dataset(self, dataset_name):
+        ''' Retrieve a Dataset that has been registered with this Experiment.
+
+            Arguments:
+                dataset_name : name of the Dataset to retrieve. (str)
+
+            Returns: 
+                dataset : the Dataset associated with dataset_name. (Dataset) 
+        '''
+
         assert dataset_name in self.datasets.keys(), "No dataset with the " + \
             "name 'dataset_name' has been added to this Experiment yet."
         return self.datasets[dataset_name]
     
     def load_train_results(self):
+
         # find directory for train_dataset results
         dir_name = os.path.join(self.save_path, self.dataset_train.get_name())
 
@@ -247,15 +302,23 @@ class Experiment():
                 results[block.get_name()] = pickle.load(f)
         return results
 
-    def load_predict_results(self, dataset):
+    def load_dataset_results(self, dataset_name='dataset_train'):
+        ''' Load and return all saved results from running a given dataset
+            through the Experiment pipeline.
+
+            Arguments: 
+                dataset_name : name of Dataset to load results for. Defaults
+                               to the dataset used to train the pipeline, 
+                               'dataset_train'. (str)
+
+            Returns:
+                results : dictionary of results-dictionaries. The first key
+                          specifies which block the results come from. The
+                          second key specifies the result name. (dict dict)
         '''
-        dataset can either be of type Dataset or str
-        '''
-        # pull corresponding Dataset if name provided
-        if type(dataset)==str:
-            dataset = self.datasets[dataset]
-        
-        # TODO: make sure dataset is of type Dataset now
+
+        # pull corresponding Dataset from providied name
+        dataset = self.get_dataset(dataset_name)
 
         # find directory for train_dataset results
         dir_name = os.path.join(self.save_path, dataset.get_name())
@@ -266,22 +329,62 @@ class Experiment():
             file_name = os.path.join(dir_name, block.get_name())
             with open(file_name, 'rb') as f:
                 results[block.get_name()] = pickle.load(f)
+        
         return results
+
     
     def build_block(self, block_name, block_param):
-        ''' for now, I will just implement this using the dict translation
-        method. Once we have time, we can look into using the registration
-        method.'''
+        ''' Given a Block's name and associated params, instantiate a Block 
+            object. 
+
+            Arguments: 
+                block_name : name of Block to instantiate. (str)
+                block_param : dictionary of parameters that specify this 
+                              Block. (dict)
+
+            Returns: instantiated Block. (Block descendent)
+
+            Note: for now, I will just implement this using the dict translation
+            method. Once we have time, we can look into using the registration
+            method.
+        '''
+            
         return BLOCK_KEY[block_name](name=block_name, data_info=self.data_info, params=block_param)
 
+
     def check_blocks_compatibility(self):
-        # TODO: implement checks on self.blocks
-        # maybe use class registration here, i.e. Clusterer can only be
-        # preceded by CDE
+        ''' Check that each Block in self.blocks is compatible with the Blocks
+            that precede and follow it. 
+            TODO: This is currently not implemented and simply states that all
+            Blocks are always compatible. We may use class registration here
+            to determine block compatibility. Alternatively, we may have each
+            Block descendent specify it's argument expectations and return
+            guarantees. 
+
+            Arguments: None
+            
+            Returns:
+                compatible : whether or not self.blocks is a compatible
+                             composition of Blocks. (bool) 
+        '''
+
         return True
 
     
-    def make_exp_dir(self, results_path):
+    def _make_exp_dir(self, results_path):
+        ''' Build directory to which to save this Experiment. 
+            
+            Arguments: 
+                results_path : where to build this Experiment's directory. For
+                               example, if results_path='path/to/dir', the
+                               direcotry 'path/to/dir/experiment000x' will
+                               be built.(str)
+            Returns: 
+                save_path : path to experiment directory 
+                            ('path/to/dir/experiment000x' in the example above).
+                            (str)
+        '''
+
         # make sure base_path exists, if not make it
         if not os.path.exists(results_path):
             print("save_path '{}' doesn't exist, creating now.".format(results_path))
