@@ -18,7 +18,7 @@ class Block(metaclass=ABCMeta):
         Instantiate the specified model.
 
         Arguments:
-            model_name : name of model (str)
+            name : name of model (str)
             data_info : dict of information about associated datasets (dict)
             model_params : parameters for this model (dict)
 
@@ -26,9 +26,9 @@ class Block(metaclass=ABCMeta):
         '''
 
         # check input argument types
-        assert type(name)==str, 'name should be of type str.'
-        assert type(data_info)==dict, 'data_info should be of type dict.'
-        assert type(params)==dict, 'params should be of type dict.'    
+        assert isinstance(name, str), 'name should be of type str.'
+        assert isinstance(data_info, dict), 'data_info should be of type dict.'
+        assert isinstance(params, dict), 'params should be of type dict.'    
 
         # set object attributes
         self.trained = False
@@ -110,7 +110,9 @@ class Block(metaclass=ABCMeta):
 
     @abstractmethod
     def _get_default_params(self):
-        ''' '''
+        ''' Return a dict of default parameters for the Block.
+            Arguments: None
+            Returns: dictionary of default parameters. (dict) '''
         ...
 
     def _check_model_params(self, input_params):
@@ -118,9 +120,14 @@ class Block(metaclass=ABCMeta):
          Check that all expected model parameters have been provided,
             and substitute the default if not. Remove any unused but
             specified parameters.
-            Arguments: Params (dictionary, where keys are parameter names)
+            Arguments: params (dictionary, where keys are parameter names)
             Returns: Verified parameter dictionary
         """
+
+        # check inputs
+        assert isinstance(input_params, dict), \
+            'input_params should be of type dict.'
+
         # dictionary of default values for each parameter
         default_params = self._get_default_params()
 
