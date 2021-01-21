@@ -86,10 +86,22 @@ class CondExpBase(CDE):
 
 
     def load_block(self, path):
+        ''' load model saved at path into this model. 
+            Arguments: 
+                path : path to saved weights. (str)
+            Returns: None
+        '''
+
         self.load_parameters(path)
         self.trained = True
 
     def save_block(self, path):
+        ''' save trained model to specified path. 
+            Arguments: 
+                path : path to save to. (str)
+            Returns: None
+        '''
+        
         self.save_parameters(path)
 
 
