@@ -98,7 +98,7 @@ class Experiment():
         if blocks is None:
             blocks = []
             for bn,bp in zip(block_names, block_params): # data_info
-                blocks.append(self.build_block(bn,bp))
+                blocks.append(self._build_block(bn,bp))
         
         # load in trained block info if past experiment provided
         if past_exp_path is not None:
@@ -379,7 +379,7 @@ class Experiment():
         return results
 
     
-    def build_block(self, block_name, block_param):
+    def _build_block(self, block_name, block_param):
         ''' Given a Block's name and associated params, instantiate a Block 
             object. 
 

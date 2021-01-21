@@ -92,8 +92,7 @@ class KMeans(Clusterer):
         try:
             pyx = prev_results['pyx']
         except:
-            'Generate pyx predictions with CDE before clustering.'
-            return
+            raise RuntimeError('Generate pyx predictions with CDE before clustering.')
 
         #train x clusters
         x_lbls = self._train_X_model(pyx)

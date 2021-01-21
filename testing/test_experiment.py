@@ -7,7 +7,7 @@ from cfl.util.data_processing import one_hot_encode
 from cfl.dataset import Dataset
 import shutil
 
-# Note: change if you want results somewhere 
+# Note: change if you want results somewhere else (folder will be deleted at end of run)
 save_path = 'testing/tmp_test_results'
 
 # hypothesis 
@@ -121,6 +121,64 @@ def test_cde_experiment():
     # clear any saved data
     shutil.rmtree(save_path)
     
+
+def test_clusterer_experiment():
+    ''' Test response to including/not including the correct pyx prev_results
+        for a stand-alone clusterer.
+    '''
+
+    # generate data
+    x,y = generate_vb_data()
+
+    # set CFL params
+    data_info = {'X_dims': x.shape, 
+                'Y_dims': y.shape, 
+                'Y_type': 'categorical'}
+
+    cluster_params = {'n_Xclusters' : 4, 
+                      'n_Yclusters' : 2}
+
+    block_names = ['Kmeans']
+    block_params = [cluster_params]
+
+    # make new CFL Experiment with clusterer only
+    my_exp_cluster = Experiment(X_train=x, Y_train=y, data_info=data_info, 
+                block_names=block_names, block_params=block_params, blocks=None, 
+                results_path=save_path)
+    
+    # make artificial pyx
+    rng = np.random.default_rng(12345) # create a Random Number Gen to set reproducible random seed
+    pyx = rng.random(y.shape[0], y.shape[1])
+    prev_results = {'pyx' : pyx}
+    
+    # train Experiment with pyx provided
+    dataset_train_cluster = Dataset(x,y,'dataset_train_cluster')
+    train_results_cluster = my_exp_cluster.train(dataset=dataset_train_cluster, prev_results=prev_results)
+    
+    # tmp save
+    np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['Kmeans']['x_lbls'])
+    np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['Kmeans']['y_lbls'])
+    
+    # # load in correct labels
+    # x_lbls_expected = np.load('testing/resources/test_experiment/x_lbls.npy')
+    # y_lbls_expected = np.load('testing/resources/test_experiment/y_lbls.npy')
+
+    # # check clustering values
+    # assert train_results_cluster['Kmeans']['x_lbls'] == x_lbls_expected, \
+    #     'x_lbls do not match expected values.'
+    # assert train_results_cluster['Kmeans']['y_lbls'] == y_lbls_expected, \
+    #     'y_lbls do not match expected values.'
+
+
+
+    # try to train with no pyx (bad)
+    my_exp_cluster2 = Experiment(X_train=x, Y_train=y, data_info=data_info, 
+            block_names=block_names, block_params=block_params, blocks=None, 
+            results_path=save_path)
+    with pytest.raises(Exception): 
+        cluster_bad = my_exp_cluster2.train(dataset=dataset_train_cluster, prev_results=None)
+
+
 
 
 
