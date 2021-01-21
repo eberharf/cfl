@@ -2,7 +2,9 @@
 import pickle
 import json
 import os
+import numpy as np
 from cfl.dataset import Dataset
+from cfl.block import Block
 import cfl.density_estimation_methods as cdem
 import cfl.cluster_methods as ccm
 from cfl.util.dir_util import get_next_dirname
@@ -46,6 +48,10 @@ class Experiment():
               Do not specify all four of these parameters. 
         '''
 
+        # check data input types
+        assert isinstance(X, np.ndarray), 'X should be of type np.ndarray.'
+        assert isinstance(Y, np.ndarray), 'Y should be of type np.ndarray.'
+
         # if loading from past experiment, make sure no other block
         # specifications are provided ...
         if past_exp_path is not None:
@@ -83,7 +89,6 @@ class Experiment():
 
         # build experiment directory
         self.save_path = self._make_exp_dir(results_path)
-        # TODO: check this save path early so that we fail early if it's already been populated
 
         # load in params from past experiment if provided
         if past_exp_path is not None:
@@ -126,11 +131,27 @@ class Experiment():
         '''
 
         if not self.is_trained:
+
+            # check inputs
+            assert isinstance(dataset, (type(None), Dataset, str)), \
+                'dataset should be None, or of type Dataset or str.'
+            assert isinstance(prev_results, (type(None), dict)), \
+                'prev_results should be None or a dict'
+
             print('Training CFL pipeline.')
+            # pull specified dataset
             if dataset is None:
                 dataset = self.get_dataset('dataset_train')
-            elif type(dataset)==str:
+            elif isinstance(dataset, str):
+                if dataset != 'dataset_train':
+                    print('Warning: you are not using the dataset_train ' + \
+                    'Dataset specified in Experiment initialization for ' + \
+                    'training the CFL pipeline.')
                 dataset = self.get_dataset(dataset)
+            else:
+                print('Warning: by specifying your own Dataset for ' + \
+                    'training, you may not be using the same data as ' + \
+                    'specified for training in Experiment initialization.')
 
             all_results = {}
             for block in self.blocks:
@@ -149,6 +170,10 @@ class Experiment():
                 prev_results = results
 
             return all_results
+        else: 
+            print('This Experiment has already been trained. If you would ' + \
+                'like to use a new Dataset for training, please create a ' + \
+                'new Experiment.')
     
     def predict(self, dataset, prev_results=None):
         ''' Predict using the trained CFL pipeline. 
@@ -162,12 +187,18 @@ class Experiment():
                 all_results : dict of results dicts from all Blocks. (dict dict)
         '''
 
-        if type(dataset)==str:
+        # check inputs
+        assert isinstance(dataset, (type(None), Dataset, str)), \
+            'dataset should be None, or of type Dataset or str.'
+        assert isinstance(prev_results, (type(None), dict)), \
+            'prev_results should be None or a dict'
+
+        # pull specified dataset
+        if isinstance(dataset, str):
             dataset = self.get_dataset(dataset)
 
         for bi,block in enumerate(self.blocks):
             assert block.is_trained, 'Block {} has not been trained yet.'.format(bi)
-            # TODO: this means all block objects should have an 'is_trained' attribute
 
         all_results = {}
         for block in self.blocks:
@@ -193,6 +224,13 @@ class Experiment():
 
             Returns: None
         '''
+
+        # check inputs
+        assert isinstance(results, dict), 'results should be a dict.'
+        assert isinstance(dataset, Dataset), 'dataset should be of type Dataset.'
+        assert isinstance(block, Block), \
+            'block should be of a type that inherits Block.'
+
         if self.save_path is not None:
             dir_name = os.path.join(self.save_path, dataset.get_name())
             if not os.path.exists(dir_name):
@@ -210,6 +248,7 @@ class Experiment():
             Arguments: None
             Returns: None
         '''
+
         if self.save_path is not None:
             assert self.blocks is not None, 'self.blocks does not exist yet.'
             assert not os.path.exists(os.path.join(self.save_path, 'params')), 'Params already saved.'
@@ -244,7 +283,10 @@ class Experiment():
                 block_params : ordered list of params dictionaries associated 
                                with each block. (dict list)
         '''
-                             
+        assert isinstance(params_path, str), 'params_path should be a str.'
+        assert os.path.exists(params_path), \
+            'The params_path specified does not exist.'
+
         with open(os.path.join(params_path, 'block_graph'), 'rb') as f:
             block_graph = pickle.load(f)
         block_params = []
@@ -269,6 +311,12 @@ class Experiment():
             Returns:
                 dataset : the newly constructed Dataset object. (Dataset)
         '''
+        
+        # check inputs
+        assert isinstance(X, np.ndarray), 'X should be of type np.ndarray.'
+        assert isinstance(Y, np.ndarray), 'Y should be of type np.ndarray.'
+        assert isinstance(dataset_name, str), \
+            'dataset_name should be of type str.'
 
         # make new Dataset, add to Experiment's dict of datasets
         dataset = Dataset(X, Y, dataset_name)
@@ -285,8 +333,12 @@ class Experiment():
                 dataset : the Dataset associated with dataset_name. (Dataset) 
         '''
 
+        # check inputs
+        assert isinstance(dataset_name, str), \
+            'dataset_name should be of type str.'
         assert dataset_name in self.datasets.keys(), "No dataset with the " + \
             "name 'dataset_name' has been added to this Experiment yet."
+
         return self.datasets[dataset_name]
 
     def load_dataset_results(self, dataset_name='dataset_train'):
@@ -303,6 +355,10 @@ class Experiment():
                           specifies which block the results come from. The
                           second key specifies the result name. (dict dict)
         '''
+
+        # check inputs
+        assert isinstance(dataset_name, str), \
+            'dataset_name should be of type str.'
 
         # pull corresponding Dataset from providied name
         dataset = self.get_dataset(dataset_name)
@@ -335,10 +391,17 @@ class Experiment():
             method. Once we have time, we can look into using the registration
             method.
         '''
+
+        # check inputs
+        assert isinstance(block_name, str), 'block_name should be of type str.'
+        assert isinstance(block_param, dict), \
+            'block_param should be of type dict.'
         assert block_name in BLOCK_KEY.keys(), block_name + ' has not been ' + \
-            'added to BLOCK_KEY yet. Please do so before proceeding. Note: ' + \ 
-            'this is a temporary system until we set up Block registration.'    
-        return BLOCK_KEY[block_name](name=block_name, data_info=self.data_info, params=block_param)
+            'added to BLOCK_KEY yet. Please do so before proceeding. Note: ' + \
+            'this is a temporary system until we set up Block registration.' 
+
+        return BLOCK_KEY[block_name](name=block_name, data_info=self.data_info, 
+                                     params=block_param)
 
 
     def check_blocks_compatibility(self):
@@ -373,6 +436,10 @@ class Experiment():
                             ('path/to/dir/experiment000x' in the example above).
                             (str)
         '''
+
+        # check inputs
+        assert isinstance(results_path, str), \
+            'results_path should be of type str.'
 
         # make sure base_path exists, if not make it
         if not os.path.exists(results_path):
