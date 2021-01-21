@@ -49,8 +49,8 @@ class Experiment():
         '''
 
         # check data input types
-        assert isinstance(X, np.ndarray), 'X should be of type np.ndarray.'
-        assert isinstance(Y, np.ndarray), 'Y should be of type np.ndarray.'
+        assert isinstance(X_train, np.ndarray), 'X should be of type np.ndarray'
+        assert isinstance(Y_train, np.ndarray), 'Y should be of type np.ndarray'
 
         # if loading from past experiment, make sure no other block
         # specifications are provided ...
