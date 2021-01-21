@@ -26,15 +26,19 @@ class Experiment():
         Arguments:
             X_train : an (n_samples, n_x_features) 2D array. (np.array)
             Y_train : an (n_samples, n_y_features) 2D array. (np.array)
-            data_info : TODO
+            data_info : a dictionary of information about this Experiment's
+                        associated data. Refer to 
+                        cfl.util.arg_validation_util.validate_data_info for 
+                        more information. (dict)
             past_exp_path : path to directory associated with a previously
-                            trained Experiment (str)
+                            trained Experiment. (str)
             block_names : list of block names to use (i.e. ['CondExpVB', 'KMeans']). 
                           Full list of names can be found here: <TODO>. (str list)
             block_params : list of dicts specifying parameters for each block specified
                            in block_names. Default is None. (dict list)
             blocks : list of block objects. Default is None. (Block list)
             results_path : path to directory to save this experiment to. Default is ''. (str)
+
         Note: There are three ways to specify blocks: 
                 1) specify past_exp_path
                 2) specify both block_names and block_params
@@ -108,10 +112,6 @@ class Experiment():
         
         # save configuration parameters for each block
         self._save_params()
-
-        # # train if creating new experiment from scratch
-        # if past_exp_path is None:
-        #     self.train()
 
     def train(self, dataset=None, prev_results=None):
         ''' Train the CFL pipeline. 
@@ -288,19 +288,6 @@ class Experiment():
         assert dataset_name in self.datasets.keys(), "No dataset with the " + \
             "name 'dataset_name' has been added to this Experiment yet."
         return self.datasets[dataset_name]
-    
-    def load_train_results(self):
-
-        # find directory for train_dataset results
-        dir_name = os.path.join(self.save_path, self.dataset_train.get_name())
-
-        # load in results for each block
-        results = {}
-        for block in self.blocks:
-            file_name = os.path.join(dir_name, block.get_name())
-            with open(file_name, 'rb') as f:
-                results[block.get_name()] = pickle.load(f)
-        return results
 
     def load_dataset_results(self, dataset_name='dataset_train'):
         ''' Load and return all saved results from running a given dataset
@@ -348,7 +335,9 @@ class Experiment():
             method. Once we have time, we can look into using the registration
             method.
         '''
-            
+        assert block_name in BLOCK_KEY.keys(), block_name + ' has not been ' + \
+            'added to BLOCK_KEY yet. Please do so before proceeding. Note: ' + \ 
+            'this is a temporary system until we set up Block registration.'    
         return BLOCK_KEY[block_name](name=block_name, data_info=self.data_info, params=block_param)
 
 
