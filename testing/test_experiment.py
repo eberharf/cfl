@@ -8,7 +8,7 @@ from cfl.dataset import Dataset
 import shutil
 
 # Note: change if you want results somewhere 
-save_path = 'tmp_test_results'
+save_path = 'testing/tmp_test_results'
 
 # hypothesis 
 ############### HELPER FUNCTIONS #################
@@ -47,7 +47,7 @@ def test_cde_experiment():
                     'n_epochs': 2,
                     'opt_config': {'lr': 0.001},
                     'verbose': 1,
-                    'show_plot': True,
+                    'show_plot': False,
                     'dense_units': [100, 50, 10, 2],
                     'activations': ['relu', 'relu', 'relu', 'softmax'],
                     'dropouts': [0.2, 0.5, 0.5, 0],
@@ -69,8 +69,12 @@ def test_cde_experiment():
     train_results_cde = my_exp_cde.train(dataset=dataset_train_cde, prev_results=None)
     
     # check output of CDE block
-    assert 'pyx' in train_results_cde.keys(), 'CDE train fxn should specify pyx in results'
-    assert 'model_weights' in train_results_cde.keys(), 'CDE train fxn should specify model_weights in results'
+    assert 'pyx' in train_results_cde['CondExpMod'].keys(), \
+        'CDE train fxn should specify pyx in training results. ' + \
+        'Actual keys: {}'.format(train_results_cde.keys())
+    assert 'model_weights' in train_results_cde['CondExpMod'].keys(), \
+        'CDE train fxn should specify model_weights in training results. ' + \
+        'Actual keys: {}'.format(train_results_cde.keys())
 
     # try to train the experiment again --- it should not work 
     with pytest.raises(Exception): 
@@ -79,15 +83,17 @@ def test_cde_experiment():
     ## predict 
     # check that results are the same as with training 
     predict_results_cde = my_exp_cde.predict(dataset_train_cde)
-    assert 'pyx' in train_results_cde.keys(), 'CDE predict fxn should specify pyx in results'
-    assert train_results_cde['pyx'] == predict_results_cde['pyx']
+    assert 'pyx' in predict_results_cde['CondExpMod'].keys(), \
+        'CDE predict fxn should specify pyx in prediction results'
+    assert np.array_equal(train_results_cde['CondExpMod']['pyx'], \
+        predict_results_cde['CondExpMod']['pyx'])
 
 
     ## CDE and cluster experiment 
     cluster_params = {'n_Xclusters': 4,
                       'n_Yclusters': 2} 
 
-    block_names = ['CondExpMod', 'KMeans']
+    block_names = ['CondExpMod', 'Kmeans']
     block_params = [condExp_params, cluster_params]
 
     my_exp_clust = Experiment(X_train=x, Y_train=y, data_info=data_info, 
@@ -97,14 +103,11 @@ def test_cde_experiment():
     dataset_train_clust = Dataset(x,y, 'dataset_train_clust')
 
     # check if clusterer can train
-    try:
-        train_results_clust = my_exp_clust.train(dataset=dataset_train_clust, prev_results=train_results_cde)
-    except ClusterTrainError:
-        pytest.fail('Cluster was not able to train with prev_results from CDE.')
+    train_results_clust = my_exp_clust.train(dataset=dataset_train_clust, prev_results=train_results_cde)
 
     # check output of clusterer block
-    assert 'x_lbls' in train_results_clust.keys(), 'Clusterer train fxn should specify x_lbls in results'
-    assert 'y_lbls' in train_results_clust.keys(), 'Clusterer train fxn should specify y_lbls in results'
+    assert 'x_lbls' in train_results_clust['Kmeans'].keys(), 'Clusterer train fxn should specify x_lbls in results'
+    assert 'y_lbls' in train_results_clust['Kmeans'].keys(), 'Clusterer train fxn should specify y_lbls in results'
     
 
     #try to train clusterer again - it should not work 
@@ -112,7 +115,7 @@ def test_cde_experiment():
         train_results_clust = my_exp_clust.train(dataset=dataset_train_clust, prev_results=train_results_cde)
 
     # clear any saved data
-    shutil.rmtree('tmp_test_results')
+    shutil.rmtree(save_path)
     
 
 

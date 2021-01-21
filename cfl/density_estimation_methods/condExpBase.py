@@ -175,7 +175,7 @@ class CondExpBase(CDE):
         # handle results
         train_loss = history.history['loss']
         val_loss = history.history['val_loss']
-        fig = self._graph_results(train_loss, val_loss, show=True)
+        fig = self._graph_results(train_loss, val_loss, show=self.params['show_plot'])
         pyx = self.model.predict(dataset.X)
 
         # load in best weights if specified

@@ -168,12 +168,13 @@ class Experiment():
                 
                 # pass results on to next block
                 prev_results = results
-
+            
+            self.is_trained = True
             return all_results
         else: 
-            print('This Experiment has already been trained. If you would ' + \
-                'like to use a new Dataset for training, please create a ' + \
-                'new Experiment.')
+            raise Exception('This Experiment has already been trained. ' + \
+                'If you would like to use a new Dataset for training, ' + \
+                'please create a new Experiment.')
     
     def predict(self, dataset, prev_results=None):
         ''' Predict using the trained CFL pipeline. 
