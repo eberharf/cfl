@@ -103,16 +103,20 @@ def test_cde_experiment():
     dataset_train_clust = Dataset(x,y, 'dataset_train_clust')
 
     # check if clusterer can train
-    train_results_clust = my_exp_clust.train(dataset=dataset_train_clust, prev_results=train_results_cde)
+    train_results_clust = my_exp_clust.train(dataset=dataset_train_clust, \
+        prev_results=train_results_cde)
 
     # check output of clusterer block
-    assert 'x_lbls' in train_results_clust['Kmeans'].keys(), 'Clusterer train fxn should specify x_lbls in results'
-    assert 'y_lbls' in train_results_clust['Kmeans'].keys(), 'Clusterer train fxn should specify y_lbls in results'
+    assert 'x_lbls' in train_results_clust['Kmeans'].keys(), \
+        'Clusterer train fxn should specify x_lbls in results'
+    assert 'y_lbls' in train_results_clust['Kmeans'].keys(), \
+        'Clusterer train fxn should specify y_lbls in results'
     
 
     #try to train clusterer again - it should not work 
     with pytest.raises(Exception): 
-        train_results_clust = my_exp_clust.train(dataset=dataset_train_clust, prev_results=train_results_cde)
+        train_results_clust = my_exp_clust.train(dataset=dataset_train_clust, \
+            prev_results=train_results_cde)
 
     # clear any saved data
     shutil.rmtree(save_path)

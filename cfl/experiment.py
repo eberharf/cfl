@@ -107,8 +107,10 @@ class Experiment():
                 block.load_block(fn)
             self.is_trained = True
 
-        # TODO: make sure all blocks descend from mega-block type
         self.blocks = blocks
+        for block in self.blocks:
+            assert isinstance(block, Block), \
+                'A specified block is not of type Block.'
 
         # TODO: check that interfaces match
         # TODO: assert in the function itself so we can give more info
