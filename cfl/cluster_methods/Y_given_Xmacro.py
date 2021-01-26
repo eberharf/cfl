@@ -7,7 +7,7 @@ Contains functions for clustering categorical and continuous 1-D Ys
 import numpy as np
 from tqdm import tqdm
 from cfl.util.x_lbl_util import rows_where_each_x_class_occurs
-
+from cfl.util.data_processing import one_hot_decode
 
 def categorical_Y(Y_data, x_lbls):
     """
@@ -24,6 +24,12 @@ def categorical_Y(Y_data, x_lbls):
     entries of the array contain the conditional probability P(y|x) for the corresponding y value, given that the x is a member of
     the corresponding class of that column
     """
+
+    # convert to standard categorical representation if one-hot-encoded
+    # TODO: check for one-hot-encoding through data_info instead of inferring it
+    if all(np.sum(Y_data,axis=1)==1): 
+        Y_data = one_hot_decode(Y_data)
+
     #TODO: check that this function does the right thing
     Y_values = np.unique(Y_data)
 
@@ -42,9 +48,11 @@ def categorical_Y(Y_data, x_lbls):
     cond_Y_prob = np.zeros((num_Ys, num_x_classes))
 
     for i, y in enumerate(Y_data):
-        for j, xclass in enumerate(x_lbl_indices):
-            cond_Y_prob[i][j] = np.sum(ys_in_each_x_class == y) / len(xclass)
-
+        # for j, xclass in enumerate(x_lbl_indices):
+        #     cond_Y_prob[i][j] = np.sum(ys_in_each_x_class == y) / len(xclass)
+        for j, cluster_vals in enumerate(ys_in_each_x_class):
+            # TODO: how should we handle this mean when we have multiple categorical variables?
+            cond_Y_prob[i][j] = np.mean(cluster_vals==y)
     return cond_Y_prob
 
 
