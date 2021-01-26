@@ -51,8 +51,7 @@ def categorical_Y(Y_data, x_lbls):
         # for j, xclass in enumerate(x_lbl_indices):
         #     cond_Y_prob[i][j] = np.sum(ys_in_each_x_class == y) / len(xclass)
         for j, cluster_vals in enumerate(ys_in_each_x_class):
-            # TODO: how should we handle this mean when we have multiple categorical variables?
-            cond_Y_prob[i][j] = np.mean(cluster_vals==y)
+            cond_Y_prob[i][j] = np.sum(cluster_vals==y) / cluster_vals.shape[0]
     return cond_Y_prob
 
 
