@@ -19,9 +19,9 @@ BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB,
 
 class Experiment():
 
-    def __init__(self, X_train, Y_train, data_info, past_exp_path=None,
-                 block_names=None, block_params=None, blocks=None, 
-                 results_path=''):
+    def __init__(self, data_info, X_train, Y_train, X_train_raw=None, 
+                 Y_train_raw=None, past_exp_path=None, block_names=None, 
+                 block_params=None, blocks=None, results_path=''):
         ''' 
         Sets up and trains an Experiment.
 
@@ -84,7 +84,10 @@ class Experiment():
         validate_data_info(data_info)
         self.data_info = data_info
         self.datasets = {}
-        self.dataset_train = self.add_dataset(X_train, Y_train, 'dataset_train')
+        self.dataset_train = self.add_dataset(X=X_train, Y=Y_train, \
+                                              Xraw=X_train_raw, \
+                                              Yraw=Y_train_raw, \
+                                              dataset_name='dataset_train')
         self.datasets[self.dataset_train.get_name()] = self.dataset_train
 
         # build experiment directory
@@ -299,7 +302,7 @@ class Experiment():
         return block_graph, block_params
 
 
-    def add_dataset(self, X, Y, dataset_name):
+    def add_dataset(self, X, Y, Xraw=None, Yraw=None, dataset_name='dataset'):
         ''' Add a new dataset to be tracked by this Experiment. 
             
             Arguments: 
@@ -316,13 +319,25 @@ class Experiment():
         '''
         
         # check inputs
-        assert isinstance(X, np.ndarray), 'X should be of type np.ndarray.'
-        assert isinstance(Y, np.ndarray), 'Y should be of type np.ndarray.'
-        assert isinstance(dataset_name, str), \
-            'dataset_name should be of type str.'
+        assert isinstance(X, np.ndarray), \
+            'X should be of type np.ndarray. Actual type: {}'.format(type(X))
+        assert isinstance(Y, np.ndarray), \
+            'Y should be of type np.ndarray. Actual type: {}'.format(type(Y))
+        assert isinstance(Xraw, (np.ndarray, type(None))), \
+            'Xraw should be of type np.ndarray or NoneType. ' + \
+                'Actual type: {}'.format(type(Xraw))
+        assert isinstance(Yraw, (np.ndarray, type(None))), \
+            'Yraw should be of type np.ndarray or NoneType. ' + \
+                'Actual type: {}'.format(type(Yraw))
+        assert isinstance(dataset_name, str), 'dataset_name should be of ' + \
+            'type str. Actual type: {}'.format(type(dataset_name))
+
+        # check that we haven't added a Dataset by this name already
+        assert dataset_name not in self.datasets.keys(), \
+            'A Dataset named {} has already been added to this Experiment.'.format(dataset_name)
 
         # make new Dataset, add to Experiment's dict of datasets
-        dataset = Dataset(X, Y, dataset_name)
+        dataset = Dataset(X=X, Y=Y, Xraw=Xraw, Yraw=Yraw, name=dataset_name)
         self.datasets[dataset_name] = dataset
         return dataset
 
