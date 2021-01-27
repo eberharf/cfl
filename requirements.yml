@@ -30,3 +30,4 @@ dependencies:
   - nibabel # for reading/writing MRIs
   - ipywidgets  # for interactive widgets
   - jupyter_nbextensions_configurator
+  - plotly # for the sankey diagrams
