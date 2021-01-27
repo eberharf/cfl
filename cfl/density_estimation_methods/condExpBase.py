@@ -152,6 +152,11 @@ class CondExpBase(CDE):
         # specify checkpoint save callback
         callbacks = []
         if self.params['best']:
+            # handle case where user interrupted previous training session
+            # before tmp_checkpoints clean-up code was executed.
+            if os.path.exists('tmp_checkpoints'):
+                print('Warning: deleting tmp_checkpoints directory.')
+                shutil.rmtree('tmp_checkpoints')
             os.mkdir('tmp_checkpoints')
             model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
                 filepath='tmp_checkpoints/best_weights',
