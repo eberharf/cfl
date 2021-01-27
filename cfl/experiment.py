@@ -21,7 +21,7 @@ class Experiment():
 
     def __init__(self, data_info, X_train, Y_train, X_train_raw=None, 
                  Y_train_raw=None, past_exp_path=None, block_names=None, 
-                 block_params=None, blocks=None, results_path=''):
+                 block_params=None, blocks=None, verbose=1, results_path=''):
         ''' 
         Sets up and trains an Experiment.
 
@@ -90,6 +90,11 @@ class Experiment():
                                               dataset_name='dataset_train')
         self.datasets[self.dataset_train.get_name()] = self.dataset_train
 
+        # add verbosity to params that don't specify
+        self.verbose = verbose
+        if block_params is not None:
+            block_params = self._propagate_verbosity(self.verbose, block_params)
+        
         # build experiment directory
         self.save_path = self._make_exp_dir(results_path)
 
@@ -143,20 +148,24 @@ class Experiment():
             assert isinstance(prev_results, (type(None), dict)), \
                 'prev_results should be None or a dict'
 
-            print('Training CFL pipeline.')
+            if self.verbose > 0:
+                print('Training CFL pipeline.')
+
             # pull specified dataset
             if dataset is None:
                 dataset = self.get_dataset('dataset_train')
             elif isinstance(dataset, str):
                 if dataset != 'dataset_train':
-                    print('Warning: you are not using the dataset_train ' + \
-                    'Dataset specified in Experiment initialization for ' + \
-                    'training the CFL pipeline.')
+                    if self.verbose > 0:
+                        print('Warning: you are not using the dataset_train ' + \
+                        'Dataset specified in Experiment initialization for ' + \
+                        'training the CFL pipeline.')
                 dataset = self.get_dataset(dataset)
             else:
-                print('Warning: by specifying your own Dataset for ' + \
-                    'training, you may not be using the same data as ' + \
-                    'specified for training in Experiment initialization.')
+                if self.verbose > 0:
+                    print('Warning: by specifying your own Dataset for ' + \
+                        'training, you may not be using the same data as ' + \
+                        'specified for training in Experiment initialization.')
 
             all_results = {}
             for block in self.blocks:
@@ -269,7 +278,7 @@ class Experiment():
 
             fn = os.path.join(self.save_path, 'params', 'block_graph')
             with open(fn, 'wb') as f:
-                pickle.dump(block_graph, f)
+                pickle.dump(block_graph, f) 
     
 
     def _load_params(self, params_path):
@@ -461,11 +470,21 @@ class Experiment():
 
         # make sure base_path exists, if not make it
         if not os.path.exists(results_path):
-            print("save_path '{}' doesn't exist, creating now.".format(results_path))
+            if self.verbose > 0:
+                print("save_path '{}' doesn't exist, creating now.".format(results_path))
             os.makedirs(results_path)
 
         # create dir for this run
         save_path = os.path.join(results_path, get_next_dirname(results_path))
-        print('All results from this run will be saved to {}'.format(save_path))
+        if self.verbose > 0:
+            print('All results from this run will be saved to {}'.format(save_path))
         os.mkdir(save_path)
         return save_path
+
+    def _propagate_verbosity(self, verbose, block_params):
+        for pi in range(len(block_params)):
+            if 'verbose' not in block_params[pi].keys():
+                modified_params = block_params[pi]
+                modified_params['verbose'] = verbose
+                block_params[pi] = modified_params
+        return block_params

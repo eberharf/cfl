@@ -155,7 +155,8 @@ class CondExpBase(CDE):
             # handle case where user interrupted previous training session
             # before tmp_checkpoints clean-up code was executed.
             if os.path.exists('tmp_checkpoints'):
-                print('Warning: deleting tmp_checkpoints directory.')
+                if self.params['verbose']>0:
+                    print('Warning: deleting tmp_checkpoints directory.')
                 shutil.rmtree('tmp_checkpoints')
             os.mkdir('tmp_checkpoints')
             model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
@@ -213,6 +214,8 @@ class CondExpBase(CDE):
         #     plt.savefig(save_path)
         if show:
             plt.show()
+        else:
+            plt.close()
         return fig
 
 
@@ -261,7 +264,8 @@ class CondExpBase(CDE):
 
         assert hasattr(self, 'model'), 'Build model before loading parameters.'
 
-        print("Loading parameters from ", file_path)
+        if self.params['verbose']>0:
+            print("Loading parameters from ", file_path)
         self.model.load_weights(file_path)
         self.trained = True
 
@@ -271,7 +275,8 @@ class CondExpBase(CDE):
                 file_path : path to checkpoint file (string)
             Returns: None
         '''
-        print("Saving parameters to ", file_path)
+        if self.params['verbose']>0:
+            print("Saving parameters to ", file_path)
         self.model.save_weights(file_path)
     
     def _get_default_params(self):

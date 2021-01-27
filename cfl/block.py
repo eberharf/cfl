@@ -131,13 +131,22 @@ class Block(metaclass=ABCMeta):
         # dictionary of default values for each parameter
         default_params = self._get_default_params()
 
+        # temporarily set verbosity
+        if 'verbose' in input_params.keys():
+            verbose = input_params['verbose']
+        elif 'verbose' in default_params.keys():
+            verbose = default_params['verbose']
+        else: 
+            verbose = 2
+
         # check for parameters that are provided but not needed
         # remove if found
         paramsToRemove = []
         for param in input_params:
             if param not in default_params.keys():
                 paramsToRemove.append(param)
-                print('{} specified but not used by {} clusterer'.format(param, self.name))
+                if verbose > 0:
+                    print('{} specified but not used by {} clusterer'.format(param, self.name))
 
         # remove unnecessary parameters after we're done iterating
         # to not cause problems
@@ -148,7 +157,8 @@ class Block(metaclass=ABCMeta):
         # add if not found
         for param in default_params:
             if param not in input_params.keys():
-                print('{} not specified in input, defaulting to {}'.format(param, default_params[param]))
+                if verbose > 0:
+                    print('{} not specified in input, defaulting to {}'.format(param, default_params[param]))
                 input_params[param] = default_params[param]
 
         input_params['name'] = self.name
