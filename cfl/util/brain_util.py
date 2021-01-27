@@ -165,7 +165,8 @@ def coarsen(x, n_voxels, brain_dims, method='majority'):
     if x.ndim < 3:
         x = unflatten(x, brain_dims)
 
-    new_dims = np.ceil(brain_dims/n_voxels).astype(int)
+    new_dims = np.ceil(np.divide(brain_dims, n_voxels)).astype(int)
+
     new_x = np.zeros(new_dims)
     for i in range(new_dims[0]):
         for j in range(new_dims[1]):
