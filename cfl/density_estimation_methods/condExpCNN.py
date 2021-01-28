@@ -23,6 +23,11 @@ class CondExpCNN(CondExpBase):
         super().__init__(name, data_info, params)
 
 
+    def _get_default_params:
+        '''model and learning parameters. Most of these parameters are actually used
+        in the learning step (implemented in CondExpBase), not model construction here '''
+
+
     def _build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
             Eventually, this architecture will have to become more dynamic (TODO).

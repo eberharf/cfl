@@ -22,6 +22,25 @@ class CondExpMod(CondExpBase):
         '''
         super().__init__(name=name, data_info=data_info, params=params)
 
+    def _get_default_params(self):
+        '''model and learning parameters. Most of these parameters are actually used
+        in the learning step (implemented in CondExpBase), not model construction here '''
+        return {'batch_size'  : 32,
+                'n_epochs'    : 20,
+                'optimizer'   : 'adam',
+                'opt_config'  : {},
+                'verbose'     : 1,
+                'dense_units' : [50, self.data_info['Y_dims'][1]],
+                'activations' : ['relu', 'linear'],
+                'dropouts'    : [0, 0],
+                'weights_path': None,
+                'loss'        : 'mean_squared_error',
+                'show_plot'   : True,
+                'name'  : self.name,
+                'standardize' : False,
+                'best'        : True,
+            }
+
 
     def _check_params(self):
         '''verify that a valid NN structure was specified in the input parameters'''
@@ -37,6 +56,7 @@ class CondExpMod(CondExpBase):
         assert len(self.params['dense_units']) == len(self.params['dropouts']), \
                 "params['dense_units'] and params['dropouts'] should be the same length but instead are {} and {}.".format(self.params['dense_units'], self.params['dropouts'])
         return
+
 
     def _build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
