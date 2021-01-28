@@ -27,7 +27,7 @@ def categorical_Y(Y_data, x_lbls):
 
     # convert to standard categorical representation if one-hot-encoded
     # TODO: check for one-hot-encoding through data_info instead of inferring it
-    if all(np.sum(Y_data,axis=1)==1): 
+    if all(np.sum(Y_data,axis=1)==1):
         Y_data = one_hot_decode(Y_data)
 
     #TODO: check that this function does the right thing
@@ -47,11 +47,9 @@ def categorical_Y(Y_data, x_lbls):
     num_Ys = Y_data.shape[0]
     cond_Y_prob = np.zeros((num_Ys, num_x_classes))
 
-    for i, y in enumerate(Y_data):
-        # for j, xclass in enumerate(x_lbl_indices):
-        #     cond_Y_prob[i][j] = np.sum(ys_in_each_x_class == y) / len(xclass)
-        for j, cluster_vals in enumerate(ys_in_each_x_class):
-            cond_Y_prob[i][j] = np.sum(cluster_vals==y) / cluster_vals.shape[0]
+    for row, y in enumerate(Y_data):
+        for col, cluster_vals in enumerate(ys_in_each_x_class):
+            cond_Y_prob[row][col] = np.sum(cluster_vals==y) / cluster_vals.shape[0]
     return cond_Y_prob
 
 
@@ -147,6 +145,6 @@ def avg_nearest_neighbors_dist(y, other_Ys, y_in_otherYs, k_neighbors=4):
     if len(sorted_dists) < k_neighbors:
         print("Warning: There are very few members in this class. Calculating distance anyways.")
 
-    # return the average distance between y and its nearest n neighbors
+    # return the average distance between y and its nearest k neighbors
     return sorted_dists[:k_neighbors].mean()
 
