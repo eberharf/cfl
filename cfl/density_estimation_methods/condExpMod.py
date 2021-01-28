@@ -23,14 +23,8 @@ class CondExpMod(CondExpBase):
         super().__init__(name=name, data_info=data_info, params=params)
 
 
-    def _build_model(self):
-        ''' Define the neural network based on dimensions passed in during initialization.
-            This model takes specifications through the self.params dict to define
-            it's architecture.
-
-            Arguments: None
-            Returns: the model (tf.keras.models.Model object)
-        '''
+    def _check_params(self):
+        '''verify that a valid NN structure was specified in the input parameters'''
 
         assert self.params['dense_units'] is not {}, "Please specify layer sizes in params['dense_units']."
         assert self.params['activations'] is not {}, "Please specify layer sizes in params['activations']."
@@ -42,9 +36,18 @@ class CondExpMod(CondExpBase):
                 "params['dense_units'] and params['activation'] should be the same length but instead are {} and {}.".format(self.params['dense_units'], self.params['activations'])
         assert len(self.params['dense_units']) == len(self.params['dropouts']), \
                 "params['dense_units'] and params['dropouts'] should be the same length but instead are {} and {}.".format(self.params['dense_units'], self.params['dropouts'])
+        return
 
+    def _build_model(self):
+        ''' Define the neural network based on dimensions passed in during initialization.
+            This model takes specifications through the self.params dict to define
+            it's architecture.
 
+            Arguments: None
+            Returns: the model (tf.keras.models.Model object)
+        '''
 
+        self._check_params()
 
         arch = [tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],))] # input layer
         for units,act,dropout in zip(self.params['dense_units'], self.params['activations'], self.params['dropouts']):
