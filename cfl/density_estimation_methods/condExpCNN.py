@@ -36,17 +36,75 @@ class CondExpCNN(CondExpBase):
             Arguments: None
             Returns: the model (tf.keras.models.Model object)
         '''
-        model = tf.keras.models.Sequential([
-            tf.keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=(10, 10, 1)),
-            tf.keras.layers.MaxPooling2D((2, 2)),
-            tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
-            tf.keras.layers.MaxPooling2D((2, 2)),
-            tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(1),
-        ])
+
+        self._check_params()
+
+        arch = []
+        first_layer = True
+
+        for filters,act,pad,kernel,pool in zip(self.params['filters'], self.params['conv_activation'],
+            self.params['padding'], self.params['kernel_size'], self.params['pool_size']):
+
+            # for the first layer of the model, the parameter 'input shape' needs to be added to the conv layer
+            if first_layer:
+                arch.append(tf.keras.layers.Conv2D(filters=filters, activation=act, padding=pad,
+                    kernel_size=kernel, input_shape= self.params['input_shape']))
+                arch.append(tf.keras.layers.MaxPooling2D(pool_size=pool))
+                first_layer = False
+
+            else:
+                arch.append(tf.keras.layers.Conv2D(filters=filters, activation=act, padding=pad, kernel_size=kernel))
+                arch.append(tf.keras.layers.MaxPooling2D(pool_size=pool))
+
+        arch.append(tf.keras.layers.Flatten())
+        arch.append(tf.keras.layers.Dense(self.params['dense_units'], activation=self.params['dense_activation']))
+        arch.append(tf.keras.layers.Dense(1, activation= self.params['output_activation']))
+
+        model = tf.keras.models.Sequential(arch)
 
         return model
 
+    def get_default_params(self):
+
+        default_params = { # parameters for model creation
+                          'filters'         : [32, 64],
+                          'input_shape'     : (10, 10, 1),
+                          'kernel_size'     : [(3, 3)] * 2,
+                          'pool_size'       : [(2, 2)] * 2,
+                          'padding'         : ['same'] * 2,
+                          'conv_activation' : ['relu'] * 2,
+                          'dense_units'     : 64,
+                          'dense_activation' : 'relu',
+                          'output_activation': 'softmax',
+
+                          # parameters for training
+                          'batch_size'  : 32,
+                          'n_epochs'    : 20,
+                          'optimizer'   : 'adam',
+                            'opt_config'  : {},
+                            'verbose'     : 1,
+                            'weights_path': None,
+                            'loss'        : 'mean_squared_error',
+                            'show_plot'   : True,
+                            'name'        : self.name,
+                            'standardize' : False,
+                            'best'        : True,
+                         }
+        return default_params
+
+    ### Cond exp mod
+    def _check_params(self):
+        '''verify that a valid CNN structure was specified in the input parameters'''
+
+        assert len(self.params['filters']) > 0, "Filters not specified. Please specify filters in params['filters']"
+        assert len(self.params['kernel_size']) > 0, "Kernel sizes not specified. Please specify in params['kernel_sizes']"
+
+        assert len(self.params['filters']) == len(self.params['kernel_size']), "Conv/pooling params should all be \
+            the same length but filters and kernel size don't match: {} and {}".format(self.params['filters'], self.params['kernel_size'])
+        assert len(self.params['filters']) == len(self.params['pool_size']), "Conv/pooling params should all be \
+            the same length but filters and pool size don't match: {} and {}".format(self.params['filters'], self.params['pool_size'])
+        assert len(self.params['filters']) == len(self.params['padding']), "Conv/pooling params should all be \
+            the same length but filters and padding don't match: {} and {}".format(self.params['filters'], self.params['padding'])
+        assert len(self.params['filters']) == len(self.params['conv_activation']), "Conv/pooling params should all be \
+            the same length but filters and conv_activation don't match: {} and {}".format(self.params['filters'], self.params['conv_activation'])
 
