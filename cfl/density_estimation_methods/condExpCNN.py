@@ -7,15 +7,16 @@ from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class CondExpCNN(CondExpBase):
     ''' A child class of CondExpBase that defines a model specialized
-        for the visual bars dataset and uses 2D convolutional layers instead
-        of flattening the image data.
+        for the visual bars dataset and uses 2D convolutional layers interspersed
+        with pooling layers instead of flattening the image data.
 
-        See CondExpBase documentation for more details.
+        See CondExpBase documentation for more details about training.
 
     '''
     def __init__(self, name, data_info, params):
         ''' Initialize model and define network.
             Arguments:
+                name : name
                 data_info : a dictionary containing information about the data that will be passed in
                 params : dictionary containing parameters for the model
         '''
@@ -25,9 +26,17 @@ class CondExpCNN(CondExpBase):
 
     def _build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
-            Eventually, this architecture will have to become more dynamic (TODO).
 
-            Right now the architecture is optimized for visual bars 1000 10x10 images
+            This creates a convolutional neural net with the structure
+            (Conv2D layer, MaxPooling2D layer) * n, Dense layer, Output layer
+
+            The number of Conv2d/Maxpooling layers is determined by the length of the
+            filter/kernel_size/pool_size parameter lists given in the params (default 2).
+
+            The first dense layer after is to reduce the number of parameters in the model
+            before the output layer. The output layer gives the final predictions for each
+            feature in Y.
+
             Arguments: None
             Returns: the model (tf.keras.models.Model object)
         '''
@@ -88,7 +97,6 @@ class CondExpCNN(CondExpBase):
                          }
         return default_params
 
-    ### Cond exp mod
     def _check_params(self):
         '''verify that a valid CNN structure was specified in the input parameters'''
 
