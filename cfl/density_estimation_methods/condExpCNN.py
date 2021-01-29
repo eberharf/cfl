@@ -20,7 +20,7 @@ class CondExpCNN(CondExpBase):
                 params : dictionary containing parameters for the model
         '''
         self.model_name='CondExpCNN'
-        super().__init__(name, data_info, params)
+        super().__init__(name, data_info, params) #Main init stuff happens in block.py
 
 
     def _build_model(self):
@@ -53,24 +53,25 @@ class CondExpCNN(CondExpBase):
 
         arch.append(tf.keras.layers.Flatten())
         arch.append(tf.keras.layers.Dense(self.params['dense_units'], activation=self.params['dense_activation']))
-        arch.append(tf.keras.layers.Dense(1, activation= self.params['output_activation']))
+        # number of units in output layer is equal to number of features in Y
+        arch.append(tf.keras.layers.Dense(self.data_info['Y_dims'][1], activation= self.params['output_activation']))
 
         model = tf.keras.models.Sequential(arch)
 
         return model
 
-    def get_default_params(self):
+    def _get_default_params(self):
 
         default_params = { # parameters for model creation
-                          'filters'         : [32, 64],
-                          'input_shape'     : (10, 10, 1),
-                          'kernel_size'     : [(3, 3)] * 2,
-                          'pool_size'       : [(2, 2)] * 2,
-                          'padding'         : ['same'] * 2,
-                          'conv_activation' : ['relu'] * 2,
-                          'dense_units'     : 64,
+                          'filters'          : [32, 16],
+                          'input_shape'      : self.data_info['X_dims'][1:],
+                          'kernel_size'      : [(3, 3)] * 2,
+                          'pool_size'        : [(2, 2)] * 2,
+                          'padding'          : ['same'] * 2,
+                          'conv_activation'  : ['relu'] * 2,
+                          'dense_units'      : 16,
                           'dense_activation' : 'relu',
-                          'output_activation': 'softmax',
+                          'output_activation': None,
 
                           # parameters for training
                           'batch_size'  : 32,
@@ -90,6 +91,8 @@ class CondExpCNN(CondExpBase):
     ### Cond exp mod
     def _check_params(self):
         '''verify that a valid CNN structure was specified in the input parameters'''
+
+        assert len(self.params['input_shape'])==3, "Input shape should be of the format (im_height, im_width, num_channels) but is {}".format(self.params['input_shape'])
 
         assert len(self.params['filters']) > 0, "Filters not specified. Please specify filters in params['filters']"
         assert len(self.params['kernel_size']) > 0, "Kernel sizes not specified. Please specify in params['kernel_sizes']"
