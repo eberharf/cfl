@@ -9,6 +9,9 @@ class CondExpKC(CondExpBase):
     ''' A child class of CondExpBase that loosely recreates the
         model construted in Chalupka 2015 visual bars code.
 
+        This model expects to receive a series of (10, 10) grayscale images
+        as input
+
         See CondExpBase documentation for more details.
 
     '''
@@ -42,7 +45,6 @@ class CondExpKC(CondExpBase):
     def _build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
             This model is roughly modeled off of Chalupka 2015 visual bars code.
-
             Arguments: None
             Returns: the model (tf.keras.models.Model object)
         '''
