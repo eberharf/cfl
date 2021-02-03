@@ -15,7 +15,7 @@ class CDE(Block):
     # @abstractmethod
     # def predict(self, dataset):
     #     ...
-    
+
     @abstractmethod
     def evaluate(self, dataset):
         ...

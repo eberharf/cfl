@@ -28,7 +28,7 @@ class Block(metaclass=ABCMeta):
         # check input argument types
         assert isinstance(name, str), 'name should be of type str.'
         assert isinstance(data_info, dict), 'data_info should be of type dict.'
-        assert isinstance(params, dict), 'params should be of type dict.'    
+        assert isinstance(params, dict), 'params should be of type dict.'
 
         # set object attributes
         self.trained = False
@@ -45,7 +45,7 @@ class Block(metaclass=ABCMeta):
         Load a Block that has already been trained in a previous Experiment.
         All Blocks should be load-able with just a path name. The specific
         Block type is responsible for making sure it's loaded all relevant
-        fields. 
+        fields.
 
         Arguments:
             path : path to load from
@@ -136,7 +136,7 @@ class Block(metaclass=ABCMeta):
             verbose = input_params['verbose']
         elif 'verbose' in default_params.keys():
             verbose = default_params['verbose']
-        else: 
+        else:
             verbose = 2
 
         # check for parameters that are provided but not needed
@@ -146,7 +146,7 @@ class Block(metaclass=ABCMeta):
             if param not in default_params.keys():
                 paramsToRemove.append(param)
                 if verbose > 0:
-                    print('{} specified but not used by {} clusterer'.format(param, self.name))
+                    print('{} specified but not used by {}'.format(param, self.name))
 
         # remove unnecessary parameters after we're done iterating
         # to not cause problems

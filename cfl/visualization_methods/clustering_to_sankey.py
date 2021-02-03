@@ -7,7 +7,11 @@ Usage of this function:
 
 
 import plotly.graph_objects as go
-link, label = convert_lbls_to_sankey_nodes(x_lbls_L)
+from cfl.visualization_methods import clustering_to_sankey as sk
+
+#x_lbls_L = list of x labels from several different rounds of clustering on the same data
+
+link, label = sk.convert_lbls_to_sankey_nodes(x_lbls_L)
 # plot
 fig = go.Figure(data=
           [go.Sankey(node = dict(pad = 15, thickness=20, label = label, color =  "blue"),
@@ -39,7 +43,7 @@ def convert_lbls_to_sankey_nodes(x_lbls_L):
 
     # label is a list of all the labels on each section of the graph in sequential order
     # (ie ['2:0', '2:1', '3:0', '3:1', ....])
-    # the number after the colon refers to
+    # the number after the colon refers to the cluster labels on the next set of clusters
     label = [names[0] + str(i) for i in np.unique(x_lbls_L[0])]
 
     # the Sankey diagram is represented as a graph
@@ -67,6 +71,8 @@ def convert_lbls_to_sankey_nodes(x_lbls_L):
             # add clusters to source and target list
               source.append(a + aindex)
               target.append(b + bindex)
+              # source.append(float(str(a) +"."+ str(aindex)))
+              # target.append(float(str(b) +"."+ str(bindex)))
 
               #calculate amount of flow between source and target
               # as the number of samples that are part of both this source and target node
