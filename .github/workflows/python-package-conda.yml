@@ -34,7 +34,7 @@ jobs:
     #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
     - name: append cfl to pythonpath
-      run: echo "::set-env name=PYTHONPATH::home/runner/work/cfl"
+      run: echo "home/runner/work/cfl" >> $GITHUB_PATH
 
     - name: Test with pytest
       run: pytest
