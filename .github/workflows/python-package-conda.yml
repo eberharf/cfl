@@ -33,7 +33,7 @@ jobs:
     #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Add cfl to system path
       run: |
-        echo /home/runner/work/cfl >> $GITHUB_PATH
+        echo /home/runner/work/cfl >> $PYTHONPATH
     - name: Test with pytest
       run: |
         conda install pytest
