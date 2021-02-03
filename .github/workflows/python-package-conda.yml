@@ -13,24 +13,28 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-    - name: Set up conda
-      uses: s-weigand/setup-conda@v1
-      with:
-        activate-conda: true
-    - run: conda --version
-    - run: which python
 
-    # - name: Add conda to system path
-    #   run: |
-    #     # $CONDA is an environment variable pointing to the root of the miniconda directory
-    #     echo $CONDA/bin >> $GITHUB_PATH
-    # - name: Install dependencies
-    #   run: |
-    #     conda env update --file requirements_tmp.yml --name cfl-env
+    # - name: Set up conda
+    #   uses: s-weigand/setup-conda@v1
+    #   with:
+    #     activate-conda: true
+
+
+    # - run: conda --version
+    # - run: which python
+
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install dependencies
+      run: |
+        conda env update --file requirements.yml --name base
     # - name: Lint with flake8
     #   run: |
     #     conda install flake8
@@ -52,8 +56,8 @@ jobs:
         # conda env create -f requirements_tmp.yml
         # conda activate cfl-env
 
-        conda env update --file requirements.yml --name base
-        conda info
+        # conda env update --file requirements.yml --name base
+        # conda info
         # conda install numpy
         # conda run python tmp.py
         pytest
