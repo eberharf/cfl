@@ -39,4 +39,4 @@ jobs:
         # echo 'export PYTHONPATH="${PYTHONPATH}:/home/runner/work/cfl/cfl"' >> ~/.bashrc
         # conda install pytest
         # conda run pytest
-        python3 tmp.py
+        conda run python3 tmp.py
