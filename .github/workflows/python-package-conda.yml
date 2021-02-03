@@ -49,7 +49,9 @@ jobs:
 
         # conda init bash
         # source ~/.bashrc
-        conda env create -f requirements_tmp.yml
-        conda activate cfl-env
+        # conda env create -f requirements_tmp.yml
+        # conda activate cfl-env
+
+        conda env update --file requirements_tmp.yml --name cfl-env
         conda info
-        python tmp.py
+        conda run python tmp.py
