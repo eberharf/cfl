@@ -12,7 +12,4 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - tqdm # progress bar
-  - matplotlib=3.3.1  # creates plots (used for visualization)
   - numpy=1.19.2 # array manipulation and fast computing
-  - scikit-learn=0.23.2 # used to import clustering methods and other algorithms/metrics
