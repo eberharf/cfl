@@ -21,9 +21,9 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install dependencies
-      run: |
-        conda env update --file requirements_tmp.yml --name cfl-env
+    # - name: Install dependencies
+    #   run: |
+    #     conda create update --file requirements_tmp.yml --name cfl-env
     # - name: Lint with flake8
     #   run: |
     #     conda install flake8
@@ -39,4 +39,6 @@ jobs:
         # echo 'export PYTHONPATH="${PYTHONPATH}:/home/runner/work/cfl/cfl"' >> ~/.bashrc
         # conda install pytest
         # conda run pytest
-        conda run python3 tmp.py
+        conda env create -f requirements_tmp.yml
+        conda activate cfl-env
+        python3 tmp.py
