@@ -1,3 +1,5 @@
+![Build Status](https://github.com/eberharf/cfl/workflows/dev_regression_tests/badge.svg)
+
 # cfl
 
 ## Set-up Instructions 
