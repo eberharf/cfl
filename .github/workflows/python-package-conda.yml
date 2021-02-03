@@ -38,4 +38,4 @@ jobs:
       run: |
         echo 'export PYTHONPATH="${PYTHONPATH}:/home/runner/work/cfl/cfl"' >> ~/.bashrc
         conda install pytest
-        pytest
+        conda run pytest
