@@ -7,7 +7,7 @@
 # to generate a new version of this file from the current environment, run the command:
 #     conda env export --from-history > requirementsNEW.yml
 
-name: cfl-env
+name: base
 channels:
   - defaults
   - conda-forge
