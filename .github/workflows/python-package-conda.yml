@@ -39,6 +39,7 @@ jobs:
         # echo 'export PYTHONPATH="${PYTHONPATH}:/home/runner/work/cfl/cfl"' >> ~/.bashrc
         # conda install pytest
         # conda run pytest
+        conda init bash
         conda env create -f requirements_tmp.yml
         conda activate cfl-env
         python3 tmp.py
