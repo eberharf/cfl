@@ -54,4 +54,5 @@ jobs:
 
         conda env update --file requirements_tmp.yml --name cfl-env
         conda info
+        conda install numpy
         conda run python tmp.py
