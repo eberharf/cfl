@@ -479,6 +479,9 @@ class Experiment():
         if self.verbose > 0:
             print('All results from this run will be saved to {}'.format(save_path))
         os.mkdir(save_path)
+
+        # make trained_blocks dir
+        os.mkdir(os.path.join(save_path, 'trained_blocks'))
         return save_path
 
     def _propagate_verbosity(self, verbose, block_params):

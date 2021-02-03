@@ -1,7 +1,8 @@
 import pytest
+from cfl.block import Block
 
 # fake Block class for testing
-class BabyBlock():
+class BabyBlock(Block):
 
     def __init__(self, name, data_info, params):
         super().__init__(name=name, data_info=data_info, params=params)

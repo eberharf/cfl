@@ -6,6 +6,7 @@ from visual_bars import generate_visual_bars_data as vbd
 from cfl.util.data_processing import one_hot_encode
 from cfl.dataset import Dataset
 import shutil
+import random
 
 # Note: change if you want results somewhere else (folder will be deleted at end of run)
 save_path = 'testing/tmp_test_results'
@@ -65,7 +66,7 @@ def test_cde_experiment():
                 block_names=block_names, block_params=block_params, blocks=None, 
                 results_path=save_path)
 
-    dataset_train_cde = Dataset(x,y,'dataset_train_cde')
+    dataset_train_cde = Dataset(x,y,name='dataset_train_cde')
     train_results_cde = my_exp_cde.train(dataset=dataset_train_cde, prev_results=None)
     
     # check output of CDE block
@@ -100,7 +101,7 @@ def test_cde_experiment():
                 block_names=block_names, block_params=block_params, blocks=None, 
                 results_path=save_path)
     
-    dataset_train_clust = Dataset(x,y, 'dataset_train_clust')
+    dataset_train_clust = Dataset(x,y, name='dataset_train_clust')
 
     # check if clusterer can train
     train_results_clust = my_exp_clust.train(dataset=dataset_train_clust, \
@@ -148,25 +149,27 @@ def test_clusterer_experiment():
     
     # make artificial pyx
     rng = np.random.default_rng(12345) # create a Random Number Gen to set reproducible random seed
-    pyx = rng.random(y.shape[0], y.shape[1])
+    pyx = np.random.rand(y.shape[0], y.shape[1])
     prev_results = {'pyx' : pyx}
     
     # train Experiment with pyx provided
-    dataset_train_cluster = Dataset(x,y,'dataset_train_cluster')
+    dataset_train_cluster = Dataset(x,y,name='dataset_train_cluster')
     train_results_cluster = my_exp_cluster.train(dataset=dataset_train_cluster, prev_results=prev_results)
     
-    # tmp save
-    np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['Kmeans']['x_lbls'])
-    np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['Kmeans']['y_lbls'])
+    # TODO: this won't work until we connect random seed setting to kmeans
+    # random.seed(a=123)
+    # # # tmp save
+    # # np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['Kmeans']['x_lbls'])
+    # # np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['Kmeans']['y_lbls'])
     
     # # load in correct labels
     # x_lbls_expected = np.load('testing/resources/test_experiment/x_lbls.npy')
     # y_lbls_expected = np.load('testing/resources/test_experiment/y_lbls.npy')
 
     # # check clustering values
-    # assert train_results_cluster['Kmeans']['x_lbls'] == x_lbls_expected, \
+    # assert np.array_equal(train_results_cluster['Kmeans']['x_lbls'], x_lbls_expected), \
     #     'x_lbls do not match expected values.'
-    # assert train_results_cluster['Kmeans']['y_lbls'] == y_lbls_expected, \
+    # assert np.array_equal(train_results_cluster['Kmeans']['y_lbls'] == y_lbls_expected), \
     #     'y_lbls do not match expected values.'
 
 
