@@ -36,6 +36,7 @@ jobs:
 #         echo /home/runner/work/cfl/cfl >> $GITHUB_PATH
     - name: Test with pytest
       run: |
-        echo 'export PYTHONPATH="${PYTHONPATH}:/home/runner/work/cfl/cfl"' >> ~/.bashrc
-        conda install pytest
-        conda run pytest
+        # echo 'export PYTHONPATH="${PYTHONPATH}:/home/runner/work/cfl/cfl"' >> ~/.bashrc
+        # conda install pytest
+        # conda run pytest
+        python3 tmp.py
