@@ -44,5 +44,5 @@ jobs:
         # source ~/.bashrc
         # conda env create -f requirements_tmp.yml
         # conda activate cfl-env
-
+        conda info
         python tmp.py
