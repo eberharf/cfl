@@ -7,7 +7,7 @@ from cfl.block import Block
 class Clusterer(Block):
 
     @abstractmethod
-    def __init__(self, name, data_info, params, random_state=42):
+    def __init__(self, name, data_info, params, random_state=None):
         """
         initialize Clusterer object
 
@@ -27,7 +27,7 @@ class Clusterer(Block):
         # self.random_state
 
         # pass
-        
+
         super().__init__(name=name, data_info=data_info, params=params)
         assert type(random_state) in [int, type(None)], 'random_state should be of type int or NoneType.'
         self.random_state = random_state
