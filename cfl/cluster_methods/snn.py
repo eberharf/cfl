@@ -5,14 +5,14 @@ from sklearn.neighbors import kneighbors_graph
 
 from cfl.cluster_methods.clusterer_interface import Clusterer #abstract base class
 from cfl.cluster_methods import Y_given_Xmacro #calculate P(Y|Xmacro)
-from snn import SNN #underlying snn algorithm
+from cfl.cluster_methods.snn_helper import SNN as extSNN #underlying snn algorithm
 
 #TODO: this class's functionality has not been tested yet
 
 
-def SNN_for_CFL(Clusterer): #named SNN_for_CFL to distinguish from the SNN class that was imported
+class SNN(Clusterer):
 
-    def __init__(self, params, random_state):
+    def __init__(self, name, data_info, params, random_state):
         """
         initialize Clusterer object
 
@@ -26,31 +26,40 @@ def SNN_for_CFL(Clusterer): #named SNN_for_CFL to distinguish from the SNN class
         =========
         None
         """
-        # super(SNN, self).__init__(params, random_state) #calls ABC's constructor #TODO: nothing of importance done here
+
+        super(SNN, self).__init__(name, data_info, params, random_state=None) #Calls clusterer constructor
+
 
         # self.Y_type = data_info['Y_type']
         # assert self.Y_type in ["categorical", "continuous"], "Y_type in data_info should be 'categorical' or 'continouous' but is {}".format(self.Y_type)
 
         self.model_name = 'SNN'
+        self.Y_type = data_info['Y_type']
 
         self.params = self._check_model_params(params)
 
         self.random_state = random_state
 
         # initialize clusterer for xs and for ys
-        self.xmodel = SNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'])
-        self.ymodel = SNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'])
+        self.xmodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'])
+        print("xmodel is", self.xmodel)
+        print("xmodel params are", self.xmodel.neighbor_num, self.xmodel.min_shared_neighbor_num)
+
+        self.ymodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'])
+        print("ymodel is", self.ymodel)
+        print("ymodel params are", self.ymodel.neighbor_num, self.ymodel.min_shared_neighbor_num)
 
 
     def get_params(self):
         return self.params
 
 
-    def get_default_params(self):
+    def _get_default_params(self):
         """
-        Returns a dictionary containing default values for all parameters that must be passed in to create a clusterer
+        Returns a dictionary containing default values for all parameters
+        that must be passed in to create a clusterer
         """
-        default_params = {'neighbor_num'                   : 4,    #TODO: replace with sensible values
+        default_params = {'neighbor_num'                   : 10,    #TODO: replace with sensible values
                           'min_shared_neighbor_proportion' : 0.2    #TODO: maybe add more params for dbscan?
                           }
         return default_params
@@ -67,17 +76,20 @@ def SNN_for_CFL(Clusterer): #named SNN_for_CFL to distinguish from the SNN class
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
         """
         #train x clusters
-        x_lbls = self.xmodel.fit(prev_results)
+        self.xmodel.fit(prev_results)
+        x_lbls = self.xmodel.labels_
 
         #find conditional probabilities P(y|Xclass) for each y
-        y_probs = self._choose_Y_proxy(dataset, x_lbls)
+        y_probs = self._sample_Y_dist(dataset, x_lbls)
 
         #train y clusters
-        y_lbls = self._train_one_model(self.ymodel, y_probs)
+        self.ymodel.fit(y_probs)
+        y_lbls = self.xmodel.labels_
+
 
         return x_lbls, y_lbls
 
-    def predict_Xmacro(self, dataset, prev_results):
+    def predict(self, dataset, prev_results):
         """
         Assign new datapoints to clusters found in training.
 
@@ -89,9 +101,10 @@ def SNN_for_CFL(Clusterer): #named SNN_for_CFL to distinguish from the SNN class
                 y_lbls : Y macrovariable class assignments for this Dataset (np.array)
         """
         x_lbls = self.xmodel.fit_predict(prev_results)
-        y_probs = self._choose_Y_proxy(dataset, x_lbls)
+        y_probs = self._sample_Y_dist(dataset, x_lbls)
         y_lbls = self.ymodel.fit_predict(y_probs)
         return x_lbls, y_lbls
+
 
     def _sample_Y_dist(self, dataset, x_lbls):
         #TODO: is name good?
@@ -117,35 +130,55 @@ def SNN_for_CFL(Clusterer): #named SNN_for_CFL to distinguish from the SNN class
             y_probs = Y_given_Xmacro.categorical_Y(Y, x_lbls)
         return y_probs
 
-    def _check_model_params(self, input_params):
-        """
-         Check that all expected model parameters have been provided,
-            and substitute the default if not. Remove any unused but
-            specified parameters.
-            Arguments: Params (dictionary, where keys are parameter names)
-            Returns: Verified parameter dictionary
-        """
-        # dictionary of default values for each parameter
-        default_params = self.get_default_params()
 
-        # check for parameters that are provided but not needed
-        # remove if found
-        paramsToRemove = []
-        for param in input_params:
-            if param not in default_params.keys():
-                paramsToRemove.append(param)
-                print('{} specified but not used by {} clusterer'.format(param, self.model_name))
 
-        # remove unnecessary parameters after we're done iterating
-        # to not cause problems
-        for param in paramsToRemove:
-            input_params.pop(param)
 
-        # check for needed parameters
-        # add if not found
-        for param in default_params:
-            if param not in input_params.keys():
-                print('{} not specified in input, defaulting to {}'.format(param, default_params[param]))
-                input_params[param] = default_params[param]
+    # TODO: move this out eventually? (this is copy pasted from Kmeans)
+    def save_model(self, dir_path):
+        ''' Save both kmeans models to compressed files.
 
-        return input_params
+            Arguments:
+                dir_path : directory in which to save models (str)
+            Returns: None
+        '''
+        model_dict = {}
+        model_dict['xmodel'] = self.xmodel
+        model_dict['ymodel'] = self.ymodel
+
+        with open(dir_path, 'wb') as f:
+            pickle.dump(model_dict, f)
+
+    def load_model(self, dir_path):
+        ''' Load both kmeans models from directory path.
+
+            Arguments:
+                dir_path : directory in which to save models (str)
+            Returns: None
+        '''
+
+        # TODO: error handling for file not found
+        with open(dir_path, 'rb') as f:
+            model_dict = pickle.load(f)
+
+        self.xmodel = model_dict['xmodel']
+        self.ymodel = model_dict['ymodel']
+        self.trained = True
+
+    def save_block(self, path):
+        ''' save trained model to specified path.
+            Arguments:
+                path : path to save to. (str)
+            Returns: None
+        '''
+
+        self.save_model(path)
+
+    def load_block(self, path):
+        ''' load model saved at path into this model.
+            Arguments:
+                path : path to saved weights. (str)
+            Returns: None
+        '''
+
+        self.load_model(path)
+        self.trained = True
