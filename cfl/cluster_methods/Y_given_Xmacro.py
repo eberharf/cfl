@@ -1,6 +1,7 @@
 """
 a helper file used by `kmeans.py` to find P(Y=y|X=Xclass),
- the conditional probability of each y value, given each X-macrovariable.
+the conditional probability of each y value, given each X-macrovariable.
+
 Contains functions for clustering categorical and continuous 1-D Ys
 (not tested on higher dimensional Y)
 """
@@ -11,18 +12,21 @@ from cfl.util.data_processing import one_hot_decode
 
 def categorical_Y(Y_data, x_lbls):
     """
-    Estimates the conditional probability density P(Y=y|X=xClass)
-    for every y (observation in Y_data) and xClass (macrovariable constructed from X_data, the "causal" data set)
-    when Y_data contains categorical variables.
+    Estimates the conditional probability density P(Y=y|X=xClass) for categorical data,
+    where 'y' is an observation in Y_data and xClass is a macrovariable constructed
+    from X_data, the "causal" data set. This function should only be used when Y_data
+    contains categorical variables.
 
-     Parameters:
-    - Y_data (np array): the "effects" data set, the observations in which are to be clustered
-    - x_lbls (1-D array): an array (same length/aligned with Y_data) of the CFL labels predicted for the x (cause) data
+    Parameters:
+        Y_data (np array): the "effects" data set, the observations in which are to be clustered
+        x_lbls (1-D array): an array (same length/aligned with Y_data)
+            of the CFL labels predicted for the x (cause) data
 
     Returns:
-    - cond_Y_probs (2D array): an array with a row for each observation in Y_data and a column for each class in x_lbls. The
-    entries of the array contain the conditional probability P(y|x) for the corresponding y value, given that the x is a member of
-    the corresponding class of that column
+        cond_Y_probs (2D array): an array with a row for each observation in Y_data and a column
+            for each class in x_lbls. The entries of the array contain the conditional probability
+            P(y|x) for the corresponding y value, given that the x is a member of the corresponding
+            class of that column
     """
 
     # convert to standard categorical representation if one-hot-encoded
@@ -43,10 +47,13 @@ def categorical_Y(Y_data, x_lbls):
     ys_in_each_x_class = [Y_data[i] for i in x_lbl_indices]
 
     # cond_Y_prob will store the P(Y|Xclasses) as they are calculated
+    #
     num_x_classes = len(x_lbl_indices)
     num_Ys = Y_data.shape[0]
     cond_Y_prob = np.zeros((num_Ys, num_x_classes))
 
+    # for each xclass, sample the number of each value of y that shows up
+    # in order to estimate P(Y=y | X= xclass)
     for row, y in enumerate(Y_data):
         for col, cluster_vals in enumerate(ys_in_each_x_class):
             cond_Y_prob[row][col] = np.sum(cluster_vals==y) / cluster_vals.shape[0]
@@ -59,26 +66,22 @@ def continuous_Y(Y_data, x_lbls):
     for every y (observation in Y_data) and xClass (macrovariable constructed from X_data, the "causal" data set)
     when Y_data contains variable(s) over a continuous distribution.
 
-
-    It approximates the probability density P(Y=y1) by using the density of points around y1
+    This fun approximates the probability density P(Y=y1) by using the density of points around y1
     (as determined by the average distance between the k nearest neighbors. Small distance=high
     density, large distance=low density) as a proxy.)
 
-    Why is P(y|xClass) calculated, instead of P(y|x) for each individual x?
-    The clusters of x created immediately prior to this step are observational classes of X (see "Causal Feature Learning:
-    An Overview" by Eberhardt, Chalupka, Pierona 2017). Observational classes are a type of equivalence class defined by the
-    relationship P(y|x1)=P(y|x2) for any x1, x2 in the same class. So, theoretically, it should be redundant to check
-    each x observation individually since each x in the same cluster should have the same effect on the conditional probability
-    of y. This method also significantly reduces the amount of computation that needs to be done.
-
     Parameters:
-    - Y_data (np array): the "effects" data set, the observations in which are to be clustered
-    - x_lbls (1-D array): an array (same length/aligned with Y_data) of the CFL labels predicted for the x (cause) data
+        Y_data (np array): the "effects" data set, the observations in which are to be clustered
+        x_lbls (1-D array): an array (same length/aligned with Y_data) of the CFL labels predicted for
+            the X (cause) data
 
     Returns:
-    - cond_Y_probs (2D array): an array with a row for each observation in Y_data and a column for each class in x_lbls. The
-    entries of the array contain the conditional probability P(y|x) for the corresponding y value, given that the x is a member of
-    the corresponding class of that column
+        cond_Y_probs (2D array): an array with a row for each observation in Y_data and a column for each class in
+            x_lbls. The entries of the array contain the conditional probability P(y|x) for the corresponding y value, given that the x is a member of the corresponding class of that column
+
+    Note:
+        Why is P(y|xClass) calculated, instead of P(y|x) for each individual x? The clusters of x created immediately prior to this step are observational classes of X (see "Causal Feature Learning: An Overview" by Eberhardt, Chalupka, Pierona 2017). Observational classes are a type of equivalence class defined by the relationship P(y|x1)=P(y|x2) for any x1, x2 in the same class. So, theoretically, it should be redundant to check each x observation individually since each x in the same cluster should have the same effect on the conditional probability of y. This method also significantly reduces the amount of computation that needs to be done.
+
 
     """
     assert Y_data.shape[0] == x_lbls.shape[0], "The Y data and x_lbls arrays passed through continuous_Y should have the same length. Actual shapes: {},{}".format(Y_data.shape[0],x_lbls.shape[0])
@@ -101,7 +104,7 @@ def continuous_Y(Y_data, x_lbls):
     # and the ys associated with each x class
     for y_id, y in enumerate(Y_data):
         for current_class, cluster_vals in enumerate(ys_in_each_x_class):
-            cond_Y_prob[y_id][current_class] = avg_nearest_neighbors_dist(y, cluster_vals, y_in_otherYs=(y_id in x_lbl_indices[current_class]))
+            cond_Y_prob[y_id][current_class] = _avg_nearest_neighbors_dist(y, cluster_vals, y_in_otherYs=(y_id in x_lbl_indices[current_class]))
     return cond_Y_prob
 
     # if we were to vectorize the above operation, I think it would look like
@@ -109,24 +112,29 @@ def continuous_Y(Y_data, x_lbls):
     # for each row, it would be
     # cond_Y_prob[y_id] = avg_nearest_neighbors_dist(y, y_data)
 
-def avg_nearest_neighbors_dist(y, other_Ys, y_in_otherYs, k_neighbors=4):
+def _avg_nearest_neighbors_dist(y, other_Ys, y_in_otherYs, k_neighbors=4):
     """
-    helper function for continuous_Y()
-    returns the distance between a point y and its nearest neighbors in the cluster other_Ys
+    Helper function for continuous_Y(). Returns the distance between a point
+    y and its nearest neighbors in the cluster other_Ys
 
-    calculates this distance by finding the euclidean distance (squared) between
+    This distance is calculated by finding the euclidean distance (squared) between
     y and each of the points in other_ys, then averaging the distances of the k (default 4) neighbors
     closest to y.
 
-    y_in_otherYs is True when y is a member of other_Ys. In that case, y is
-    removed the distance calculation to the nearest neighbors (so that the distance
-    between y and itself is not a factored into the calculation)
+    Parameters:
+        y: a value from Y_data
+        other_Ys (np array): all of the y values that correspond to a given xClass
+        y_in_otherYs (boolean): True when y is a member of other_Ys. In this case, y is
+            removed from the distance calculation to the nearest neighbors (so that the distance between y and itself is not a factored into the calculation)
+        k_neighbors (int): the number of nearest neighbor distances to average
 
-    4 neighbors is the default because that is the number of neighbors used when this
-    method was described in Chalupka 2016 (El Nino paper). If there fewer than n neighbors in the class,
-    then however many points there are used to calculate the avg distance
+    Note:
+        4 neighbors is the default because that is the number of neighbors used when this
+        method was described in Chalupka 2016 (El Nino paper). If there fewer than n neighbors in the class,
+        then however many points there are used to calculate the avg distance
 
-    NOTE: euclidean/L2 distance metric may be less useful with high-dimensional Ys
+    Note:
+        Euclidean/L2 distance metric may be less useful with high-dimensional Ys
     """
 
     # calculates the Euclidean distance (squared) between y and each observation in other_Ys,

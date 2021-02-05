@@ -12,12 +12,13 @@ def view_class_examples(images, im_shape, n_examples, x_lbls):
     Best for viewing a lot of images at once.
 
     Parameters:
-    images (2D or 3D np array): Array of images (must be aligned with x_lbls)
-        If 2D, axis 0 = samples, axis 1 = flattened image pixels
-        If 3D, axis 0 = samples, axis 1 = image rows, axis 2 = image cols
-    n_rows (int): Number of rows of images to display.
-    x_lbls (1D np array): labels to show at the top of each image.
-                        Should be aligned with the images input
+        images (2D or 3D np array): Array of images (must be aligned with x_lbls)
+            If 2D, axis 0 = samples, axis 1 = flattened image pixels
+            If 3D, axis 0 = samples, axis 1 = image rows, axis 2 = image cols
+        n_rows (int): Number of rows of images to display.
+        x_lbls (1D np array): labels to show at the top of each image.
+            Should be aligned with the images input
+
     """
 
     assert images.shape[0] == x_lbls.shape[0], "The number of images and \
@@ -45,7 +46,7 @@ def view_class_examples(images, im_shape, n_examples, x_lbls):
         print('You have at least one class with no examples. Currently, this' +
         'function limits the number of examples displayed by the size of the smallest class')
         return
-        
+
     # create subplot for each image
     fig,ax = plt.subplots(nrows=N_ROWS, ncols=N_COLS, figsize=(N_COLS*2, N_ROWS*2))
     for i in range(N_COLS):
@@ -58,12 +59,14 @@ def view_class_examples(images, im_shape, n_examples, x_lbls):
     plt.show()
 
 def view_random_example(image_array, random_state=None):
-    """chooses a random image from the image_array and displays 
-    it. Setting random state causes it to be reproducible"""
-    
+    """chooses a random image from the image_array and displays
+    it. Setting random state causes it to be reproducible
+
+    """
+    rng = np.random.default_rng(seed=random_state)
     # choose random img idx
-    idx = np.random.choice(image_array.shape[0], replace=False)
-    
+    idx = rng.choice(image_array.shape[0], replace=False)
+
     fig,ax = plt.subplots()
     ax.imshow(image_array[idx])
     ax.axis('off')
