@@ -7,15 +7,15 @@ def standardize_train_test(data, dtype=np.float32):
         and test sets.
 
         Arguments:
-            data : an array of 2D np.arrays to z-score along axis=1 (array). 
-                   For example, data could equal [Xtr, Xts, Ytr, Yts], where: 
+            data (array) : an array of 2D np.arrays to z-score along axis=1
+                   For example, data could equal [Xtr, Xts, Ytr, Yts], where:
                        - Xtr.shape = (n_train_samples, n_x_features)
                        - Xts.shape = (n_test_samples , n_x_features)
                        - Ytr.shape = (n_train_samples, n_y_features)
                        - Yts.shape = (n_test_samples , n_y_features)
-            dtype : data type to return values of all np.arrays in (type)
+            dtype (type): data type to return values of all np.arrays in
         Returns:
-            data : standardized version of the data argument (array)
+            data (array): standardized version of the data argument
     '''
 
     for di in range(len(data)):
@@ -40,13 +40,13 @@ def one_hot_encode(data, unique_labels):
 
         Arguments:
             data : an int array of categorical labels. (np.array)
-            unique_labels : unique set of labels included in 
+            unique_labels : unique set of labels included in
                             data (i.e. result of np.unique(data)) (np.array)
-        
+
         Returns:
             ohe : one-hot encoding of data (2D np.array)
     '''
-    
+
     ohe = np.zeros((data.shape[0], len(unique_labels)))
     for uli,ul in enumerate(unique_labels):
         ohe[:,uli] = data==ul
