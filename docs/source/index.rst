@@ -10,7 +10,9 @@ Welcome to cfl's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
+README.md
+SETUP.md
+examples/quick_start_guide.ipynb
 
 Indices and tables
 ==================
@@ -18,3 +20,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
