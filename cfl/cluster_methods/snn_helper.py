@@ -24,6 +24,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+## small modifications to the original code made by Jenna Kahn
+
 import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
 from sklearn.cluster import DBSCAN
@@ -45,10 +47,23 @@ def snn(X, neighbor_num, min_shared_neighbor_num):
 
     # for each data point, find their set of K nearest neighbors
     knn_graph = kneighbors_graph(X, n_neighbors=neighbor_num, include_self=False)
-    neighbors = np.array([set(knn_graph[i].nonzero()[1]) for i in range(len(X))])
 
+    neighbors = []
+    for i in range(len(X)):
+        neighbors.append(set(knn_graph[i].nonzero()[1]))
+
+
+    snn_distance_matrix = np.zeros((len(neighbors), len(neighbors)))
     # the distance matrix is computed as the complementary of the proportion of shared neighbors between each pair of data points
-    snn_distance_matrix = np.asarray([[get_snn_distance(neighbors[i], neighbors[j]) for j in range(len(neighbors))] for i in range(len(neighbors))])
+    # for efficiency's sake, we only iterate over the top triangle of the matrix
+    # and compute the snn_distance one time for both pairs
+    for i in range(len(neighbors)):
+        for j in range(i):
+            dist = get_snn_distance(neighbors[i], neighbors[j])
+            snn_distance_matrix[i][j] = dist
+            snn_distance_matrix[j][i] = dist
+
+    print(snn_distance_matrix)
 
     # perform DBSCAN with the shared-neighbor distance criteria for density estimation
     dbscan = DBSCAN(min_samples=min_shared_neighbor_num, metric="precomputed")
@@ -56,16 +71,10 @@ def snn(X, neighbor_num, min_shared_neighbor_num):
     return dbscan.core_sample_indices_, dbscan.labels_
 
 
-def get_snn_similarity(x0, x1):
-    """Calculate the shared-neighbor similarity of two sets of nearest neighbors, normalized by the maximum number of shared neighbors"""
-
-    return len(x0.intersection(x1)) / len(x0)
-
-
 def get_snn_distance(x0, x1):
     """Calculate the shared-neighbor distance of two sets of nearest neighbors, normalized by the maximum number of shared neighbors"""
 
-    return 1 - get_snn_similarity(x0, x1)
+    return 1 - len(x0.intersection(x1)) / len(x0)
 
 
 class SNN(BaseEstimator, ClusterMixin):

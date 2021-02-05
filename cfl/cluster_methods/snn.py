@@ -42,12 +42,8 @@ class SNN(Clusterer):
 
         # initialize clusterer for xs and for ys
         self.xmodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'])
-        print("xmodel is", self.xmodel)
-        print("xmodel params are", self.xmodel.neighbor_num, self.xmodel.min_shared_neighbor_num)
 
         self.ymodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'])
-        print("ymodel is", self.ymodel)
-        print("ymodel params are", self.ymodel.neighbor_num, self.ymodel.min_shared_neighbor_num)
 
 
     def get_params(self):
