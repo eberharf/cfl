@@ -1,24 +1,77 @@
+import numpy as np
+
 """Dataset class"""
 
 class Dataset():
-    """Dataset class stores the X and Y datasets so that they can be easily passed
-    through steps of CFL and saved in a consistent way"""
+    """Dataset class stores the X and Y datasets so that they can be easily 
+    passed through steps of CFL and saved in a consistent way"""
 
-    def __init__(self, X, Y, dataset_label=None, experiment_saver=None):
+    def __init__(self, X, Y, Xraw=None, Yraw=None, name='dataset'):
+        ''' Initialize Dataset.
+            Arguments:
+                X : X data to pass through CFL pipeline, dimensions 
+                    n_samples x n_x_features. (np.ndarray)
+                Y : Y data to pass through CFL pipeline, dimensions 
+                    n_samples x n_y_features. (np.ndarray)
+                Xraw : Optional raw form of X before preprocessing to remain
+                       associated with X for visualization. Defaults to None.
+                       (np.ndarray)
+                Yraw : Optional raw form of Y before preprocessing to remain
+                       associated with Y for visualization. Defaults to None. 
+                       (np.ndarray)
+                name : name of Dataset. Defaults to 'dataset'. (str)
+            
+            Returns: None
+        '''
+
+        # check data input types
+        assert isinstance(X, np.ndarray), \
+            'X should be of type np.ndarray. Actual type: {}'.format(type(X))
+        assert isinstance(Y, np.ndarray), \
+            'Y should be of type np.ndarray. Actual type: {}'.format(type(Y))
+        assert isinstance(Xraw, (np.ndarray, type(None))), \
+            'Xraw should be of type np.ndarray or NoneType. ' + \
+                'Actual type: {}'.format(type(Xraw))
+        assert isinstance(Yraw, (np.ndarray, type(None))), \
+            'Yraw should be of type np.ndarray or NoneType. ' + \
+                'Actual type: {}'.format(type(Yraw))
+        assert isinstance(name, str), 'name should be of type str. ' + \
+            'Actual type: {}'.format(type(name))
+
         self.X = X
         self.Y = Y
-        self.dataset_label = dataset_label
-        self.to_save = experiment_saver is not None
-        self.saver = None
-        if self.to_save:
-            self.saver = experiment_saver.get_new_dataset_saver(dataset_label)
-        self.pyx = None
 
-    # TODO: add other attributes/methods that would be helpful to keep together with a dataset
-    def get_pyx(self):
-        """returns the learned conditional probabilities P(Y|X=x) for all x"""
-        return self.pyx
+        if Xraw is None:
+            self.Xraw = self.X
+        else:
+            self.Xraw = Xraw
+        if Yraw is None:
+            self.Yraw = self.Y
+        else:
+            self.Yraw = Yraw
 
-    def set_pyx(self, pyx):
-        """set a conditional probability value (from previous training)"""
-        self.pyx = pyx
+        self.name = name
+
+    def get_name(self):
+        ''' Return the name of this Dataset.
+            Arguments: None
+            Returns:
+                name : name associated with this Dataset. (str)
+        '''
+        return self.name
+    
+    def get_X(self):
+        ''' Return X.
+            Arguments: None
+            Returns:
+                X : X data associated with this Dataset. (np.ndarray)
+        '''
+        return self.X
+
+    def get_Y(self):
+        ''' Return Y.
+            Arguments: None
+            Returns:
+                Y : Y data associated with this Dataset. (np.ndarray)
+        '''
+        return self.Y

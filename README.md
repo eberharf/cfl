@@ -1,13 +1,15 @@
-# Causal Feature Learning (CFL)
+![Build Status](https://github.com/eberharf/cfl/workflows/dev_regression_tests/badge.svg)
 
-# Quick Links 
+# cfl
 
-### Set-up 
-Instructions for setting up CFL and its dependencies can be found [here](https://github.com/eberharf/cfl/blob/master/SETUP.md)
+## Set-up Instructions 
+Instructions for setting installing CFL and its dependencies can be found [here](https://github.com/eberharf/cfl/blob/master/SETUP.md)
+- A quick start guide with example code can be found [here](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb)
+- Complete documentation can be found here
 
-### Running CFL
+## Running CFL
 
-Go to the [examples](https://github.com/eberharf/cfl/blob/master/examples) folder to find Jupyter Notebooks that demonstrate how to use the CFL code. Check out the [Quick Start Guide](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb) first if you're just getting started.
+Go to the [examples](https://github.com/eberharf/cfl/blob/master/examples) folder to find Jupyter Notebooks that demonstrate how to use the CFL code. Check out the [Quick Start Guide](https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb first if you're just getting started.
 
 --------------------------------------
 ## License and Citations
@@ -44,10 +46,6 @@ Krzysztof Chalupka, Pietro Perona and Frederick Eberhardt developed the original
 
 Code development benefitted from regular discussions with Patrick Burauel.
 
-
---------------------------------------------
-## Funding
-This project is supported in part by NSF grants NSF 1564330, NSF BCS-1845958 and BCS-1840756, and the Schmidt Academy fellows program.
 
 ----------------------------------------------------------
 ## Repository Contents

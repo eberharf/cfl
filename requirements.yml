@@ -15,19 +15,19 @@ dependencies:
   - tqdm # progress bar
   - matplotlib=3.3.1  # creates plots (used for visualization)
   - tensorflow  # machine learning
+  - keras
   - numpy=1.19.2 # array manipulation and fast computing
-  - joblib=0.16.0 # used to save/load data primarily for el nino example
-  - scikit-learn=0.23.2 # used to import clustering methods, other algorithms/metrics
+  - scikit-learn=0.23.2 # used to import clustering methods and other algorithms/metrics
   - jupyter # for jupyter notebooks
   - ipykernel # to add dependencies to kernel during set-up
-  - keras
-
 
 # # the following packages are not required to use the basic
 # # cfl code, but may be needed to run some of the example notebooks
 # # or testing code.
+  - joblib=0.16.0 # used to save/load data primarily for el nino example
   - pytest=6.0.1 # to run regression tests
   - pandas # for formatting data frames (eg used for fear mice data)
   - nibabel # for reading/writing MRIs
   - ipywidgets  # for interactive widgets
   - jupyter_nbextensions_configurator
+  - plotly # for the sankey diagrams
