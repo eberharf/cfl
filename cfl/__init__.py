@@ -4,7 +4,6 @@ import cfl.visualization_methods
 import cfl.cluster_methods
 import cfl.density_estimation_methods
 import cfl.util
-import cfl.cfl_wrapper
 import cfl.dataset
 import cfl.experiment
 import cfl.block
