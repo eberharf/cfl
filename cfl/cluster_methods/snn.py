@@ -1,25 +1,29 @@
+'''Shared Nearest Neighbor Clustering
+
+This module contains the code to interface Albert Espín's implementation of SNN clustering with the
+CFL structure.
+
+'''
+
 import numpy as np
 from sklearn.cluster import DBSCAN
 from sklearn.neighbors import kneighbors_graph
-
 
 from cfl.cluster_methods.clusterer_interface import Clusterer #abstract base class
 from cfl.cluster_methods import Y_given_Xmacro #calculate P(Y|Xmacro)
 from cfl.cluster_methods.snn_helper import SNN as extSNN #underlying snn algorithm
 
-#TODO: this class's functionality has not been tested yet
 
 
 class SNN(Clusterer):
 
     def __init__(self, name, data_info, params, random_state):
         """
-        initialize Clusterer object
+        initialize SNN Clusterer object
 
         Parameters
-        ==========
-        params (dict) : a dictionary of relevant hyperparameters for clustering
-        random_state (int) : a random seed to create reproducible results
+            params (dict) : a dictionary of relevant hyperparameters for clustering
+            random_state (int) : a random seed to create reproducible results
         pass # no outputs
 
         Return

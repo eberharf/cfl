@@ -12,14 +12,11 @@ class Clusterer(Block):
         initialize Clusterer object
 
         Parameters
-        ==========
-        params (dict) : a dictionary of relevant hyperparameters for clustering
-        random_state (int) : a random seed to create reproducible results
-        pass # no outputs
+            params (dict) : a dictionary of relevant hyperparameters for clustering
+            random_state (int) : a random seed to create reproducible results pass
 
         Return
-        =========
-        None
+            None
         """
 
         #attributes:
