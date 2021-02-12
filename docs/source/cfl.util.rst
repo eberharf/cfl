@@ -4,6 +4,14 @@ cfl.util package
 Submodules
 ----------
 
+cfl.util.arg\_validation\_util module
+-------------------------------------
+
+.. automodule:: cfl.util.arg_validation_util
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cfl.util.brain\_util module
 ---------------------------
 
@@ -32,6 +40,14 @@ cfl.util.dir\_util module
 -------------------------
 
 .. automodule:: cfl.util.dir_util
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+cfl.util.fear\_mice\_functions module
+-------------------------------------
+
+.. automodule:: cfl.util.fear_mice_functions
    :members:
    :undoc-members:
    :show-inheritance:

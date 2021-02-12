@@ -4,6 +4,14 @@ cfl.visualization\_methods package
 Submodules
 ----------
 
+cfl.visualization\_methods.clustering\_to\_sankey module
+--------------------------------------------------------
+
+.. automodule:: cfl.visualization_methods.clustering_to_sankey
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cfl.visualization\_methods.el\_nino\_vis module
 -----------------------------------------------
 

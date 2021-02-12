@@ -36,6 +36,14 @@ cfl.cluster\_methods.snn module
    :undoc-members:
    :show-inheritance:
 
+cfl.cluster\_methods.snn\_helper module
+---------------------------------------
+
+.. automodule:: cfl.cluster_methods.snn_helper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

@@ -16,6 +16,14 @@ Subpackages
 Submodules
 ----------
 
+cfl.block module
+----------------
+
+.. automodule:: cfl.block
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cfl.cfl\_wrapper module
 -----------------------
 
