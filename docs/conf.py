@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('../cfl'))
 # -- Project information -----------------------------------------------------
 
 project = 'cfl'
-copyright = '2021, Jenna Kahn, Iman Wahle, Frederick Eberhardt'
+copyright = '2021, California Institute of Technology'
 author = 'Jenna Kahn, Iman Wahle, Frederick Eberhardt'
 
 # The full version, including alpha/beta/rc tags
