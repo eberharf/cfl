@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Welcome to CFL &mdash; cfl 0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cfl package" href="cfl.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> cfl
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cfl.html">cfl package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cfl.cluster_methods.html">cfl.cluster_methods package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cfl.density_estimation_methods.html">cfl.density_estimation_methods package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cfl.save.html">cfl.save package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">cfl</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Welcome to CFL</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="welcome-to-cfl">
+<h1>Welcome to CFL<a class="headerlink" href="#welcome-to-cfl" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cfl.html">cfl package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#cfl-block-module">cfl.block module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#cfl-cfl-wrapper-module">cfl.cfl_wrapper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#cfl-dataset-module">cfl.dataset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#cfl-experiment-module">cfl.experiment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cfl.cluster_methods.html">cfl.cluster_methods package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cfl.cluster_methods.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.cluster_methods.html#module-cfl.cluster_methods.Y_given_Xmacro">cfl.cluster_methods.Y_given_Xmacro module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.cluster_methods.html#module-cfl.cluster_methods.clusterer_interface">cfl.cluster_methods.clusterer_interface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.cluster_methods.html#module-cfl.cluster_methods.kmeans">cfl.cluster_methods.kmeans module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.cluster_methods.html#module-cfl.cluster_methods.snn">cfl.cluster_methods.snn module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.cluster_methods.html#module-cfl.cluster_methods.snn_helper">cfl.cluster_methods.snn_helper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.cluster_methods.html#module-cfl.cluster_methods">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cfl.density_estimation_methods.html">cfl.density_estimation_methods package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cfl.density_estimation_methods.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.density_estimation_methods.html#cfl-density-estimation-methods-cde-interface-module">cfl.density_estimation_methods.cde_interface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.density_estimation_methods.html#cfl-density-estimation-methods-condexpbase-module">cfl.density_estimation_methods.condExpBase module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.density_estimation_methods.html#cfl-density-estimation-methods-condexpcnn-module">cfl.density_estimation_methods.condExpCNN module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.density_estimation_methods.html#cfl-density-estimation-methods-condexpkc-module">cfl.density_estimation_methods.condExpKC module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.density_estimation_methods.html#cfl-density-estimation-methods-condexpmod-module">cfl.density_estimation_methods.condExpMod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.density_estimation_methods.html#cfl-density-estimation-methods-condexpvb-module">cfl.density_estimation_methods.condExpVB module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.density_estimation_methods.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cfl.save.html">cfl.save package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cfl.save.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.save.html#cfl-save-dataset-saver-module">cfl.save.dataset_saver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.save.html#cfl-save-experiment-saver-module">cfl.save.experiment_saver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.save.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="set-up-instructions">
+<h2>Set-up Instructions<a class="headerlink" href="#set-up-instructions" title="Permalink to this headline">¶</a></h2>
+<p>Instructions for setting installing CFL and its dependencies can be
+found <a href="#id1"><span class="problematic" id="id2">`here`_</span></a> - A quick start guide with example code can be found
+<a class="reference external" href="https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb">here</a>
+- Complete documentation can be found here on Read the Docs.</p>
+</div>
+<div class="section" id="running-cfl">
+<h2>Running CFL<a class="headerlink" href="#running-cfl" title="Permalink to this headline">¶</a></h2>
+<p>Go to the <a href="#id3"><span class="problematic" id="id4">`examples`_</span></a> folder to find Jupyter Notebooks that demonstrate
+how to use the CFL code. Check out the [Quick Start
+Guide](<a class="reference external" href="https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb">https://github.com/eberharf/cfl/blob/master/examples/quick_start_guide.ipynb</a>
+first if you’re just getting started.</p>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+<p>CFL is released under a BSD-like
+license for non-commercial use
+only. If you use CFL in
+published research work, we
+encourage you to cite this
+repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Causal</span> <span class="n">Feature</span> <span class="n">Learning</span> <span class="p">(</span><span class="mi">2021</span><span class="p">)</span><span class="o">.</span>
+<span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">eberharf</span><span class="o">/</span><span class="n">cfl</span>
+</pre></div>
+</div>
+<p>or use the BibTex reference:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@misc</span><span class="p">{</span><span class="n">cfl2021</span><span class="p">,</span>
+<span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Causal Feature Learning&quot;</span><span class="p">,</span>
+<span class="n">year</span> <span class="o">=</span> <span class="s2">&quot;2021&quot;</span><span class="p">,</span>
+<span class="n">publisher</span> <span class="o">=</span> <span class="s2">&quot;GitHub&quot;</span><span class="p">,</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/eberharf/cfl&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Jenna Kahn &amp; Iman Wahle [first authors; name order chosen randomly]</p></li>
+<li><p>Krzysztof Chalupka</p></li>
+<li><p>Patrick Burauel</p></li>
+<li><p>Pietro Perona</p></li>
+<li><p>Frederick Eberhardt</p></li>
+</ul>
+<p>Jenna Kahn and Iman Wahle designed the software and wrote the code in
+this repository.</p>
+<p>Krzysztof Chalupka, Pietro Perona and Frederick Eberhardt developed the
+original theory for CFL. Krzysztof also wrote the original code upon
+which this software is based.</p>
+<p>Code development benefitted from regular discussions with Patrick
+Burauel.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="cfl.html" class="btn btn-neutral float-right" title="cfl package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, California Institute of Technology.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

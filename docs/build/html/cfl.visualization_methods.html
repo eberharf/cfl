@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>cfl.visualization_methods package &mdash; cfl 0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="cfl.util package" href="cfl.util.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cfl
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="cfl.html">cfl package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="cfl.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cfl.cluster_methods.html">cfl.cluster_methods package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cfl.density_estimation_methods.html">cfl.density_estimation_methods package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cfl.save.html">cfl.save package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cfl.util.html">cfl.util package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cfl.visualization_methods package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-cfl.visualization_methods.clustering_to_sankey">cfl.visualization_methods.clustering_to_sankey module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-cfl.visualization_methods.el_nino_vis">cfl.visualization_methods.el_nino_vis module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-cfl.visualization_methods.general_vis">cfl.visualization_methods.general_vis module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-cfl.visualization_methods.visual_bars_vis">cfl.visualization_methods.visual_bars_vis module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-cfl.visualization_methods">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#cfl-block-module">cfl.block module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#cfl-cfl-wrapper-module">cfl.cfl_wrapper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#cfl-dataset-module">cfl.dataset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#cfl-experiment-module">cfl.experiment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cfl.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cfl.cluster_methods.html">cfl.cluster_methods package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cfl.density_estimation_methods.html">cfl.density_estimation_methods package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cfl.save.html">cfl.save package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cfl</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="cfl.html">cfl package</a> &raquo;</li>
+        
+      <li>cfl.visualization_methods package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/cfl.visualization_methods.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="cfl-visualization-methods-package">
+<h1>cfl.visualization_methods package<a class="headerlink" href="#cfl-visualization-methods-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cfl.visualization_methods.clustering_to_sankey">
+<span id="cfl-visualization-methods-clustering-to-sankey-module"></span><h2>cfl.visualization_methods.clustering_to_sankey module<a class="headerlink" href="#module-cfl.visualization_methods.clustering_to_sankey" title="Permalink to this headline">¶</a></h2>
+<p>Iman Wahle and Jenna Kahn
+1/8/20
+Sankey diagram code</p>
+<p>Usage of this function:</p>
+<p>import plotly.graph_objects as go
+from cfl.visualization_methods import clustering_to_sankey as sk</p>
+<p>#x_lbls_L = list of x labels from several different rounds of clustering on the same data</p>
+<p>link, label = sk.convert_lbls_to_sankey_nodes(x_lbls_L)
+# plot
+fig = go.Figure(data=</p>
+<blockquote>
+<div><dl class="simple">
+<dt>[go.Sankey(node = dict(pad = 15, thickness=20, label = label, color =  “blue”),</dt><dd><p>link = link)])</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>fig.update_layout(title_text=”Sample Sankey”, font_size=10)
+fig.show()</p>
+<dl class="py function">
+<dt id="cfl.visualization_methods.clustering_to_sankey.convert_lbls_to_sankey_nodes">
+<code class="sig-prename descclassname">cfl.visualization_methods.clustering_to_sankey.</code><code class="sig-name descname">convert_lbls_to_sankey_nodes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_lbls_L</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.visualization_methods.clustering_to_sankey.convert_lbls_to_sankey_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert cluster labels into source, target, and value information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x_lbls_L</strong> (<em>x_lbls_L is a list of x_lbls</em><em>, </em><em>the result from multiple kmeans clusterings on the same data</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>link (dict)</strong> (<em>a representation of nodes and weighted connections between them to make a Sankey diagram</em>)</p></li>
+<li><p><strong>labels (list)</strong> (<em>labels for every node in the sankey diagram</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cfl.visualization_methods.el_nino_vis">
+<span id="cfl-visualization-methods-el-nino-vis-module"></span><h2>cfl.visualization_methods.el_nino_vis module<a class="headerlink" href="#module-cfl.visualization_methods.el_nino_vis" title="Permalink to this headline">¶</a></h2>
+<p>A module for Visualization methods of CFL results
+Iman Wahle and Jenna Kahn
+Aug 28 2020</p>
+<dl class="py function">
+<dt id="cfl.visualization_methods.el_nino_vis.visualize">
+<code class="sig-prename descclassname">cfl.visualization_methods.el_nino_vis.</code><code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">Y</span></em>, <em class="sig-param"><span class="n">x_lbls</span></em>, <em class="sig-param"><span class="n">y_lbls</span></em>, <em class="sig-param"><span class="n">fig_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Y_kwargs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.visualization_methods.el_nino_vis.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over each cluster in X and Y to plot the cluster
+average’s difference from the global mean. Only good for spatially organized data
+Arguments:</p>
+<blockquote>
+<div><p>X : X dataset of dimensions [# observations, # features] (np.array)
+Y : Y dataset of dimensions [# observations, # features] (np.array)
+x_lbls : class label for each observation in X, of dimensions [# observations,] (np.array)
+y_lbls : class label for each observation in Y, of dimensions [# observations,] (np.array)
+fig_kwargs : dictionary of keyword arguments to pass to plt.figure (specify appearance of plot)
+X_kwargs : dictionary of keyword arguments to pass to visualize_helper for the X plots
+Y_kwargs : dictionary of keyword arguments to pass to visualize_helper for the Y plots</p>
+</div></blockquote>
+<p>Returns: None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cfl.visualization_methods.el_nino_vis.visualize_helper">
+<code class="sig-prename descclassname">cfl.visualization_methods.el_nino_vis.</code><code class="sig-name descname">visualize_helper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">lbls</span></em>, <em class="sig-param"><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.visualization_methods.el_nino_vis.visualize_helper" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a given variable (X or Y), plot each cluster average’s difference from
+the global mean.
+Arguments:</p>
+<blockquote>
+<div><p>col : which column in the figure to assign to this variable (int)
+data : X or Y dataset of dimensions [# observations, # features] (np.array)
+lbls : cluster labels of dimensions [# observations,] (np.array)
+levels : what levels to plot on contour plot (TODO: infer this from data)
+kwargs : dictionary of keyword arguments to pass to ax.contourf (specify appearance of plot)</p>
+</div></blockquote>
+<p>Returns: None</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cfl.visualization_methods.general_vis">
+<span id="cfl-visualization-methods-general-vis-module"></span><h2>cfl.visualization_methods.general_vis module<a class="headerlink" href="#module-cfl.visualization_methods.general_vis" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="cfl.visualization_methods.general_vis.view_class_examples">
+<code class="sig-prename descclassname">cfl.visualization_methods.general_vis.</code><code class="sig-name descname">view_class_examples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">images</span></em>, <em class="sig-param"><span class="n">im_shape</span></em>, <em class="sig-param"><span class="n">n_examples</span></em>, <em class="sig-param"><span class="n">x_lbls</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.visualization_methods.general_vis.view_class_examples" title="Permalink to this definition">¶</a></dt>
+<dd><p>shows images in matplotlib with labels displayed at the top of each image.
+Best for viewing a lot of images at once.</p>
+<p>Parameters:
+images (2D or 3D np array): Array of images (must be aligned with x_lbls)</p>
+<blockquote>
+<div><p>If 2D, axis 0 = samples, axis 1 = flattened image pixels
+If 3D, axis 0 = samples, axis 1 = image rows, axis 2 = image cols</p>
+</div></blockquote>
+<p>n_rows (int): Number of rows of images to display.
+x_lbls (1D np array): labels to show at the top of each image.</p>
+<blockquote>
+<div><p>Should be aligned with the images input</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cfl.visualization_methods.general_vis.view_random_example">
+<code class="sig-prename descclassname">cfl.visualization_methods.general_vis.</code><code class="sig-name descname">view_random_example</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">image_array</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.visualization_methods.general_vis.view_random_example" title="Permalink to this definition">¶</a></dt>
+<dd><p>chooses a random image from the image_array and displays
+it. Setting random state causes it to be reproducible</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cfl.visualization_methods.visual_bars_vis">
+<span id="cfl-visualization-methods-visual-bars-vis-module"></span><h2>cfl.visualization_methods.visual_bars_vis module<a class="headerlink" href="#module-cfl.visualization_methods.visual_bars_vis" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="cfl.visualization_methods.visual_bars_vis.viewImagesAndLabels">
+<code class="sig-prename descclassname">cfl.visualization_methods.visual_bars_vis.</code><code class="sig-name descname">viewImagesAndLabels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">images</span></em>, <em class="sig-param"><span class="n">im_shape</span></em>, <em class="sig-param"><span class="n">n_examples</span></em>, <em class="sig-param"><span class="n">x_lbls</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.visualization_methods.visual_bars_vis.viewImagesAndLabels" title="Permalink to this definition">¶</a></dt>
+<dd><p>shows images in matplotlib with labels displayed at the top of each image.
+Best for viewing a lot of images at once. Designed with visual bars images
+in mind.</p>
+<p>Parameters:
+images (2D or 3D np array): Array of images (must be aligned with x_lbls)</p>
+<blockquote>
+<div><p>If 2D, axis 0 = samples, axis 1 = flattened image pixels
+If 3D, axis 0 = samples, axis 1 = image rows, axis 2 = image cols</p>
+</div></blockquote>
+<p>n_rows (int): Number of rows of images to display.
+x_lbls (1D np array): labels to show at the top of each image.</p>
+<blockquote>
+<div><p>Should be aligned with the images input</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cfl.visualization_methods.visual_bars_vis.viewSingleImage">
+<code class="sig-prename descclassname">cfl.visualization_methods.visual_bars_vis.</code><code class="sig-name descname">viewSingleImage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">image_array</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.visualization_methods.visual_bars_vis.viewSingleImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>chooses a random image from the image_array and displays it. Setting random state causes it to be reproducible</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cfl.visualization_methods">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cfl.visualization_methods" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="cfl.util.html" class="btn btn-neutral float-left" title="cfl.util package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, California Institute of Technology.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

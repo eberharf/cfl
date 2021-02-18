@@ -15,7 +15,7 @@ from recommonmark.parser import CommonMarkParser # for parsing Markdown files
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../cfl'))
+sys.path.insert(0, os.path.abspath('../../cfl'))
 
 
 # -- Project information -----------------------------------------------------
