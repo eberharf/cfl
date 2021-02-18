@@ -1,4 +1,5 @@
 import cfl.density_estimation_methods.condExpVB
 import cfl.density_estimation_methods.condExpKC
 import cfl.density_estimation_methods.condExpCNN
+import cfl.density_estimation_methods.condExpCNN3D
 import cfl.density_estimation_methods.condExpMod
