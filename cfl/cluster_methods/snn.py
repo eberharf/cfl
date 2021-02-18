@@ -54,9 +54,12 @@ class SNN(Clusterer):
         """
         Returns a dictionary containing default values for all parameters
         that must be passed in to create a clusterer
+
+        default params chosen based off defaults in this code: https://github.com/albert-espin/snn-clustering/blob/master/SNN/main.py
+
         """
-        default_params = {'neighbor_num'                   : 10,    #TODO: replace with sensible values
-                          'min_shared_neighbor_proportion' : 0.2    #TODO: maybe add more params for dbscan?
+        default_params = {'neighbor_num'                   : 20,
+                          'min_shared_neighbor_proportion' : 0.5    #TODO: maybe add more params for dbscan?
                           }
         return default_params
 
