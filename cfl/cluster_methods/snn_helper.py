@@ -24,7 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-## small modifications to the original code made by Jenna Kahn
+## modifications to the original code made by Jenna Kahn
 
 import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
@@ -35,14 +35,12 @@ from sklearn.neighbors import kneighbors_graph
 def snn(X, neighbor_num, min_shared_neighbor_num):
     """Perform Shared Nearest Neighbor (SNN) clustering algorithm clustering.
 
-    Parameters
-    ----------
-    X : array or sparse (CSR) matrix of shape (n_samples, n_features), or array of shape (n_samples, n_samples)
-    A feature array
-    neighbor_num : int
-    K number of neighbors to consider for shared nearest neighbor similarity
-    min_shared_neighbor_num : int
-    Number of nearest neighbors that need to share two data points to be considered part of the same cluster
+    Parameters:
+        X (array or sparse (CSR) matrix of shape (n_samples, n_features), or array of shape (n_samples, n_samples)):
+            A feature array
+        neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity
+        min_shared_neighbor_num (int): Number of nearest neighbors that need to share two data points to be considered
+            part of the same cluster
     """
 
     # for each data point, find their set of K nearest neighbors
@@ -63,7 +61,9 @@ def snn(X, neighbor_num, min_shared_neighbor_num):
             snn_distance_matrix[i][j] = dist
             snn_distance_matrix[j][i] = dist
 
-    print(snn_distance_matrix)
+
+    # np.save('distance_matrix.npy', snn_distance_matrix)
+    # print('distance matrix saved')
 
     # perform DBSCAN with the shared-neighbor distance criteria for density estimation
     dbscan = DBSCAN(min_samples=min_shared_neighbor_num, metric="precomputed")
@@ -80,13 +80,11 @@ def get_snn_distance(x0, x1):
 class SNN(BaseEstimator, ClusterMixin):
     """Class for performing the Shared Nearest Neighbor (SNN) clustering algorithm.
 
-    Parameters
-    ----------
-    neighbor_num : int
-        K number of neighbors to consider for shared nearest neighbor similarity
+    Parameters:
+        neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity
 
-    min_shared_neighbor_proportion : float [0, 1]
-        Proportion of the K nearest neighbors that need to share two data points to be considered part of the same cluster
+        min_shared_neighbor_proportion (float [0, 1]): Proportion of the K nearest neighbors that
+            need to share two data points to be considered part of the same cluster
 
     Note: Naming conventions for attributes are based on the analogous ones of DBSCAN
     """
