@@ -31,8 +31,9 @@ from sklearn.base import BaseEstimator, ClusterMixin
 from sklearn.cluster import DBSCAN
 from sklearn.neighbors import kneighbors_graph
 
+import joblib # for testing TODO: remove later
 
-def snn(X, neighbor_num, min_shared_neighbor_num):
+def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     """Perform Shared Nearest Neighbor (SNN) clustering algorithm clustering.
 
     Parameters:
@@ -41,19 +42,28 @@ def snn(X, neighbor_num, min_shared_neighbor_num):
         neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity
         min_shared_neighbor_num (int): Number of nearest neighbors that need to share two data points to be considered
             part of the same cluster
+        eps (float [0, 1]): parameter for DBSCAN, radius of the neighborhood. Default is the sklearn default
+
+    Return:
+        dbscan.core_sample_indices_ : indices of the core points, as determined by DBSCAN
+        dbscan.labels_ : array of cluster labels for each point
     """
 
-    # for each data point, find their set of K nearest neighbors
+    # the knn_graph is a sparese matrix of shape (n_samples, n_samples), where knn_graph[i][j] = 1 if j is a
+    # k-nearest neighbor of i, 0 otherwise
     knn_graph = kneighbors_graph(X, n_neighbors=neighbor_num, include_self=False)
 
+    # neighbors is a list of len (n_samples)
+    # where neighbors[i] is a set of the indices in X that represent k-nearest neighbors of X[i]
     neighbors = []
     for i in range(len(X)):
         neighbors.append(set(knn_graph[i].nonzero()[1]))
 
 
     snn_distance_matrix = np.zeros((len(neighbors), len(neighbors)))
-    # the distance matrix is computed as the complementary of the proportion of shared neighbors between each pair of data points
-    # for efficiency's sake, we only iterate over the top triangle of the matrix
+    # the distance matrix is computed as the complement of the proportion of shared
+    # neighbors between each pair of data points
+    # for efficiency, we only iterate over the top triangle of the matrix
     # and compute the snn_distance one time for both pairs
     for i in range(len(neighbors)):
         for j in range(i):
@@ -62,17 +72,15 @@ def snn(X, neighbor_num, min_shared_neighbor_num):
             snn_distance_matrix[j][i] = dist
 
 
-    # np.save('distance_matrix.npy', snn_distance_matrix)
-    # print('distance matrix saved')
-
     # perform DBSCAN with the shared-neighbor distance criteria for density estimation
-    dbscan = DBSCAN(min_samples=min_shared_neighbor_num, metric="precomputed")
+    dbscan = DBSCAN(eps=eps, min_samples=min_shared_neighbor_num, metric="precomputed")
     dbscan = dbscan.fit(snn_distance_matrix)
     return dbscan.core_sample_indices_, dbscan.labels_
 
 
 def get_snn_distance(x0, x1):
-    """Calculate the shared-neighbor distance of two sets of nearest neighbors, normalized by the maximum number of shared neighbors"""
+    """Calculate the shared-neighbor distance of two sets of nearest neighbors,
+    normalized by the maximum number of shared neighbors"""
 
     return 1 - len(x0.intersection(x1)) / len(x0)
 
@@ -86,27 +94,35 @@ class SNN(BaseEstimator, ClusterMixin):
         min_shared_neighbor_proportion (float [0, 1]): Proportion of the K nearest neighbors that
             need to share two data points to be considered part of the same cluster
 
-    Note: Naming conventions for attributes are based on the analogous ones of DBSCAN
+    Attributes:
+        self.labels_ : [assigned after fitting data]  Cluster labels for each point in the dataset given to
+            fit(). Noisy samples are given the label -1
+        self.core_sample_indices_ : [assigned after fitting data] Indices of core samples
+        self.components_ : [assigned after fitting data] Copy of each core sample found by training
+
+    Note: Naming conventions for attributes are based on the analogous ones of DBSCAN. Some documentation
+        copied from the sklearn DBSCAN documentation
     """
 
-    def __init__(self, neighbor_num, min_shared_neighbor_proportion):
-
+    def __init__(self, neighbor_num, min_shared_neighbor_proportion, eps=0.5):
         """Constructor"""
 
         self.neighbor_num = neighbor_num
         self.min_shared_neighbor_num = round(neighbor_num * min_shared_neighbor_proportion)
+        self.eps = eps
 
     def fit(self, X):
 
         """Perform SNN clustering from features or distance matrix.
 
-        Parameters
-        ----------
-        X : array or sparse (CSR) matrix of shape (n_samples, n_features), or array of shape (n_samples, n_samples)
-            A feature array
+        Parameters:
+            X (array or sparse (CSR) matrix of shape (n_samples, n_features),
+                or array of shape (n_samples, n_samples)): A feature array
+        Return:
+            self: the SNN model with self.labels_, self.core_sample_indices_, self.components_ assigned
         """
 
-        clusters = snn(X, neighbor_num=self.neighbor_num, min_shared_neighbor_num=self.min_shared_neighbor_num)
+        clusters = snn(X, neighbor_num=self.neighbor_num, min_shared_neighbor_num=self.min_shared_neighbor_num, eps=eps)
 
         self.core_sample_indices_, self.labels_ = clusters
         if len(self.core_sample_indices_):
@@ -132,12 +148,11 @@ class SNN(BaseEstimator, ClusterMixin):
             weight may inhibit its eps-neighbor from being core.
             Note that weights are absolute, and default to 1.
 
-        y : Ignored
+        y : Ignored. Not used, present here for API consistency by convention
 
         Returns
         -------
-        y : ndarray, shape (n_samples,)
-            cluster labels
+        y (ndarray, shape (n_samples,)) : cluster labels
         """
         self.fit(X)
         return self.labels_
