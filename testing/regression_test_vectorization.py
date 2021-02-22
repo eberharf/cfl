@@ -130,6 +130,8 @@ def main():
                 rand_index = adjusted_rand_score(y, y_pred)
                 calinski_score = calinski_harabasz_score(X, y_pred)
 
+        # this part of the code requires the snn_distance matrix to be saved as a .npy
+        # in the execution of each of the snn clustering methods
         og_mat = np.load('d_mat_og_' + str(counter)+ '.npy')
         new_mat = np.load('d_mat_vect_' + str(counter)+ '.npy')
         assert(np.all(og_mat == new_mat)), "Distance matrices for {} not the same".format(data_name)
