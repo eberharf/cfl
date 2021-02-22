@@ -32,11 +32,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.neighbors import kneighbors_graph
 from scipy.sparse import csr_matrix
 
-import joblib # for testing TODO: remove later
-
-# TODO: take out two different versions
-
-def snn(X, num, neighbor_num, min_shared_neighbor_num, eps):
+def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     """Perform Shared Nearest Neighbor (SNN) clustering algorithm clustering.
 
     Parameters:
@@ -72,9 +68,6 @@ def snn(X, num, neighbor_num, min_shared_neighbor_num, eps):
             dist = get_snn_distance(neighbors[i], neighbors[j])
             snn_distance_matrix[i][j] = dist
             snn_distance_matrix[j][i] = dist
-
-    name = 'd_mat_og_' + str(num) + '.npy'
-    np.save(name, snn_distance_matrix)
 
     # perform DBSCAN with the shared-neighbor distance criteria for density estimation
     dbscan = DBSCAN(eps=eps, min_samples=min_shared_neighbor_num, metric="precomputed")
@@ -113,7 +106,7 @@ class SNN(BaseEstimator, ClusterMixin):
         self.min_shared_neighbor_num = round(neighbor_num * min_shared_neighbor_proportion)
         self.eps = eps
 
-    def fit(self, X, num):
+    def fit(self, X):
 
         """Perform SNN clustering from features or distance matrix.
 
@@ -124,7 +117,7 @@ class SNN(BaseEstimator, ClusterMixin):
             self: the SNN model with self.labels_, self.core_sample_indices_, self.components_ assigned
         """
 
-        clusters = snn(X, num, neighbor_num=self.neighbor_num, min_shared_neighbor_num=self.min_shared_neighbor_num, eps=self.eps)
+        clusters = snn(X, neighbor_num=self.neighbor_num, min_shared_neighbor_num=self.min_shared_neighbor_num, eps=self.eps)
 
         self.core_sample_indices_, self.labels_ = clusters
         if len(self.core_sample_indices_):
