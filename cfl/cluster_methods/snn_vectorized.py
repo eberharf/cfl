@@ -34,8 +34,6 @@ from scipy.sparse import csr_matrix
 
 import joblib # for testing TODO: remove later
 
-# TODO: take out two different versions
-
 def snn(X, num, neighbor_num, min_shared_neighbor_num, eps):
     """Perform Shared Nearest Neighbor (SNN) clustering algorithm clustering.
 
@@ -51,41 +49,35 @@ def snn(X, num, neighbor_num, min_shared_neighbor_num, eps):
         dbscan.core_sample_indices_ : indices of the core points, as determined by DBSCAN
         dbscan.labels_ : array of cluster labels for each point
     """
+    n_samples = X.shape[0]
 
     # the knn_graph is a sparse matrix of shape (n_samples, n_samples), where knn_graph[i][j] = 1 if j is a
     # k-nearest neighbor of i, 0 otherwise
     knn_graph = kneighbors_graph(X, n_neighbors=neighbor_num, include_self=False)
 
-    # neighbors is a list of len (n_samples)
-    # where neighbors[i] is a set of the indices in X that represent k-nearest neighbors of X[i]
-    neighbors = []
-    for i in range(len(X)):
-        neighbors.append(set(knn_graph[i].nonzero()[1]))
+    # so what happens now is we create the neighbors list
+    # and then the distance is computed, which is the intersection between the elements of one connectivity matrix and another
+    # my idea is: instead of neighbors being a list of sets like this
+    # pass in the knn_graph as a numpy array (not a sparse matrix)
+    # and the intersection is whatever rows are non-zero for both knn_graph[i] and knn_graph[j]
+    # calculated using the dot product
+    knn_array = knn_graph.toarray()
 
-    snn_distance_matrix = np.zeros((len(neighbors), len(neighbors)))
-    # the distance matrix is computed as the complement of the proportion of shared
-    # neighbors between each pair of data points
-    # for efficiency, we only iterate over the top triangle of the matrix
-    # and compute the snn_distance one time for both pairs
-    for i in range(len(neighbors)):
-        for j in range(i):
-            dist = get_snn_distance(neighbors[i], neighbors[j])
-            snn_distance_matrix[i][j] = dist
-            snn_distance_matrix[j][i] = dist
+    num_shared_neighbors = np.dot(knn_array, knn_array.T)
 
-    name = 'd_mat_og_' + str(num) + '.npy'
+    normalization_factor = np.sum(knn_array, axis=1)
+
+    normalized_snn = np.divide(num_shared_neighbors, normalization_factor).T
+
+    snn_distance_matrix = 1 - normalized_snn
+
+    name = 'd_mat_vect_' + str(num) + '.npy'
     np.save(name, snn_distance_matrix)
 
     # perform DBSCAN with the shared-neighbor distance criteria for density estimation
     dbscan = DBSCAN(eps=eps, min_samples=min_shared_neighbor_num, metric="precomputed")
     dbscan = dbscan.fit(snn_distance_matrix)
     return dbscan.core_sample_indices_, dbscan.labels_
-
-def get_snn_distance(x0, x1):
-    """Calculate the shared-neighbor distance of two sets of nearest neighbors,
-    normalized by the maximum number of shared neighbors"""
-    return 1 - len(x0.intersection(x1)) / len(x0)
-
 
 class SNN(BaseEstimator, ClusterMixin):
     """Class for performing the Shared Nearest Neighbor (SNN) clustering algorithm.
