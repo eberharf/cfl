@@ -43,11 +43,11 @@ class SNN(Clusterer):
         self.random_state = random_state
 
         # initialize clusterer for xs and for ys
-        self.xmodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'])
+        self.xmodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'], self.params['eps'])
         print("xmodel is", self.xmodel)
         print("xmodel params are", self.xmodel.neighbor_num, self.xmodel.min_shared_neighbor_num)
 
-        self.ymodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'])
+        self.ymodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'], self.params['eps'])
         print("ymodel is", self.ymodel)
         print("ymodel params are", self.ymodel.neighbor_num, self.ymodel.min_shared_neighbor_num)
 
