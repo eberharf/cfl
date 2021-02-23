@@ -1,7 +1,13 @@
+'''Shared Nearest Neighbor Clustering
+
+This module contains the code to interface Albert Espín's implementation of SNN clustering with the
+CFL structure.
+
+'''
+
 import numpy as np
 from sklearn.cluster import DBSCAN
 from sklearn.neighbors import kneighbors_graph
-
 
 from cfl.cluster_methods.clusterer_interface import Clusterer #abstract base class
 from cfl.cluster_methods import Y_given_Xmacro #calculate P(Y|Xmacro)
@@ -12,17 +18,15 @@ class SNN(Clusterer):
 
     def __init__(self, name, data_info, params, random_state):
         """
-        initialize Clusterer object
+        initialize SNN Clusterer object
 
-        Parameters
-        ==========
-        params (dict) : a dictionary of relevant hyperparameters for clustering
-        random_state (int) : a random seed to create reproducible results
+        Parameters: 
+            params (dict) : a dictionary of relevant hyperparameters for clustering
+            random_state (int) : a random seed to create reproducible results
         pass # no outputs
 
-        Return
-        =========
-        None
+        Return:
+            None
         """
 
         super(SNN, self).__init__(name, data_info, params, random_state=None) #Calls clusterer constructor
@@ -53,12 +57,15 @@ class SNN(Clusterer):
         Returns a dictionary containing default values for all parameters
         that must be passed in to create a clusterer
 
-        default params chosen based off defaults in this code: https://github.com/albert-espin/snn-clustering/blob/master/SNN/main.py
+        default params for neighbor_num and min_shared_neighbor_proportion chosen based off defaults in 
+        this code: https://github.com/albert-espin/snn-clustering/blob/master/SNN/main.py
+        value for eps is chosen from sklearn default
 
         """
         default_params = {'neighbor_num'                   : 20,
-                          'min_shared_neighbor_proportion' : 0.5    #TODO: maybe add more params for dbscan?
-                          }
+                          'min_shared_neighbor_proportion' : 0.5, 
+                          'eps'                            : 0.5,
+                        } 
         return default_params
 
 
