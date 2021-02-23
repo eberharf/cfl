@@ -6,9 +6,6 @@ from sklearn.metrics import silhouette_score
 
 from cfl.cluster_methods.clusterer_interface import Clusterer #abstract base class
 from cfl.cluster_methods import Y_given_Xmacro #calculate P(Y|Xmacro)
-import pickle
-
-import os #save, load model
 
 class KMeans(Clusterer):
     """ This class uses K-Means to form the observational partition that CFL
@@ -201,54 +198,3 @@ class KMeans(Clusterer):
     # def cluster_metric(self, probs, lbls):
     #     '''calculate silhouette score (intrinsic metric for clustering quality)'''
     #     return silhouette_score(probs, lbls)
-
-
-    # TODO: move this out eventually?
-    def save_model(self, dir_path):
-        ''' Save both kmeans models to compressed files.
-
-            Arguments:
-                dir_path : directory in which to save models (str)
-            Returns: None
-        '''
-        model_dict = {}
-        model_dict['xmodel'] = self.xmodel
-        model_dict['ymodel'] = self.ymodel
-
-        with open(dir_path, 'wb') as f:
-            pickle.dump(model_dict, f)
-
-    def load_model(self, dir_path):
-        ''' Load both kmeans models from directory path.
-
-            Arguments:
-                dir_path : directory in which to save models (str)
-            Returns: None
-        '''
-
-        # TODO: error handling for file not found
-        with open(dir_path, 'rb') as f:
-            model_dict = pickle.load(f)
-
-        self.xmodel = model_dict['xmodel']
-        self.ymodel = model_dict['ymodel']
-        self.trained = True
-
-    def save_block(self, path):
-        ''' save trained model to specified path.
-            Arguments:
-                path : path to save to. (str)
-            Returns: None
-        '''
-
-        self.save_model(path)
-
-    def load_block(self, path):
-        ''' load model saved at path into this model.
-            Arguments:
-                path : path to saved weights. (str)
-            Returns: None
-        '''
-
-        self.load_model(path)
-        self.trained = True
