@@ -18,7 +18,6 @@ class KMeans(Clusterer):
         Y_given_Xmacro.py). Once these two K-Means models are trained, they can then
         be used to assign new datapoints to these clusters.
 
-
         Attributes:
             params : parameters for the clusterer that are passed in by the
                      user and corrected by check_model_params (dict)
@@ -236,20 +235,20 @@ class KMeans(Clusterer):
         self.trained = True
 
     def save_block(self, path):
-        ''' save trained model to specified path. 
-            Arguments: 
+        ''' save trained model to specified path.
+            Arguments:
                 path : path to save to. (str)
             Returns: None
         '''
-        
+
         self.save_model(path)
 
     def load_block(self, path):
-        ''' load model saved at path into this model. 
-            Arguments: 
+        ''' load model saved at path into this model.
+            Arguments:
                 path : path to saved weights. (str)
             Returns: None
         '''
-        
+
         self.load_model(path)
         self.trained = True

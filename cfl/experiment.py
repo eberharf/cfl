@@ -14,6 +14,7 @@ from cfl.util.arg_validation_util import validate_data_info
 BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB, 
                 'CondExpKC' : cdem.condExpKC.CondExpKC,
                 'CondExpCNN'  : cdem.condExpCNN.CondExpCNN,
+                'CondExpCNN3D'  : cdem.condExpCNN3D.CondExpCNN3D,
                 'CondExpMod'  : cdem.condExpMod.CondExpMod,
                 'Kmeans' : ccm.kmeans.KMeans }
 
@@ -479,6 +480,9 @@ class Experiment():
         if self.verbose > 0:
             print('All results from this run will be saved to {}'.format(save_path))
         os.mkdir(save_path)
+
+        # make trained_blocks dir
+        os.mkdir(os.path.join(save_path, 'trained_blocks'))
         return save_path
 
     def _propagate_verbosity(self, verbose, block_params):
