@@ -97,7 +97,7 @@ class SNN(BaseEstimator, ClusterMixin):
         copied from the sklearn DBSCAN documentation
     """
 
-    def __init__(self, neighbor_num, min_shared_neighbor_proportion, eps=0.5):
+    def __init__(self, neighbor_num, min_shared_neighbor_proportion, eps):
         """Constructor"""
 
         self.neighbor_num = neighbor_num
