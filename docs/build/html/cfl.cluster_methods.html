@@ -509,6 +509,7 @@ y_lbls : Y macrovariable class assignments for this Dataset (np.array)</p>
 <code class="sig-name descname">_get_default_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cfl.cluster_methods.snn.SNN._get_default_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dictionary containing default values for all parameters
 that must be passed in to create a clusterer</p>
+<p>default params chosen based off defaults in this code: <a class="reference external" href="https://github.com/albert-espin/snn-clustering/blob/master/SNN/main.py">https://github.com/albert-espin/snn-clustering/blob/master/SNN/main.py</a></p>
 </dd></dl>
 
 <dl class="py method">
@@ -617,21 +618,29 @@ y_lbls : Y macrovariable class assignments for this Dataset (np.array)</p>
 <span id="cfl-cluster-methods-snn-helper-module"></span><h2>cfl.cluster_methods.snn_helper module<a class="headerlink" href="#module-cfl.cluster_methods.snn_helper" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="cfl.cluster_methods.snn_helper.SNN">
-<em class="property">class </em><code class="sig-prename descclassname">cfl.cluster_methods.snn_helper.</code><code class="sig-name descname">SNN</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">neighbor_num</span></em>, <em class="sig-param"><span class="n">min_shared_neighbor_proportion</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.cluster_methods.snn_helper.SNN" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">cfl.cluster_methods.snn_helper.</code><code class="sig-name descname">SNN</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">neighbor_num</span></em>, <em class="sig-param"><span class="n">min_shared_neighbor_proportion</span></em>, <em class="sig-param"><span class="n">eps</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.cluster_methods.snn_helper.SNN" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClusterMixin</span></code></p>
 <p>Class for performing the Shared Nearest Neighbor (SNN) clustering algorithm.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>neighbor_num</strong> (<em>int</em>) – K number of neighbors to consider for shared nearest neighbor similarity</p></li>
-<li><p><strong>min_shared_neighbor_proportion</strong> (<em>float</em><em> [</em><em>0</em><em>, </em><em>1</em><em>]</em>) – Proportion of the K nearest neighbors that need to share two data points to be considered part of the same cluster</p></li>
-<li><p><strong>Note</strong> (<em>Naming conventions for attributes are based on the analogous ones of DBSCAN</em>) – </p></li>
-</ul>
+<dl>
+<dt>Parameters:</dt><dd><p>neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity</p>
+<dl class="simple">
+<dt>min_shared_neighbor_proportion (float [0, 1]): Proportion of the K nearest neighbors that</dt><dd><p>need to share two data points to be considered part of the same cluster</p>
+</dd>
+</dl>
+</dd>
+<dt>Attributes:</dt><dd><dl class="simple">
+<dt><a href="#id5"><span class="problematic" id="id6">self.labels_</span></a><span class="classifier">[assigned after fitting data]  Cluster labels for each point in the dataset given to</span></dt><dd><p>fit(). Noisy samples are given the label -1</p>
+</dd>
+</dl>
+<p><a href="#id7"><span class="problematic" id="id8">self.core_sample_indices_</span></a> : [assigned after fitting data] Indices of core samples
+<a href="#id9"><span class="problematic" id="id10">self.components_</span></a> : [assigned after fitting data] Copy of each core sample found by training</p>
+</dd>
+<dt>Note: Naming conventions for attributes are based on the analogous ones of DBSCAN. Some documentation</dt><dd><p>copied from the sklearn DBSCAN documentation</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt id="cfl.cluster_methods.snn_helper.SNN.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">neighbor_num</span></em>, <em class="sig-param"><span class="n">min_shared_neighbor_proportion</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.cluster_methods.snn_helper.SNN.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">neighbor_num</span></em>, <em class="sig-param"><span class="n">min_shared_neighbor_proportion</span></em>, <em class="sig-param"><span class="n">eps</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.cluster_methods.snn_helper.SNN.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor</p>
 </dd></dl>
 
@@ -639,9 +648,13 @@ y_lbls : Y macrovariable class assignments for this Dataset (np.array)</p>
 <dt id="cfl.cluster_methods.snn_helper.SNN.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.cluster_methods.snn_helper.SNN.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform SNN clustering from features or distance matrix.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>X</strong> (<em>array</em><em> or </em><em>sparse</em><em> (</em><em>CSR</em><em>) </em><em>matrix of shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_features</em><em>)</em><em>, or </em><em>array of shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_samples</em><em>)</em>) – A feature array</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="simple">
+<dt>X (array or sparse (CSR) matrix of shape (n_samples, n_features),</dt><dd><p>or array of shape (n_samples, n_samples)): A feature array</p>
+</dd>
+</dl>
+</dd>
+<dt>Return:</dt><dd><p>self: the SNN model with <a href="#id11"><span class="problematic" id="id12">self.labels_</span></a>, <a href="#id13"><span class="problematic" id="id14">self.core_sample_indices_</span></a>, <a href="#id15"><span class="problematic" id="id16">self.components_</span></a> assigned</p>
 </dd>
 </dl>
 </dd></dl>
@@ -659,14 +672,14 @@ y_lbls : Y macrovariable class assignments for this Dataset (np.array)</p>
 <code class="docutils literal notranslate"><span class="pre">min_samples</span></code> is by itself a core sample; a sample with negative
 weight may inhibit its eps-neighbor from being core.
 Note that weights are absolute, and default to 1.</p></li>
-<li><p><strong>y</strong> (<em>Ignored</em>) – </p></li>
+<li><p><strong>y</strong> (<em>Ignored. Not used</em><em>, </em><em>present here for API consistency by convention</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>y</strong> – cluster labels</p>
+<dd class="field-even"><p><strong>y (ndarray, shape (n_samples,))</strong></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>ndarray, shape (n_samples,)</p>
+<dd class="field-odd"><p>cluster labels</p>
 </dd>
 </dl>
 </dd></dl>
@@ -676,23 +689,28 @@ Note that weights are absolute, and default to 1.</p></li>
 <dl class="py function">
 <dt id="cfl.cluster_methods.snn_helper.get_snn_distance">
 <code class="sig-prename descclassname">cfl.cluster_methods.snn_helper.</code><code class="sig-name descname">get_snn_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x0</span></em>, <em class="sig-param"><span class="n">x1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.cluster_methods.snn_helper.get_snn_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the shared-neighbor distance of two sets of nearest neighbors, normalized by the maximum number of shared neighbors</p>
+<dd><p>Calculate the shared-neighbor distance of two sets of nearest neighbors,
+normalized by the maximum number of shared neighbors</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="cfl.cluster_methods.snn_helper.snn">
-<code class="sig-prename descclassname">cfl.cluster_methods.snn_helper.</code><code class="sig-name descname">snn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">neighbor_num</span></em>, <em class="sig-param"><span class="n">min_shared_neighbor_num</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.cluster_methods.snn_helper.snn" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cfl.cluster_methods.snn_helper.</code><code class="sig-name descname">snn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">neighbor_num</span></em>, <em class="sig-param"><span class="n">min_shared_neighbor_num</span></em>, <em class="sig-param"><span class="n">eps</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cfl.cluster_methods.snn_helper.snn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform Shared Nearest Neighbor (SNN) clustering algorithm clustering.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>array</em><em> or </em><em>sparse</em><em> (</em><em>CSR</em><em>) </em><em>matrix of shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_features</em><em>)</em><em>, or </em><em>array of shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_samples</em><em>)</em>) – </p></li>
-<li><p><strong>feature array</strong> (<em>A</em>) – </p></li>
-<li><p><strong>neighbor_num</strong> (<em>int</em>) – </p></li>
-<li><p><strong>number of neighbors to consider for shared nearest neighbor similarity</strong> (<em>K</em>) – </p></li>
-<li><p><strong>min_shared_neighbor_num</strong> (<em>int</em>) – </p></li>
-<li><p><strong>of nearest neighbors that need to share two data points to be considered part of the same cluster</strong> (<em>Number</em>) – </p></li>
-</ul>
+<dl>
+<dt>Parameters:</dt><dd><dl class="simple">
+<dt>X (array or sparse (CSR) matrix of shape (n_samples, n_features), or array of shape (n_samples, n_samples)):</dt><dd><p>A feature array</p>
+</dd>
+</dl>
+<p>neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity
+min_shared_neighbor_num (int): Number of nearest neighbors that need to share two data points to be considered</p>
+<blockquote>
+<div><p>part of the same cluster</p>
+</div></blockquote>
+<p>eps (float [0, 1]): parameter for DBSCAN, radius of the neighborhood. Default is the sklearn default</p>
+</dd>
+<dt>Return:</dt><dd><p><a href="#id17"><span class="problematic" id="id18">dbscan.core_sample_indices_</span></a> : indices of the core points, as determined by DBSCAN
+<a href="#id19"><span class="problematic" id="id20">dbscan.labels_</span></a> : array of cluster labels for each point</p>
 </dd>
 </dl>
 </dd></dl>
