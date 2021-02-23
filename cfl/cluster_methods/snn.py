@@ -4,7 +4,6 @@ This module contains the code to interface Albert Espín's implementation of SNN
 CFL structure.
 
 '''
-
 import numpy as np
 from sklearn.cluster import DBSCAN
 from sklearn.neighbors import kneighbors_graph
@@ -44,13 +43,8 @@ class SNN(Clusterer):
 
         # initialize clusterer for xs and for ys
         self.xmodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'], self.params['eps'])
-        print("xmodel is", self.xmodel)
-        print("xmodel params are", self.xmodel.neighbor_num, self.xmodel.min_shared_neighbor_num)
 
         self.ymodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'], self.params['eps'])
-        print("ymodel is", self.ymodel)
-        print("ymodel params are", self.ymodel.neighbor_num, self.ymodel.min_shared_neighbor_num)
-
 
     def get_params(self):
         return self.params
