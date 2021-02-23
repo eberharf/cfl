@@ -1,30 +1,32 @@
-# from " Shared Nearest Neighbor Clustering Algorithm: Implementation and Evaluation "
-# in github repository  albert-espin/snn-clustering
-# used under the following license:
+'''this code is modified by Jenna Kahn from the implemention in
+" Shared Nearest Neighbor Clustering Algorithm: Implementation and Evaluation "
+in github repository  albert-espin/snn-clustering
 
-# MIT License
+Used under the following license:
 
-# Copyright (c) 2019 Albert Espín
+MIT License
 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
+Copyright (c) 2019 Albert Espín
 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-## modifications to the original code made by Jenna Kahn
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
+# TODO: add a bit of information about the point of SNN and when you would want to use it
 
 import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
@@ -32,9 +34,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.neighbors import kneighbors_graph
 from scipy.sparse import csr_matrix
 
-import joblib # for testing TODO: remove later
-
-def snn(X, num, neighbor_num, min_shared_neighbor_num, eps):
+def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     """Perform Shared Nearest Neighbor (SNN) clustering algorithm clustering.
 
     Parameters:
@@ -51,28 +51,27 @@ def snn(X, num, neighbor_num, min_shared_neighbor_num, eps):
     """
     n_samples = X.shape[0]
 
-    # the knn_graph is a sparse matrix of shape (n_samples, n_samples), where knn_graph[i][j] = 1 if j is a
-    # k-nearest neighbor of i, 0 otherwise
+    # the knn_graph is a sparse matrix showing the connectivity of the nearest neighbors
+    # knn_graph has the shape (n_samples, n_samples), where knn_graph[i][j] = 1 if j is
+    # a k-nearest neighbor of i and = 0 otherwise
     knn_graph = kneighbors_graph(X, n_neighbors=neighbor_num, include_self=False)
-
-    # so what happens now is we create the neighbors list
-    # and then the distance is computed, which is the intersection between the elements of one connectivity matrix and another
-    # my idea is: instead of neighbors being a list of sets like this
-    # pass in the knn_graph as a numpy array (not a sparse matrix)
-    # and the intersection is whatever rows are non-zero for both knn_graph[i] and knn_graph[j]
-    # calculated using the dot product
     knn_array = knn_graph.toarray()
 
+    # finding the dot product of the original array with its transpose gives an array
+    # whose (i, j)th element is the number of shared neighbors between X[i] and X[j]
+    # similarity(p, q) = size(NN(p) intersect NN(q))
     num_shared_neighbors = np.dot(knn_array, knn_array.T)
 
-    normalization_factor = np.sum(knn_array, axis=1)
+    # now we go from the shared nearest neighbor similarity metric to the
+    # SNN distance metric, which is defined for two points in X as
+    # dist(x0, x1) = 1 - len(kNN(x0).intersect(knn(x1))) / k
+
+    normalization_factor = np.sum(knn_array, axis=1) #NOTE: as far as I can tell, this normalization should be equal to k in all
+    # cases, but the original code had the normalization as a function of the SNN
+    # similarity, and I'm scared to change it in case my understanding is wrong
 
     normalized_snn = np.divide(num_shared_neighbors, normalization_factor).T
-
     snn_distance_matrix = 1 - normalized_snn
-
-    name = 'd_mat_vect_' + str(num) + '.npy'
-    np.save(name, snn_distance_matrix)
 
     # perform DBSCAN with the shared-neighbor distance criteria for density estimation
     dbscan = DBSCAN(eps=eps, min_samples=min_shared_neighbor_num, metric="precomputed")
@@ -105,7 +104,7 @@ class SNN(BaseEstimator, ClusterMixin):
         self.min_shared_neighbor_num = round(neighbor_num * min_shared_neighbor_proportion)
         self.eps = eps
 
-    def fit(self, X, num):
+    def fit(self, X):
 
         """Perform SNN clustering from features or distance matrix.
 
@@ -116,7 +115,7 @@ class SNN(BaseEstimator, ClusterMixin):
             self: the SNN model with self.labels_, self.core_sample_indices_, self.components_ assigned
         """
 
-        clusters = snn(X, num, neighbor_num=self.neighbor_num, min_shared_neighbor_num=self.min_shared_neighbor_num, eps=self.eps)
+        clusters = snn(X, neighbor_num=self.neighbor_num, min_shared_neighbor_num=self.min_shared_neighbor_num, eps=self.eps)
 
         self.core_sample_indices_, self.labels_ = clusters
         if len(self.core_sample_indices_):
