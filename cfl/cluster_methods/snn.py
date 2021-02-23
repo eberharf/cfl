@@ -11,8 +11,7 @@ from sklearn.neighbors import kneighbors_graph
 
 from cfl.cluster_methods.clusterer_interface import Clusterer #abstract base class
 from cfl.cluster_methods import Y_given_Xmacro #calculate P(Y|Xmacro)
-from cfl.cluster_methods.snn_helper import SNN as extSNN #underlying snn algorithm
-
+from cfl.cluster_methods.snn_vectorized import SNN as extSNN #underlying snn algorithm
 
 
 class SNN(Clusterer):
