@@ -74,9 +74,6 @@ def plot_panels(brains, dims, mask_vec, save_path):
     return panels
 
 
-
-
-
 # note: this requires the full scan, not just the masked template area
 def plot_interactive_panels(brains, dims, mask_vec, dir_labels, figsize=(6,4), std_scale='std', colormap='coolwarm', column_titles=[], step=1):
     ''' plots 3 panels along the three axes of the 3D brain volumes.
@@ -96,21 +93,25 @@ def plot_interactive_panels(brains, dims, mask_vec, dir_labels, figsize=(6,4), s
         panels: array of the three panels (each a 2D array) in the non-interactive case,
                 otherwise None
     '''
+
+    # create a copy to not alter the original array (otherwise the original gets modified)
+    brains_vis = np.asarray(brains, np.floating) #the array needs to be float type or else assigning the NaNs later won't work 
+
     # handle 1 brain case
-    if brains.ndim < 2:
-        brains = np.expand_dims(brains, 0)
+    if brains_vis.ndim < 2:
+        brains_vis = np.expand_dims(brains_vis, 0)
 
     # set voxels outside of template region to not plot
     assert ~np.all(np.equal(mask_vec, 0)), "please give a mask vector with at least one non-zero value" #to avoid accidentally submitting a blank mask
     mask_regions = np.where(mask_vec==0)[0]
-    for bi in range(brains.shape[0]):
-        brains[bi,mask_regions] = np.nan
-    brains = np.ma.masked_invalid(brains)
+    for bi in range(brains_vis.shape[0]): 
+        brains_vis[bi,mask_regions] = np.nan 
+    brains_vis = np.ma.masked_invalid(brains_vis)
 
     # volumes is list of unflattened mri images
     volumes = []
-    for bi in range(brains.shape[0]):
-        volumes.append(BU.unflatten(brains[bi], dims).astype(np.float32))
+    for bi in range(brains_vis.shape[0]):
+        volumes.append(BU.unflatten(brains_vis[bi], dims).astype(np.float32))
 
     vmin = None
     vmax = None
