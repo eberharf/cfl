@@ -74,7 +74,10 @@ def get_snn_similarity(x0, x1):
 
 
 def get_snn_distance(x0, x1):
-    """Calculate the shared-neighbor distance of two sets of nearest neighbors, normalized by the maximum number of shared neighbors"""
+    """Calculate the shared-neighbor distance of two sets of nearest neighbors, normalized by the maximum number of shared neighbors
+    A value of 1 means they share no k-nearest neighbors (very distant)
+    A value of 0 means they share all their k-nearest neighbors (very close togethers)
+    """
 
     return 1 - get_snn_similarity(x0, x1)
 
