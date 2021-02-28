@@ -14,6 +14,7 @@ from cfl.util.arg_validation_util import validate_data_info
 BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB, 
                 'CondExpKC' : cdem.condExpKC.CondExpKC,
                 'CondExpCNN'  : cdem.condExpCNN.CondExpCNN,
+                'CondExpCNN3D'  : cdem.condExpCNN3D.CondExpCNN3D,
                 'CondExpMod'  : cdem.condExpMod.CondExpMod,
                 'Kmeans' : ccm.kmeans.KMeans }
 
