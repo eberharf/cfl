@@ -22,8 +22,6 @@ from sklearn.cluster import DBSCAN
         params : parameters for the clusterer that are passed in by the
                     user and corrected by check_model_params (dict)
         y_data_type : whether the y data is categorical or continuous (str)
-        random_state : value of random seed to set in clustering for reproducible results
-                        (None if this shouldn't be held constant) (int)
         name : name of the model so that the model type can be recovered from saved parameters (str)
         n_Xclusters : number of X macrovariables to find (int)
         n_Yclusters : number of Y macrovariables to find (int)
@@ -45,7 +43,7 @@ from sklearn.cluster import DBSCAN
 
 class ClustererBase(Block):
 
-    def __init__(self, name, data_info, params, random_state=None):
+    def __init__(self, name, data_info, params):
         """
         initialize Clusterer object
 
@@ -60,7 +58,6 @@ class ClustererBase(Block):
                 ClusterMixin Interfaces (https://scikit-learn.org/stable/modules/generated/sklearn.base.ClusterMixin.html)
                 ^ (this means they need to have the method fit_predict(X, y=None) and assign the results as self.labels_
                 #TODO: make this docstring and the requirements better
-            random_state (int) : a random seed to create reproducible results pass
 
         Return
             None
@@ -68,18 +65,14 @@ class ClustererBase(Block):
 
         #attributes:
         # self.model_name
-        # self.random_state
 
         super().__init__(name=name, data_info=data_info, params=params)
-        assert type(random_state) in [int, type(None)], 'random_state should be of type int or NoneType.'
-        self.random_state = random_state
 
         self.Y_type = data_info['Y_type']
         assert self.Y_type in ["categorical", "continuous"], "Y_type in data_info should be 'categorical' or 'continouous' but is {}".format(self.Y_type)
 
         # self.name = name
         # self.params = self._check_model_params(params)
-        # self.random_state = random_state
 
         self.xmodel = self.params['x_model']
         self.ymodel = self.params['y_model']

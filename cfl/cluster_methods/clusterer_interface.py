@@ -9,13 +9,12 @@ from cfl.block import Block
 class Clusterer(Block):
 
     @abstractmethod
-    def __init__(self, name, data_info, params, random_state=None):
+    def __init__(self, name, data_info, params):
         """
         initialize Clusterer object
 
         Parameters
             params (dict) : a dictionary of relevant hyperparameters for clustering
-            random_state (int) : a random seed to create reproducible results pass
 
         Return
             None
@@ -23,14 +22,10 @@ class Clusterer(Block):
 
         #attributes:
         # self.model_name
-        # self.random_state
 
         # pass
 
         super().__init__(name=name, data_info=data_info, params=params)
-        assert type(random_state) in [int, type(None)], 'random_state should be of type int or NoneType.'
-        self.random_state = random_state
-
 
     @abstractmethod
     def train(self, dataset, prev_results):
