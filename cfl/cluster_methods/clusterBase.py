@@ -11,23 +11,24 @@ from sklearn.cluster import DBSCAN
 # - tests to run with new module to ensure that it works right?
 
 
-""" This class uses K-Means to form the observational partition that CFL
-    is trying to identify. It trains two K-Means models, one to cluster datapoints
+""" This class uses  clustering to form the observational partition that CFL
+    is trying to identify. It trains two user-defined clustering models, one to cluster datapoints
     based on P(Y|X=x), and the other to cluster datapoints based on a proxy
     for P(Y=y|X) (more information on this proxy can be found in the helper file
-    Y_given_Xmacro.py). Once these two K-Means models are trained, they can then
+    Y_given_Xmacro.py). Once these two models are trained, they can then
     be used to assign new datapoints to these clusters.
 
     Attributes:
-        params : parameters for the clusterer that are passed in by the
-                    user and corrected by check_model_params (dict)
-        y_data_type : whether the y data is categorical or continuous (str)
-        name : name of the model so that the model type can be recovered from saved parameters (str)
-        n_Xclusters : number of X macrovariables to find (int)
-        n_Yclusters : number of Y macrovariables to find (int)
+        params (dict): two clusterer objects (keys: 'x_model' and 'y_model') that have already been created. 
+            The clusterer objects must follow scikit-learn interface
+        x_model: clusterer for cause data
+        y_model: clusterer for effect data
+        data_info (dict) : dictionary with the keys 'X_dims', 'Y_dims', and 
+            'Y_type' (whether the y data is categorical or continuous)
+        name : name of the model so that the model type can be recovered from saved parameters (str) #TODO: remove
 
     Methods:
-        train : fit a kmeans model with P(Y|X=x) found by CDE, and a fit second kmeans
+        train : fit a model with P(Y|X=x) found by CDE, and a fit second
                 model with proxy for P(Y=y|X).
         predict : assign new datapoints to clusters found in train
         evaluate_clusters : evaluate the goodness of clustering based on metric specified
@@ -36,19 +37,32 @@ from sklearn.cluster import DBSCAN
         check_model_params : fill in any parameters that weren't provided in params with
                                     the default value, and discard any unnecessary paramaters
                                     that were provided.
+    Example: 
+        from sklearn.cluster import DBSCAN 
+        from cfl.cluster_methods.clusterBase import ClusterBase
+        from cfl.dataset import Dataset
+
+        X = cause data 
+        y = effect data 
+        prev_results = CDE results
+        data = Dataset(X, y)
+
+        x_DBSCAN = DBSCAN(eps=0.3, min_samples=10)
+        x_DBSCAN = DBSCAN(eps=0.5, min_samples=15) #TODO: what are appropriate params for y? (values are more consistent)
+        clusterer = ClusterBase('cluster', data_info ={'X_dims': X.shape, 'Y_dims':Y.shape, 
+            'Y_type': 'continuous'}, params={'x_model':x_DBSCAN, 'y_model':y_DBSCAN})
+
+        results = clusterer.train(data, prev_results)
  """
 
-# TODO: does this way of doing things complicate the random state of it all? yes. also, not all methods (eg SNN) require random state
-# so it may have been misleading as it was 
-
-class ClustererBase(Block):
+class ClusterBase(Block):
 
     def __init__(self, name, data_info, params):
         """
         initialize Clusterer object
 
         Parameters
-            name (str): we get rid of it i hope #TODO 
+            name (str): we get rid of it #TODO 
             data_info (dict): 
             params (dict) : a dictionary of relevant hyperparameters for clustering. 
                 For a base clusterer object, these should be two already created clusterers (one
@@ -64,7 +78,6 @@ class ClustererBase(Block):
         """
 
         #attributes:
-        # self.model_name
 
         super().__init__(name=name, data_info=data_info, params=params)
 
@@ -98,15 +111,12 @@ class ClustererBase(Block):
         Based on the data type of Y, chooses the correct method
         to find (a proxy of) P(Y=y | Xclass) for all Y=y.
 
-        Parameters
-        -----------
-        dataset: Dataset object containing X and Y data
-        x_lbls: Cluster labels for X data
+        Parameters:
+            dataset: Dataset object containing X and Y data
+            x_lbls: Cluster labels for X data
 
-        Returns
-        -----------
-
-        y_probs: array with P(Y=y |Xclass) distribution (aligned to the Y dataset)
+        Returns:
+            y_probs: array with P(Y=y |Xclass) distribution (aligned to the Y dataset)
         """
         Y = dataset.get_Y()
         if self.Y_type == 'continuous':
@@ -119,16 +129,17 @@ class ClustererBase(Block):
 
 
     def train(self, dataset, prev_results):
-        ''' Assign new datapoints to clusters found in training.
+        """
+        Assign new datapoints to clusters found in training.
 
-            Arguments:
-                dataset : Dataset object containing X, Y and pyx data to assign parition labels to (Dataset)
-                prev_results : dictionary that contains a key called 'pyx', whose value is an array of
-                probabilities
-            Returns:
-                x_lbls : X macrovariable class assignments for this Dataset (np.array)
-                y_lbls : Y macrovariable class assignments for this Dataset (np.array)
-        '''
+        Arguments:
+            dataset : Dataset object containing X, Y and pyx data to assign parition labels to (Dataset)
+            prev_results : dictionary that contains a key called 'pyx', whose value is an array of
+            probabilities
+        Returns:
+            x_lbls : X macrovariable class assignments for this Dataset (np.array)
+            y_lbls : Y macrovariable class assignments for this Dataset (np.array)
+        """
         
         try:
             pyx = prev_results['pyx']
@@ -152,16 +163,17 @@ class ClustererBase(Block):
         return results_dict
 
     def predict(self, dataset, prev_results):
-        ''' Assign new datapoints to clusters found in training.
+        """  
+        Assign new datapoints to clusters found in training.
 
-            Arguments:
-                dataset : Dataset object containing X, Y and pyx data to assign parition labels to (Dataset)
-                prev_results : dictionary that contains a key called 'pyx', whose value is an array of
-                probabilities
-            Returns:
-                x_lbls : X macrovariable class assignments for this Dataset (np.array)
-                y_lbls : Y macrovariable class assignments for this Dataset (np.array)
-        '''
+        Arguments:
+            dataset : Dataset object containing X, Y and pyx data to assign parition labels to (Dataset)
+            prev_results : dictionary that contains a key called 'pyx', whose value is an array of
+            probabilities
+        Returns:
+            x_lbls : X macrovariable class assignments for this Dataset (np.array)
+            y_lbls : Y macrovariable class assignments for this Dataset (np.array)
+        """
 
         assert self.trained, "Remember to train the model before prediction."
 
