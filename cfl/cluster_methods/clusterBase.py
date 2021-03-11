@@ -162,6 +162,7 @@ class ClusterBase(Block):
         else:
             y_lbls = None
 
+        self.trained = True
         results_dict = {'x_lbls' : x_lbls,
                         'y_lbls' : y_lbls}
         return results_dict
