@@ -1,4 +1,7 @@
 
+# Iman Wahle
+# March 9 2021
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,6 +13,8 @@ import sklearn.cluster as skcluster
 import sklearn.mixture as skmixture
 import shutil
 from glob import glob
+import pandas as pd
+from tqdm import tqdm
 
 # constants
 SKLEARN_MODELS = {  'AffinityPropagation' : skcluster.AffinityPropagation, 
@@ -137,7 +142,7 @@ def tune_cluster_params(data_to_cluster, true_labels, method, params, save_path)
     cg_scores = np.zeros((len(param_combinations),))
 
     # generate clusters and scores for each param configuration
-    for ci,cur_params in enumerate(param_combinations):
+    for ci,cur_params in tqdm(enumerate(param_combinations)):
 
         # generate cfl clusters
         try:
@@ -186,17 +191,26 @@ def generate_cfl_clusters(data_to_cluster, method, params, save_path):
 
 def build_cluster_params(method, params):
     return {'x_model' : SKLEARN_MODELS[method](**params),
-            'y_model' : SKLEARN_MODELS[method](**params)}
+            'y_model' : SKLEARN_MODELS[method](**params),
+            'cluster_effect' : False }
 
 def compute_gt_score(true, pred, score_type='AMI'):
     # TODO: handle other score types
     # TODO: if we do this, we need to account for min or max in tuning
-    return metrics.adjusted_mutual_info_score(true, pred)
+    try:
+        gt_score = metrics.adjusted_mutual_info_score(true, pred)
+    except: 
+        gt_score = -2 # TODO: confirm this will happen if pred only has one cluster
+    return gt_score
 
 def compute_cg_score(data_to_cluster, pred, score_type='silhouette'):
     # TODO: handle other score types
     # TODO: can choose distance metric for silhouette, should we be using Euclidean?
-    return metrics.silhouette_score(data_to_cluster, pred)
+    try:
+        cg_score = metrics.silhouette_score(data_to_cluster, pred)
+    except:
+        cg_score = -2 # TODO: confirm this will happen if pred only has one cluster
+    return cg_score
 
 
 def get_embedding(data_path, dataset):
@@ -211,6 +225,11 @@ def get_embedding(data_path, dataset):
         embedding = TSNE(n_components=2).fit_transform(data_to_cluster)
         np.save(os.path.join(data_path, dataset, 'embedding.npy'), embedding)
         return embedding
+
+
+
+###############################################################################
+# HELPER FUNCTIONS FOR VISUALIZATION AND ANALYSIS
 
 def make_scatter(data_path, dataset, data_to_cluster, pred, true, save_path=None):
 
@@ -232,13 +251,13 @@ def make_scatter(data_path, dataset, data_to_cluster, pred, true, save_path=None
     plt.show()
     return fig
 
-def scatter_helper(ax, data, labels, title, subscript=None):
+def scatter_helper(ax, data, labels, title, subscript=None, xlabel='', ylabel=''):
     scatter = ax.scatter(data[:,0], data[:,1], c=labels, alpha=0.5, s=8, cmap=CMAP)
     legend = ax.legend(*scatter.legend_elements(), title="Clusters")
     ax.add_artist(legend)
-    ax.set_title(title)
-    ax.set_xlabel('Component 1')
-    ax.set_ylabel('Component 2')
+    ax.set_title(title, fontweight='bold')
+    ax.set_xlabel(xlabel, fontweight='bold')
+    ax.set_ylabel(ylabel, fontweight='bold')
     
     if subscript is not None:
         ax.text(.95, .01, subscript, size=12,
@@ -247,11 +266,7 @@ def scatter_helper(ax, data, labels, title, subscript=None):
                 transform=ax.transAxes)
 
 
-
-###############################################################################
-# HELPER FUNCTIONS FOR VISUALIZATION AND ANALYSIS
-
-def compare_scatter_plots(data_path, results_path, subfigsize=(6,4)):
+def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=None):
     ''' build a 2D grid of scatter plots, where each row corresponds to 
         a dataset and each column corresponds to a clustering method.
         Scatter plots will be colored by labeling from the given method.
@@ -294,14 +309,52 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4)):
             title = ''
             if di==0:
                 title = method
+
+            # set ylabel for first column
+            ylabel = ''
+            if mi==0:
+                ylabel = dataset
             
             # pull gt_score for subscript
             if method=='ground_truth':
                 subscript = 'N/A'
             else:
-                subscript = 'GTS: {}'.format(round(float(np.load(os.path.join(results_path, dataset,method, 'best_gt_score.npy'))), 2))
+                subscript = 'GTS: {}'.format(round(float(np.load(os.path.join(results_path, dataset, method, 'best_gt_score.npy'))), 2))
 
             # make subplot
-            scatter_helper(axs[di,mi], embedding, labels, title, subscript)
+            scatter_helper(axs[di,mi], embedding, labels, title, subscript=subscript, ylabel=ylabel)
     
+    # save figure
+    if fig_path is not None:
+        plt.savefig(fig_path)
+
+    plt.show()
+
+
+def compare_best_gt_scores(results_path, fig_path=None):
+
+    # infer datasets and methods used from directory structure
+    dataset_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, '*'))]
+    assert len(dataset_list) > 0, 'No datasets available at results_path.'
+
+    method_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, dataset_list[0], '*'))]
+    assert len(dataset_list) > 0, 'No methods available for datasets at results_path.'
+
+    # pull best_gt_scores
+    best_gt_scores = np.zeros((len(dataset_list), len(method_list)))
+    for di,dataset in enumerate(dataset_list):
+        for mi,method in enumerate(method_list):
+            best_gt_scores[di,mi] = float(np.load(os.path.join(results_path, dataset, method, 'best_gt_score.npy')))
+    
+    # convert to dataframe for plotting
+    df = pd.DataFrame(best_gt_scores, columns=method_list)
+    df['dataset'] = dataset_list
+
+    # generate bar plot
+    df.plot(x='dataset', y=method_list, kind="bar",figsize=(9,8), cmap=CMAP, ylabel='Ground Truth Score (AMI)')
+
+    # save figure
+    if fig_path is not None:
+        plt.savefig(fig_path)
+
     plt.show()

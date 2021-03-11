@@ -100,6 +100,7 @@ class ClusterBase(Block):
 
         default_params =  {'x_model' : DBSCAN(),
                            'y_model' : DBSCAN(),
+                           'cluster_effect' : True
                           }
         return default_params
 
@@ -151,12 +152,15 @@ class ClusterBase(Block):
         self.xmodel.fit(pyx)
         x_lbls = self.xmodel.labels_
 
-        # sample P(Y|Xclass)
-        y_probs = self._sample_Y_dist(dataset, x_lbls)
+        if self.params['cluster_effect']:
+            # sample P(Y|Xclass)
+            y_probs = self._sample_Y_dist(dataset, x_lbls)
 
-        # do y clustering
-        self.ymodel.fit(y_probs)
-        y_lbls = self.ymodel.labels_
+            # do y clustering
+            self.ymodel.fit(y_probs)
+            y_lbls = self.ymodel.labels_
+        else:
+            y_lbls = None
 
         results_dict = {'x_lbls' : x_lbls,
                         'y_lbls' : y_lbls}
