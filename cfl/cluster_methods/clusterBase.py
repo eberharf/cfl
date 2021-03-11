@@ -158,6 +158,7 @@ class ClusterBase(Block):
         self.ymodel.fit(y_probs)
         y_lbls = self.ymodel.labels_
 
+        self.trained = True
         results_dict = {'x_lbls' : x_lbls,
                         'y_lbls' : y_lbls}
         return results_dict
