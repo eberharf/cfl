@@ -184,7 +184,7 @@ class ClusterBase(Block):
             'Generate pyx predictions with CDE before clustering.'
             return
 
-        x_lbls = self.xmodel.fit_predict(prev_results)
+        x_lbls = self.xmodel.fit_predict(pyx)
         y_probs = self._sample_Y_dist(dataset, x_lbls)
         y_lbls = self.ymodel.fit_predict(y_probs)
 
