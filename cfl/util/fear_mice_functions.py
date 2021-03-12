@@ -96,12 +96,7 @@ def timepoint_indices_dir(Y):
 
 # function to get the indices for each timepoint/genotype
 def geno_time_indices_dir(Y):
-    baseline_indices = Y[Y["Timepoint"]=="BL"].index.tolist()
-    prefear_indices = Y[Y["Timepoint"]=="PreF"].index.tolist()
-    postfear_indices = Y[Y["Timepoint"]=="Fear"].index.tolist()
-    d9_indices = Y[Y["Timepoint"]=="D9"].index.tolist()
-    timepoints_dir = {'BL' : baseline_indices, 'PreF': prefear_indices, "Fear": postfear_indices, 'D9': d9_indices}
-
+    timepoints_dir = timepoint_indices_dir(Y)
 
     WT_indices = Y[Y["Genotype"]=="WT"].index.tolist()
     KO_indices = Y[Y["Genotype"]=="KO"].index.tolist()
