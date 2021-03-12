@@ -1,4 +1,25 @@
-''' Experiment class '''
+''' Experiment class
+ 
+- Pipeline to pass data through the different blocks of CFL 
+- Save parameters, models, results for reuse 
+
+
+Methods: 
+
+train()
+predict()
+_save_results()
+_save_params()
+_load_params()
+add_dataset()
+get_dataset()
+load_dataset_results()
+_build_block()
+_make_exp_dir()
+_propagate_verbosity()
+
+'''
+
 import pickle
 import json
 import os
@@ -125,7 +146,7 @@ class Experiment():
         # TODO: check that interfaces match
         # TODO: assert in the function itself so we can give more info
         # about what exactly is incompatible
-        assert self.check_blocks_compatibility(), 'Specified blocks are incompatible'
+        # assert self.check_blocks_compatibility(), 'Specified blocks are incompatible'
         
         # save configuration parameters for each block
         self._save_params()
@@ -154,9 +175,9 @@ class Experiment():
                 print('Training CFL pipeline.')
 
             # pull specified dataset
-            if dataset is None:
+            if dataset is None: #if you don't specify a dataset, use the one specified in initialization
                 dataset = self.get_dataset('dataset_train')
-            elif isinstance(dataset, str):
+            elif isinstance(dataset, str): #otherwise, they can pass a string specifying a particular dataset to use
                 if dataset != 'dataset_train':
                     if self.verbose > 0:
                         print('Warning: you are not using the dataset_train ' + \
@@ -170,6 +191,8 @@ class Experiment():
                         'specified for training in Experiment initialization.')
 
             all_results = {}
+
+            # this is the main logic - train each block 
             for block in self.blocks:
                 # train current block
                 results = block.train(dataset, prev_results)
@@ -433,23 +456,23 @@ class Experiment():
                                      params=block_param)
 
 
-    def check_blocks_compatibility(self):
-        ''' Check that each Block in self.blocks is compatible with the Blocks
-            that precede and follow it. 
-            TODO: This is currently not implemented and simply states that all
-            Blocks are always compatible. We may use class registration here
-            to determine block compatibility. Alternatively, we may have each
-            Block descendent specify it's argument expectations and return
-            guarantees. 
+    # def check_blocks_compatibility(self):
+    #     ''' Check that each Block in self.blocks is compatible with the Blocks
+    #         that precede and follow it. 
+    #         TODO: This is currently not implemented and simply states that all
+    #         Blocks are always compatible. We may use class registration here
+    #         to determine block compatibility. Alternatively, we may have each
+    #         Block descendent specify it's argument expectations and return
+    #         guarantees. 
 
-            Arguments: None
+    #         Arguments: None
             
-            Returns:
-                compatible : whether or not self.blocks is a compatible
-                             composition of Blocks. (bool) 
-        '''
+    #         Returns:
+    #             compatible : whether or not self.blocks is a compatible
+    #                          composition of Blocks. (bool) 
+    #     '''
 
-        return True
+    #     return True
 
     
     def _make_exp_dir(self, results_path):
