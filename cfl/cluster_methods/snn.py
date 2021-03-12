@@ -28,7 +28,7 @@ class SNN(Clusterer):
             None
         """
 
-        super(SNN, self).__init__(name, data_info, params, random_state=None) #Calls clusterer constructor
+        super(SNN, self).__init__(name, data_info, params) #Calls clusterer constructor
 
 
         # self.Y_type = data_info['Y_type']
