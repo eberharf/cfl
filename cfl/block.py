@@ -165,3 +165,5 @@ class Block(metaclass=ABCMeta):
 
         return input_params
 
+    def get_params(self): 
+        return self.params
