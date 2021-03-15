@@ -99,8 +99,6 @@ class CondExpCNN3D(CondExpBase):
         return model
 
 
-
-
     def _get_default_params(self):
 
         default_params = { # parameters for model creation
