@@ -1,4 +1,4 @@
-"""npeturn the indices of each x_lbl grouped together"""
+"""return the indices of each x_lbl grouped together"""
 
 import numpy as np
 
