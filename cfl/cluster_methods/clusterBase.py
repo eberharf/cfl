@@ -76,7 +76,7 @@ class ClusterBase(Block):
         Return
             None
         """
-
+        
         #attributes:
 
         super().__init__(name=name, data_info=data_info, params=params)
@@ -87,7 +87,7 @@ class ClusterBase(Block):
         # self.name = name
         # self.params = self._check_model_params(params)
 
-        self.xmodel = self.params['x_model']
+        self.xmodel = self.paarms['x_model']
         self.ymodel = self.params['y_model']
 
     def get_params(self):
@@ -188,9 +188,9 @@ class ClusterBase(Block):
             'Generate pyx predictions with CDE before clustering.'
             return
 
-        x_lbls = self.xmodel.fit_predict(pyx)
+        x_lbls = self.xmodel.predict(pyx)
         y_probs = self._sample_Y_dist(dataset, x_lbls)
-        y_lbls = self.ymodel.fit_predict(y_probs)
+        y_lbls = self.ymodel.predict(y_probs)
 
         results_dict = {'x_lbls' : x_lbls,
                         'y_lbls' : y_lbls}
@@ -198,7 +198,7 @@ class ClusterBase(Block):
 
 
     #################### SAVE/LOAD FUNCTIONS (required by block.py) ################################
-    # TODO: should these go somewhere more central eventually? 
+    # TODO: collapse these into two functions
 
     def save_model(self, dir_path):
         ''' Save both models to compressed files.
@@ -247,5 +247,5 @@ class ClusterBase(Block):
         '''
 
         self.load_model(path)
-        self.trained = True
+        self.trained = True #TODO: this is an information leak - 
 
