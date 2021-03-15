@@ -2,6 +2,8 @@ from abc import abstractmethod
 
 from cfl.block import Block
 
+# purpose: provide guidance for someone who wants to create their own, from 
+# scratch cluster method 
 class Clusterer(Block):
 
     @abstractmethod
