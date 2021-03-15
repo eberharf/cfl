@@ -4,7 +4,6 @@ This module contains the code to interface Albert Espín's implementation of SNN
 CFL structure.
 
 '''
-
 import numpy as np
 from sklearn.cluster import DBSCAN
 from sklearn.neighbors import kneighbors_graph
@@ -29,7 +28,7 @@ class SNN(Clusterer):
             None
         """
 
-        super(SNN, self).__init__(name, data_info, params, random_state=None) #Calls clusterer constructor
+        super(SNN, self).__init__(name, data_info, params) #Calls clusterer constructor
 
 
         # self.Y_type = data_info['Y_type']
@@ -43,10 +42,9 @@ class SNN(Clusterer):
         self.random_state = random_state
 
         # initialize clusterer for xs and for ys
-        self.xmodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'])
+        self.xmodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'], self.params['eps'])
 
-        self.ymodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'])
-
+        self.ymodel = extSNN(self.params['neighbor_num'], self.params['min_shared_neighbor_proportion'], self.params['eps'])
 
     def get_params(self):
         return self.params
@@ -134,55 +132,3 @@ class SNN(Clusterer):
             y_probs = Y_given_Xmacro.categorical_Y(Y, x_lbls)
         return y_probs
 
-
-
-
-    # TODO: move this out eventually? (this is copy pasted from Kmeans)
-    def save_model(self, dir_path):
-        ''' Save both kmeans models to compressed files.
-
-            Arguments:
-                dir_path : directory in which to save models (str)
-            Returns: None
-        '''
-        model_dict = {}
-        model_dict['xmodel'] = self.xmodel
-        model_dict['ymodel'] = self.ymodel
-
-        with open(dir_path, 'wb') as f:
-            pickle.dump(model_dict, f)
-
-    def load_model(self, dir_path):
-        ''' Load both kmeans models from directory path.
-
-            Arguments:
-                dir_path : directory in which to save models (str)
-            Returns: None
-        '''
-
-        # TODO: error handling for file not found
-        with open(dir_path, 'rb') as f:
-            model_dict = pickle.load(f)
-
-        self.xmodel = model_dict['xmodel']
-        self.ymodel = model_dict['ymodel']
-        self.trained = True
-
-    def save_block(self, path):
-        ''' save trained model to specified path.
-            Arguments:
-                path : path to save to. (str)
-            Returns: None
-        '''
-
-        self.save_model(path)
-
-    def load_block(self, path):
-        ''' load model saved at path into this model.
-            Arguments:
-                path : path to saved weights. (str)
-            Returns: None
-        '''
-
-        self.load_model(path)
-        self.trained = True

@@ -65,8 +65,6 @@ def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     dbscan = dbscan.fit(snn_distance_matrix)
     return dbscan.core_sample_indices_, dbscan.labels_
 
-
-
 def get_snn_similarity(x0, x1):
     """Calculate the shared-neighbor similarity of two sets of nearest neighbors, normalized by the maximum number of shared neighbors"""
 
@@ -74,10 +72,7 @@ def get_snn_similarity(x0, x1):
 
 
 def get_snn_distance(x0, x1):
-    """Calculate the shared-neighbor distance of two sets of nearest neighbors, normalized by the maximum number of shared neighbors
-    A value of 1 means they share no k-nearest neighbors (very distant)
-    A value of 0 means they share all their k-nearest neighbors (very close togethers)
-    """
+    """Calculate the shared-neighbor distance of two sets of nearest neighbors, normalized by the maximum number of shared neighbors"""
 
     return 1 - get_snn_similarity(x0, x1)
 
@@ -85,20 +80,16 @@ def get_snn_distance(x0, x1):
 class SNN(BaseEstimator, ClusterMixin):
     """Class for performing the Shared Nearest Neighbor (SNN) clustering algorithm.
 
-    Parameters:
-        neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity
+    Parameters
+    ----------
+    neighbor_num : int
+        K number of neighbors to consider for shared nearest neighbor similarity
 
-        min_shared_neighbor_proportion (float [0, 1]): Proportion of the K nearest neighbors that
-            need to share two data points to be considered part of the same cluster
-
-    Attributes:
-        self.labels_ : [assigned after fitting data]  Cluster labels for each point in the dataset given to
-            fit(). Noisy samples are given the label -1
-        self.core_sample_indices_ : [assigned after fitting data] Indices of core samples
-        self.components_ : [assigned after fitting data] Copy of each core sample found by training
+    min_shared_neighbor_proportion : float [0, 1]
+        Proportion of the K nearest neighbors that need to share two data points to be considered part of the same cluster
 
     Note: Naming conventions for attributes are based on the analogous ones of DBSCAN. Appropriate attribute 
-        documentation copeied from the sklearn DBSCAN documentation
+        documentation copied from the sklearn DBSCAN documentation
     """
 
     def __init__(self, neighbor_num, min_shared_neighbor_proportion, eps):
@@ -112,11 +103,10 @@ class SNN(BaseEstimator, ClusterMixin):
 
         """Perform SNN clustering from features or distance matrix.
 
-        Parameters:
-            X (array or sparse (CSR) matrix of shape (n_samples, n_features),
-                or array of shape (n_samples, n_samples)): A feature array
-        Return:
-            self: the SNN model with self.labels_, self.core_sample_indices_, self.components_ assigned
+        Parameters
+        ----------
+        X : array or sparse (CSR) matrix of shape (n_samples, n_features), or array of shape (n_samples, n_samples)
+            A feature array
         """
 
         clusters = snn(X, neighbor_num=self.neighbor_num, min_shared_neighbor_num=self.min_shared_neighbor_num, eps=self.eps)
@@ -145,7 +135,7 @@ class SNN(BaseEstimator, ClusterMixin):
             weight may inhibit its eps-neighbor from being core.
             Note that weights are absolute, and default to 1.
 
-        y : Ignored. Not used, present here for API consistency by convention
+        y : Ignored
 
         Returns
         -------

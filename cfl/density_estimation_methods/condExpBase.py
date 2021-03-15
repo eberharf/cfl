@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from cfl.util.data_processing import standardize_train_test
 
-from cfl.density_estimation_methods.cde_interface import CDE #base class
+from cfl.density_estimation_methods.cde_interface import Block #base class
 
-class CondExpBase(CDE):
+class CondExpBase(Block):
     ''' A class to define, train, and perform inference with conditional density
     estimators that fall under the "conditional expectation" umbrella. This
     subset of conditional density estimators (referred to as 'CondExp') learns
