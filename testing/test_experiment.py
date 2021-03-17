@@ -7,6 +7,8 @@ from cfl.util.data_processing import one_hot_encode
 from cfl.dataset import Dataset
 import shutil
 
+from sklearn.cluster import DBSCAN
+
 # Note: change if you want results somewhere else (folder will be deleted at end of run)
 save_path = 'testing/tmp_test_results'
 
@@ -90,10 +92,9 @@ def test_cde_experiment():
 
 
     ## CDE and cluster experiment 
-    cluster_params = {'n_Xclusters': 4,
-                      'n_Yclusters': 2} 
+    cluster_params = {} 
 
-    block_names = ['CondExpMod', 'Kmeans']
+    block_names = ['CondExpMod', 'ClusterBase']
     block_params = [condExp_params, cluster_params]
 
     my_exp_clust = Experiment(X_train=x, Y_train=y, data_info=data_info, 
@@ -107,9 +108,9 @@ def test_cde_experiment():
         prev_results=train_results_cde)
 
     # check output of clusterer block
-    assert 'x_lbls' in train_results_clust['Kmeans'].keys(), \
+    assert 'x_lbls' in train_results_clust['ClusterBase'].keys(), \
         'Clusterer train fxn should specify x_lbls in results'
-    assert 'y_lbls' in train_results_clust['Kmeans'].keys(), \
+    assert 'y_lbls' in train_results_clust['ClusterBase'].keys(), \
         'Clusterer train fxn should specify y_lbls in results'
     
 
@@ -135,10 +136,10 @@ def test_clusterer_experiment():
                 'Y_dims': y.shape, 
                 'Y_type': 'categorical'}
 
-    cluster_params = {'n_Xclusters' : 4, 
-                      'n_Yclusters' : 2}
+    cluster_params = {'x_model' : DBSCAN(),
+                      'y_model' : DBSCAN()}
 
-    block_names = ['Kmeans']
+    block_names = ['ClusterBase']
     block_params = [cluster_params]
 
     # make new CFL Experiment with clusterer only
@@ -148,25 +149,25 @@ def test_clusterer_experiment():
     
     # make artificial pyx
     rng = np.random.default_rng(12345) # create a Random Number Gen to set reproducible random seed
-    pyx = rng.random(y.shape[0], y.shape[1])
+    pyx = rng.random((y.shape[0], y.shape[1]))
     prev_results = {'pyx' : pyx}
     
     # train Experiment with pyx provided
-    dataset_train_cluster = Dataset(x,y,'dataset_train_cluster')
+    dataset_train_cluster = Dataset(x,y, name='dataset_train_cluster', Xraw=None, Yraw=None)
     train_results_cluster = my_exp_cluster.train(dataset=dataset_train_cluster, prev_results=prev_results)
     
     # tmp save
-    np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['Kmeans']['x_lbls'])
-    np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['Kmeans']['y_lbls'])
+    np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['ClusterBase']['x_lbls'])
+    np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['ClusterBase']['y_lbls'])
     
     # # load in correct labels
     # x_lbls_expected = np.load('testing/resources/test_experiment/x_lbls.npy')
     # y_lbls_expected = np.load('testing/resources/test_experiment/y_lbls.npy')
 
     # # check clustering values
-    # assert train_results_cluster['Kmeans']['x_lbls'] == x_lbls_expected, \
+    # assert train_results_cluster['ClusterBase']['x_lbls'] == x_lbls_expected, \
     #     'x_lbls do not match expected values.'
-    # assert train_results_cluster['Kmeans']['y_lbls'] == y_lbls_expected, \
+    # assert train_results_cluster['ClusterBase']['y_lbls'] == y_lbls_expected, \
     #     'y_lbls do not match expected values.'
 
 
