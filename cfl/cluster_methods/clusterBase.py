@@ -87,7 +87,7 @@ class ClusterBase(Block):
         # self.name = name
         # self.params = self._check_model_params(params)
 
-        self.xmodel = self.paarms['x_model']
+        self.xmodel = self.params['x_model']
         self.ymodel = self.params['y_model']
 
     def get_params(self):
