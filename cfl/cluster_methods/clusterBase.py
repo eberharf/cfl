@@ -3,7 +3,7 @@ import pickle #for saving code
 
 from cfl.block import Block
 import numpy as np
-from cfl.cluster_methods import Y_given_Xmacro #calculate P(Y|Xmacro)
+from cfl.cluster_methods.Y_given_Xmacro import sample_Y_dist #calculate P(Y|Xmacro)
 from sklearn.cluster import DBSCAN
 
 #TODO: next step: add very clear documentation about how to add new module. Include:
@@ -109,29 +109,6 @@ class ClusterBase(Block):
         return default_params
 
 
-    def _sample_Y_dist(self, dataset, x_lbls):
-        #TODO: is name good? I think it's decent
-        """
-        private function for training and predicting.
-        Based on the data type of Y, chooses the correct method
-        to find (a proxy of) P(Y=y | Xclass) for all Y=y.
-
-        Parameters:
-            dataset: Dataset object containing X and Y data
-            x_lbls: Cluster labels for X data
-
-        Returns:
-            y_probs: array with P(Y=y |Xclass) distribution (aligned to the Y dataset)
-        """
-        Y = dataset.get_Y()
-        if self.Y_type == 'continuous':
-            y_probs = Y_given_Xmacro.continuous_Y(Y, x_lbls)
-        elif self.Y_type == 'categorical':
-            y_probs = Y_given_Xmacro.categorical_Y(Y, x_lbls)
-        else: 
-            raise TypeError('Invalid Y-type')
-        return y_probs
-
 
     def train(self, dataset, prev_results):
         """
@@ -158,7 +135,7 @@ class ClusterBase(Block):
 
         if self.params['cluster_effect']:
             # sample P(Y|Xclass)
-            y_probs = self._sample_Y_dist(dataset, x_lbls)
+            y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
 
             # do y clustering
             self.ymodel.fit(y_probs)
@@ -193,7 +170,7 @@ class ClusterBase(Block):
             return
 
         x_lbls = self.xmodel.predict(pyx)
-        y_probs = self._sample_Y_dist(dataset, x_lbls)
+        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
         y_lbls = self.ymodel.predict(y_probs)
 
         results_dict = {'x_lbls' : x_lbls,

@@ -11,7 +11,37 @@ from cfl.util.x_lbl_util import rows_where_each_x_class_occurs
 from cfl.util.data_processing import one_hot_decode
 from sklearn.metrics.pairwise import euclidean_distances
 
-def categorical_Y(Y_data, x_lbls):
+
+
+def sample_Y_dist(Y_type, dataset, x_lbls):
+    #TODO: is name good? I think it's decent
+    """
+    Finds (a proxy of) P(Y=y | Xclass) for all Y=y
+
+    uses the data type of the variable(s) in Y to select the correct method for 
+    samping P(Y=y |X=Xclass)
+    
+    This function is used by clusterBase for training and predicting on the Y (effect)
+    data
+
+    Parameters:
+        dataset: Dataset object containing X and Y data
+        x_lbls: Cluster labels for X data
+
+    Returns:
+        y_probs: array with P(Y=y |Xclass) distribution (aligned to the Y dataset)
+    """
+    Y = dataset.get_Y()
+    if Y_type == 'continuous':
+        y_probs = _continuous_Y(Y, x_lbls)
+    elif Y_type == 'categorical':
+        y_probs = _categorical_Y(Y, x_lbls)
+    else: 
+        raise TypeError('Invalid Y-type')
+    return y_probs
+
+
+def _categorical_Y(Y_data, x_lbls):
     """
     Estimates the conditional probability density P(Y=y|X=xClass) for categorical data,
     where 'y' is an observation in Y_data and xClass is a macrovariable constructed
@@ -61,7 +91,7 @@ def categorical_Y(Y_data, x_lbls):
     return cond_Y_prob
 
 
-def continuous_Y(Y_data, x_lbls):
+def _continuous_Y(Y_data, x_lbls):
     """
     Estimates the conditional probability density P(Y=y|X=xClass)
     for every y (observation in Y_data) and xClass (macrovariable constructed from X_data, the "causal" data set)
