@@ -179,54 +179,33 @@ class Clusterer(Block):
 
 
     #################### SAVE/LOAD FUNCTIONS (required by block.py) ################################
-    # TODO: collapse these into two functions
-
-    def save_model(self, dir_path):
-        ''' Save both models to compressed files.
-
+    def save_block(self, file_path):
+        ''' save both cluster models to specified path.
             Arguments:
-                dir_path : directory in which to save models (str)
-            Returns: None
+                file_path (str): path to save to
+
+            Returns:
+                None
         '''
         model_dict = {}
-        model_dict['xmodel'] = self.xmodel
-        model_dict['ymodel'] = self.ymodel
+        model_dict['x_model'] = self.xmodel
+        model_dict['y_model'] = self.ymodel
 
-        with open(dir_path, 'wb') as f:
+        with open(file_path, 'wb') as f:
             pickle.dump(model_dict, f)
 
-    def load_model(self, dir_path):
-        ''' Load both models from directory path.
+    def load_block(self, file_path):
+        ''' Load both models from path.
 
             Arguments:
-                dir_path : directory in which to save models (str)
+                file_path (str): path to load saved models from 
             Returns: None
         '''
 
         # TODO: error handling for file not found
-        with open(dir_path, 'rb') as f:
+        with open(file_path, 'rb') as f:
             model_dict = pickle.load(f)
 
-        self.xmodel = model_dict['xmodel']
-        self.ymodel = model_dict['ymodel']
-        self.trained = True
-
-    def save_block(self, path):
-        ''' save trained model to specified path.
-            Arguments:
-                path : path to save to. (str)
-            Returns: None
-        '''
-        self.save_model(path)
-
-
-    def load_block(self, path):
-        ''' load model saved at path into this model.
-            Arguments:
-                path : path to saved weights. (str)
-            Returns: None
-        '''
-
-        self.load_model(path)
-        self.trained = True #TODO: this is an information leak - 
-
+        self.xmodel = model_dict['x_model']
+        self.ymodel = model_dict['y_model']
+        self.trained = True 
