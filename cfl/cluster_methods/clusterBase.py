@@ -57,12 +57,11 @@ from sklearn.cluster import DBSCAN
 
 class ClusterBase(Block):
 
-    def __init__(self, name, data_info, params):
+    def __init__(self, data_info, params):
         """
         initialize Clusterer object
 
         Parameters
-            name (str): we get rid of it #TODO 
             data_info (dict): 
             params (dict) : a dictionary of relevant hyperparameters for clustering. 
                 For a base clusterer object, these should be two already created clusterers (one
@@ -79,16 +78,18 @@ class ClusterBase(Block):
         
         #attributes:
 
-        super().__init__(name=name, data_info=data_info, params=params)
+        super().__init__(data_info=data_info, params=params)
 
         self.Y_type = data_info['Y_type']
         assert self.Y_type in ["categorical", "continuous"], "Y_type in data_info should be 'categorical' or 'continouous' but is {}".format(self.Y_type)
 
-        # self.name = name
-        # self.params = self._check_model_params(params)
-
         self.xmodel = self.params['x_model']
         self.ymodel = self.params['y_model']
+
+        # Idea: name of a clustererer is of the format <x clusterer>_<y clusterer>
+        # TODO is this good
+        # self.name = str(self.params['x_model']) + "_" + str(self.params['y_model']) 
+        self.name = 'ClusterBase'
 
     def get_params(self):
         return self.params
