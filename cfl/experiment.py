@@ -454,7 +454,7 @@ class Experiment():
             'added to BLOCK_KEY yet. Please do so before proceeding. Note: ' + \
             'this is a temporary system until we set up Block registration.' 
 
-        return BLOCK_KEY[block_name](name=block_name, data_info=self.data_info, 
+        return BLOCK_KEY[block_name](data_info=self.data_info, 
                                      params=block_param)
 
 
