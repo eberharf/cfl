@@ -77,22 +77,19 @@ class Clusterer(Block):
         """
         
         #attributes:
-
-        super().__init__(data_info=data_info, params=params)
+        self.name = 'Clusterer'
 
         self.Y_type = data_info['Y_type']
         assert self.Y_type in ["categorical", "continuous"], "Y_type in data_info should be 'categorical' or 'continouous' but is {}".format(self.Y_type)
 
-        # self.name = name
-        # self.params = self._check_model_params(params)
+
+        super().__init__(data_info=data_info, params=params) #parameter checks and self.params assignment done here 
 
         self.xmodel = self.params['x_model']
         self.ymodel = self.params['y_model']
 
-        # Idea: name of a clustererer is of the format <x clusterer>_<y clusterer>
-        # TODO is this good
-        # self.name = str(self.params['x_model']) + "_" + str(self.params['y_model']) 
-        self.name = 'Clusterer'
+        
+
 
     def get_params(self):
         return self.params
@@ -198,7 +195,7 @@ class Clusterer(Block):
         ''' Load both models from path.
 
             Arguments:
-                file_path (str): path to load saved models from 
+                file_path : path to load saved models from 
             Returns: None
         '''
 
