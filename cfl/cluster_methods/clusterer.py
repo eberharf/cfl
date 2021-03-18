@@ -39,7 +39,7 @@ from sklearn.cluster import DBSCAN
                                     that were provided.
     Example: 
         from sklearn.cluster import DBSCAN 
-        from cfl.cluster_methods.clusterBase import ClusterBase
+        from cfl.cluster_methods.clusterer import Clusterer
         from cfl.dataset import Dataset
 
         X = cause data 
@@ -49,13 +49,13 @@ from sklearn.cluster import DBSCAN
 
         x_DBSCAN = DBSCAN(eps=0.3, min_samples=10)
         x_DBSCAN = DBSCAN(eps=0.5, min_samples=15) #TODO: what are appropriate params for y? (values are more consistent)
-        clusterer = ClusterBase('cluster', data_info ={'X_dims': X.shape, 'Y_dims':Y.shape, 
+        c = Clusterer(data_info ={'X_dims': X.shape, 'Y_dims':Y.shape, 
             'Y_type': 'continuous'}, params={'x_model':x_DBSCAN, 'y_model':y_DBSCAN})
 
-        results = clusterer.train(data, prev_results)
+        results = c.train(data, prev_results)
  """
 
-class ClusterBase(Block):
+class Clusterer(Block):
 
     def __init__(self, data_info, params):
         """
@@ -92,7 +92,7 @@ class ClusterBase(Block):
         # Idea: name of a clustererer is of the format <x clusterer>_<y clusterer>
         # TODO is this good
         # self.name = str(self.params['x_model']) + "_" + str(self.params['y_model']) 
-        self.name = 'ClusterBase'
+        self.name = 'Clusterer'
 
     def get_params(self):
         return self.params

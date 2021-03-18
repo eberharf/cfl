@@ -95,7 +95,7 @@ def test_cde_experiment():
     ## CDE and cluster experiment 
     cluster_params = {} 
 
-    block_names = ['CondExpMod', 'ClusterBase']
+    block_names = ['CondExpMod', 'Clusterer']
     block_params = [condExp_params, cluster_params]
 
     my_exp_clust = Experiment(X_train=x, Y_train=y, data_info=data_info, 
@@ -109,9 +109,9 @@ def test_cde_experiment():
         prev_results=train_results_cde)
 
     # check output of clusterer block
-    assert 'x_lbls' in train_results_clust['ClusterBase'].keys(), \
+    assert 'x_lbls' in train_results_clust['Clusterer'].keys(), \
         'Clusterer train fxn should specify x_lbls in results'
-    assert 'y_lbls' in train_results_clust['ClusterBase'].keys(), \
+    assert 'y_lbls' in train_results_clust['Clusterer'].keys(), \
         'Clusterer train fxn should specify y_lbls in results'
     
 
@@ -140,7 +140,7 @@ def test_clusterer_experiment():
     cluster_params = {'x_model' : DBSCAN(),
                       'y_model' : DBSCAN()}
 
-    block_names = ['ClusterBase']
+    block_names = ['Clusterer']
     block_params = [cluster_params]
 
     # make new CFL Experiment with clusterer only
@@ -158,8 +158,8 @@ def test_clusterer_experiment():
     train_results_cluster = my_exp_cluster.train(dataset=dataset_train_cluster, prev_results=prev_results)
     
     # tmp save
-    np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['ClusterBase']['x_lbls'])
-    np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['ClusterBase']['y_lbls'])
+    np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['Clusterer']['x_lbls'])
+    np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['Clusterer']['y_lbls'])
     
     # # load in correct labels
     # x_lbls_expected = np.load('testing/resources/test_experiment/x_lbls.npy')
