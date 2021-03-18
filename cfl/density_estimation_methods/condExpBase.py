@@ -51,9 +51,9 @@ class CondExpBase(Block):
         graph_results : helper function to graph training and validation loss
         predict : once the model is trained, predict for a given Dataset
         evaluate : return the model's prediction loss on a Dataset
-        load_parameters : load tensorflow model weights from a file into
+        load_model : load tensorflow model weights from a file into
                           self.model
-        save_parameters : save the current weights of self.model
+        save_model : save the current weights of self.model
         build_model : create and return a tensorflow model
         check_model_params : fill in any parameters that weren't provided in
                              params with the default value, and discard any
@@ -83,7 +83,7 @@ class CondExpBase(Block):
 
         # load model weights if specified
         if self.params['weights_path'] is not None:
-            self.load_parameters(self.params['weights_path'])
+            self.load_model(self.params['weights_path'])
             self.weights_loaded = True
             self.trained = True
 
@@ -95,7 +95,7 @@ class CondExpBase(Block):
             Returns: None
         '''
 
-        self.load_parameters(path)
+        self.load_model(path)
         self.trained = True
 
     def save_block(self, path):
@@ -105,7 +105,7 @@ class CondExpBase(Block):
             Returns: None
         '''
 
-        self.save_parameters(path)
+        self.save_model(path)
 
 
     def train(self, dataset, prev_results=None):
@@ -189,7 +189,7 @@ class CondExpBase(Block):
 
         # load in best weights if specified
         if self.params['best']:
-            self.load_parameters('tmp_checkpoints/best_weights')
+            self.load_model('tmp_checkpoints/best_weights')
             shutil.rmtree('tmp_checkpoints')
 
 
@@ -258,7 +258,7 @@ class CondExpBase(Block):
         return tf.reduce_mean(cost)
 
 
-    def load_parameters(self, file_path):
+    def load_model(self, file_path):
         ''' Load model weights from saved checkpoint into current model.
             Arguments:
                 file_path : path to checkpoint file (string)
@@ -272,7 +272,7 @@ class CondExpBase(Block):
         self.model.load_weights(file_path)
         self.trained = True
 
-    def save_parameters(self, file_path):
+    def save_model(self, file_path):
         ''' Save model weights from current model.
             Arguments:
                 file_path : path to checkpoint file (string)
