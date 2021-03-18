@@ -56,7 +56,6 @@ def test_cde_experiment():
                     'dropouts': [0.2, 0.5, 0.5, 0],
                     'weights_path': None,
                     'loss': 'mean_squared_error',
-                    'name': 'CondExpMod',
                     'standardize': False,
                     'best': True}
 
@@ -157,9 +156,9 @@ def test_clusterer_experiment():
     dataset_train_cluster = Dataset(x,y, name='dataset_train_cluster', Xraw=None, Yraw=None)
     train_results_cluster = my_exp_cluster.train(dataset=dataset_train_cluster, prev_results=prev_results)
     
-    # tmp save
-    np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['Clusterer']['x_lbls'])
-    np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['Clusterer']['y_lbls'])
+    # # tmp save
+    # np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['Clusterer']['x_lbls'])
+    # np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['Clusterer']['y_lbls'])
     
     # # load in correct labels
     # x_lbls_expected = np.load('testing/resources/test_experiment/x_lbls.npy')
