@@ -21,7 +21,7 @@ def sample_Y_dist(Y_type, dataset, x_lbls):
     uses the data type of the variable(s) in Y to select the correct method for 
     samping P(Y=y |X=Xclass)
     
-    This function is used by clusterBase for training and predicting on the Y (effect)
+    This function is used by the Clusterer for training and predicting on the Y (effect)
     data
 
     Parameters:
