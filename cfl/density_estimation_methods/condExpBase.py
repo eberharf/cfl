@@ -11,6 +11,10 @@ from cfl.util.data_processing import standardize_train_test
 
 from cfl.density_estimation_methods.cde_interface import Block #base class
 
+# Things that descend from this class should have a self.name attribute but this class doesn't 
+# since CondExpBase objects are not supposed to be created by the user 
+
+
 class CondExpBase(Block):
     ''' A class to define, train, and perform inference with conditional density
     estimators that fall under the "conditional expectation" umbrella. This
@@ -56,7 +60,7 @@ class CondExpBase(Block):
                              unnecessary paramaters that were provided.
     '''
 
-    def __init__(self, name, data_info, params):
+    def __init__(self, data_info, params):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data
@@ -69,9 +73,8 @@ class CondExpBase(Block):
             Returns: None
         '''
 
-        super().__init__(name=name, data_info=data_info, params=params)
+        super().__init__(data_info=data_info, params=params)
 
-        # self.name = name
         # self.params = self._check_model_params(params)
 
         # set object attributes

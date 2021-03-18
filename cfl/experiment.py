@@ -33,12 +33,14 @@ from cfl.util.dir_util import get_next_dirname
 from cfl.util.arg_validation_util import validate_data_info
 
 # TODO: this is a placeholder until we have a block registration system.
+# NOTE: the name in the registry has to match the self.name in each block's __init__ 
 BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB, 
-                'CondExpKC' : cdem.condExpKC.CondExpKC,
-                'CondExpCNN'  : cdem.condExpCNN.CondExpCNN,
+                'CondExpKC'     :   cdem.condExpKC.CondExpKC,
+                'CondExpCNN'    : cdem.condExpCNN.CondExpCNN,
                 'CondExpCNN3D'  : cdem.condExpCNN3D.CondExpCNN3D,
-                'CondExpMod'  : cdem.condExpMod.CondExpMod,
-                'ClusterBase'  : clusterBase.ClusterBase }
+                'CondExpMod'    : cdem.condExpMod.CondExpMod,
+                'ClusterBase'   : clusterBase.ClusterBase } #TODO: I want to change this so that instead of 
+                                                            # calling ClusterBase, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods  
 
 class Experiment():
 
