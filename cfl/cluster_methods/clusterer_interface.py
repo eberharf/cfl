@@ -7,7 +7,7 @@ from cfl.block import Block
 class Clusterer(Block):
 
     @abstractmethod
-    def __init__(self, name, data_info, params):
+    def __init__(self, data_info, params):
         """
         initialize Clusterer object
 
@@ -19,11 +19,11 @@ class Clusterer(Block):
         """
 
         #attributes:
-        # self.model_name
+        # self.name
 
         # pass
 
-        super().__init__(name=name, data_info=data_info, params=params)
+        super().__init__(data_info=data_info, params=params)
 
     @abstractmethod
     def train(self, dataset, prev_results):

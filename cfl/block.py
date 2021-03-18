@@ -13,12 +13,11 @@ class Block(metaclass=ABCMeta):
     '''
 
 
-    def __init__(self, name, data_info, params):
+    def __init__(self, data_info, params):
         '''
         Instantiate the specified model.
 
         Arguments:
-            name : name of model (str)
             data_info : dict of information about associated datasets (dict)
             model_params : parameters for this model (dict)
 
@@ -26,13 +25,11 @@ class Block(metaclass=ABCMeta):
         '''
 
         # check input argument types
-        assert isinstance(name, str), 'name should be of type str.'
         assert isinstance(data_info, dict), 'data_info should be of type dict.'
         assert isinstance(params, dict), 'params should be of type dict.'
 
         # set object attributes
         self.trained = False
-        self.name = name
         self.data_info = data_info
 
         # validate parameter dictionaries
@@ -89,6 +86,7 @@ class Block(metaclass=ABCMeta):
         '''
         ...
 
+    # TODO: how to document that an object that inherits from block must have a name attribute 
     def get_name(self):
         '''
         Return name of model.
@@ -161,7 +159,7 @@ class Block(metaclass=ABCMeta):
                     print('{} not specified in input, defaulting to {}'.format(param, default_params[param]))
                 input_params[param] = default_params[param]
 
-        input_params['name'] = self.name
+        # input_params['name'] = self.name #TODO: remove?
 
         return input_params
 

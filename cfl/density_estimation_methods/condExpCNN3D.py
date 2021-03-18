@@ -13,15 +13,15 @@ class CondExpCNN3D(CondExpBase):
         See CondExpBase documentation for more details about training.
 
     '''
-    def __init__(self, name, data_info, params):
+    def __init__(self, data_info, params):
         ''' Initialize model and define network.
             Arguments:
                 name : name
                 data_info : a dictionary containing information about the data that will be passed in
                 params : dictionary containing parameters for the model
         '''
-        self.model_name='CondExpCNN'
-        super().__init__(name, data_info, params) #Main init stuff happens in block.py
+        self.name='CondExpCNN'
+        super().__init__(data_info, params) #Main init stuff happens in block.py
 
 
     def _build_model(self):
@@ -121,7 +121,6 @@ class CondExpCNN3D(CondExpBase):
                             'weights_path': None,
                             'loss'        : 'mean_squared_error',
                             'show_plot'   : True,
-                            'name'        : self.name,
                             'standardize' : False,
                             'best'        : True,
                          }
