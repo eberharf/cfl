@@ -165,3 +165,9 @@ class Block(metaclass=ABCMeta):
 
     def get_params(self): 
         return self.params
+
+#TODO: create decorator here for load_block that sets trained to true 
+def do_bookkeeping(self, func): 
+    def wrapper(): 
+        self.trained = true  ### this function is clearly wrong 
+#### ^what we're gonna do is apply these decorators to load_block in lower level files 
