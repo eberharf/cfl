@@ -28,7 +28,7 @@ from cfl.dataset import Dataset
 from cfl.block import Block
 import cfl.density_estimation_methods as cdem
 # import cfl.cluster_methods as ccm
-from cfl.cluster_methods import clusterBase
+from cfl.cluster_methods import clusterer
 from cfl.util.dir_util import get_next_dirname
 from cfl.util.arg_validation_util import validate_data_info
 
@@ -39,8 +39,8 @@ BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB,
                 'CondExpCNN'    : cdem.condExpCNN.CondExpCNN,
                 'CondExpCNN3D'  : cdem.condExpCNN3D.CondExpCNN3D,
                 'CondExpMod'    : cdem.condExpMod.CondExpMod,
-                'ClusterBase'   : clusterBase.ClusterBase } #TODO: I want to change this so that instead of 
-                                                            # calling ClusterBase, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods  
+                'Clusterer'     : clusterer.Clusterer } #TODO: maybe change this so that instead of 
+                                                            # calling clusterer, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods  
 
 class Experiment():
 
@@ -454,7 +454,7 @@ class Experiment():
             'added to BLOCK_KEY yet. Please do so before proceeding. Note: ' + \
             'this is a temporary system until we set up Block registration.' 
 
-        return BLOCK_KEY[block_name](name=block_name, data_info=self.data_info, 
+        return BLOCK_KEY[block_name](data_info=self.data_info, 
                                      params=block_param)
 
 
