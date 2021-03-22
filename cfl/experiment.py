@@ -29,7 +29,6 @@ from cfl.block import Block
 import cfl.density_estimation_methods as cdem
 # import cfl.cluster_methods as ccm
 from cfl.cluster_methods import clusterer
-from cfl.util.dir_util import get_next_dirname
 from cfl.util.arg_validation_util import validate_data_info
 
 # TODO: this is a placeholder until we have a block registration system.
@@ -510,6 +509,20 @@ class Experiment():
         # make trained_blocks dir
         os.mkdir(os.path.join(save_path, 'trained_blocks'))
         return save_path
+
+def get_next_dirname(path):
+    ''' gets the next subdirectory name in numerical order. i.e. if  'path' 
+    contains 'run0000' and 'run0001', this will return 'run0002'. 
+    Arguments: 
+        path: path of directory in which to find next subdirectory name (string)
+    Returns:
+        next subdirectory name. 
+    '''
+    i = 0
+    while os.path.exists(os.path.join(path, 'experiment{}'.format(str(i).zfill(4)))):
+        i += 1  
+    return 'experiment{}'.format(str(i).zfill(4))
+
 
     def _propagate_verbosity(self, verbose, block_params):
         for pi in range(len(block_params)):
