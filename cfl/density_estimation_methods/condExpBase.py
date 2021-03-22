@@ -7,7 +7,6 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from cfl.util.data_processing import standardize_train_test
 
 from cfl.density_estimation_methods.cde_interface import Block #base class
 
@@ -136,11 +135,7 @@ class CondExpBase(Block):
         # train-test split
         dataset.split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
 
-        # standardize if specified
-        if self.params['standardize']:
-            dataset.split_data = standardize_train_test(dataset.split_data)
         Xtr, Xts, Ytr, Yts = dataset.split_data
-
 
         # build optimizer
         optimizer = tf.keras.optimizers.get({ 'class_name' : self.params['optimizer'],
