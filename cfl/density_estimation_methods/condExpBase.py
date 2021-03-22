@@ -285,6 +285,3 @@ class CondExpBase(Block):
             Returns: the model (tf.keras.models.Model object)
         '''
         ...
-
-    def get_params(self):
-        return self.params
