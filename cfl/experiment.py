@@ -29,7 +29,6 @@ from cfl.block import Block
 import cfl.density_estimation_methods as cdem
 # import cfl.cluster_methods as ccm
 from cfl.cluster_methods import clusterer
-from cfl.util.arg_validation_util import validate_data_info
 
 # TODO: this is a placeholder until we have a block registration system.
 # NOTE: the name in the registry has to match the self.name in each block's __init__ 
@@ -54,7 +53,7 @@ class Experiment():
             Y_train : an (n_samples, n_y_features) 2D array. (np.array)
             data_info : a dictionary of information about this Experiment's
                         associated data. Refer to 
-                        cfl.util.arg_validation_util.validate_data_info for 
+                        cfl.block.validate_data_info() for 
                         more information. (dict)
             past_exp_path : path to directory associated with a previously
                             trained Experiment. (str)
@@ -105,7 +104,6 @@ class Experiment():
         # attribute enforces the definition that an Experiment is a unique 
         # configuration of a trained CFL.
         self.is_trained = False
-        validate_data_info(data_info)
         self.data_info = data_info
         self.datasets = {}
         self.dataset_train = self.add_dataset(X=X_train, Y=Y_train, \
