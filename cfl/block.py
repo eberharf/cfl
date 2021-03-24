@@ -165,9 +165,17 @@ class Block(metaclass=ABCMeta):
         return self.params
 
 #TODO: create decorator here for load_block that sets trained to true 
-def do_bookkeeping(self, func): 
-    def wrapper(): 
-        self.trained = true  ### this function is clearly wrong 
+# TODO: document this thing 
+# TODO: add functools 
+# TODO: what is functools 
+# TODO: add this decorator wherever it needs to be added (load pre-trained models or do training)
+def mark_as_trained(func): 
+    def wrapper(self, *args, **kwargs): 
+        print('whatta life')
+        self.trained = True
+        output = func(*args, **kwargs)
+        return output
+    return wrapper
 #### ^what we're gonna do is apply these decorators to load_block in lower level files 
 
 

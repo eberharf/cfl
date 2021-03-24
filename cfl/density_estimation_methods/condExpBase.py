@@ -8,6 +8,8 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
+from cfl.block import do_bookkeeping
+
 from cfl.density_estimation_methods.cde_interface import Block #base class
 
 # Things that descend from this class should have a self.name attribute but this class doesn't 
@@ -106,7 +108,7 @@ class CondExpBase(Block):
 
         self.save_model(path)
 
-
+    @do_bookkeeping
     def train(self, dataset, prev_results=None):
         ''' Full training loop. Constructs t.data.Dataset for training and
             testing, updates model weights each epoch and evaluates on test set
@@ -265,6 +267,8 @@ class CondExpBase(Block):
         if self.params['verbose']>0:
             print("Loading parameters from ", file_path)
         self.model.load_weights(file_path)
+
+        #TODO: does tensorflow keep track of if model is trained? 
         self.trained = True
 
     def save_model(self, file_path):
@@ -273,6 +277,7 @@ class CondExpBase(Block):
                 file_path : path to checkpoint file (string)
             Returns: None
         '''
+        # TODO : add check to only save trained models? (bc of load model setting train to true )
         if self.params['verbose']>0:
             print("Saving parameters to ", file_path)
         self.model.save_weights(file_path)
