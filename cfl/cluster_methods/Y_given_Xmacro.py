@@ -7,7 +7,7 @@ Contains functions for clustering categorical and continuous 1-D Ys
 """
 import numpy as np
 from tqdm import tqdm
-from cfl.util.x_lbl_util import rows_where_each_x_class_occurs
+from cfl.util.find_xlbl_locations import rows_where_each_x_class_occurs
 from cfl.util.data_processing import one_hot_decode
 from sklearn.metrics.pairwise import euclidean_distances
 
