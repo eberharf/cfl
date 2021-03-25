@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('../cfl'))
 # -- Project information -----------------------------------------------------
 
 project = 'cfl'
-copyright = '2021, Jenna Kahn, Iman Wahle, Frederick Eberhardt'
+copyright = '2021, California Institute of Technology'
 author = 'Jenna Kahn, Iman Wahle, Frederick Eberhardt'
 
 # The full version, including alpha/beta/rc tags
@@ -35,7 +35,8 @@ release = '0.0'
 # ones.
 extensions = ['sphinx.ext.autodoc', #for auto-using docstrings
               'sphinx.ext.napoleon', #for converting Numpy/Google style-doc strings to rst
-              'nbsphinx' # for incorporating jupyter notebooks into docs
+              'sphinx.ext.mathjax', # for rendering math in rst documents
+            #   'nbsphinx' # for incorporating jupyter notebooks into docs
 ]
 
 source_parsers = {'.md': CommonMarkParser}
