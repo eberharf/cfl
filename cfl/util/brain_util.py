@@ -8,6 +8,7 @@ import os
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from scipy.stats import mode
 
 import nibabel as nib
 
@@ -149,13 +150,14 @@ def load_data(fpX, fpY, brain_dims, mask_path=None, ori='RAS', dtype=np.float32)
 
     return X, Y
 
-# TODO: add option to switch between 'majority-rules' and 'percentage' modes
-def coarsen(x, n_voxels, brain_dims):
+def coarsen(x, n_voxels, brain_dims, method='majority'):
     ''' coarsens brain by specified amount
     arguments:
         x: 3D array of brain or 1D array of flattened brain
         n_voxels: how many original voxels to include in new voxel along a dimension
         brain_dims: array containing [dim0, dim1, dim2] of 3D brain (int array)
+        method: how the value of the new coarsened pixel is decided. Either the most
+        common value is chosen ('majority') or the average of all the values is chosen ('avg')
     returns:
         new_x: 3D array of coarsened brain
     '''
@@ -163,7 +165,8 @@ def coarsen(x, n_voxels, brain_dims):
     if x.ndim < 3:
         x = unflatten(x, brain_dims)
 
-    new_dims = np.ceil(brain_dims/n_voxels).astype(int)
+    new_dims = np.ceil(np.divide(brain_dims, n_voxels)).astype(int)
+
     new_x = np.zeros(new_dims)
     for i in range(new_dims[0]):
         for j in range(new_dims[1]):
@@ -177,8 +180,18 @@ def coarsen(x, n_voxels, brain_dims):
                 kend = np.min((kstart+n_voxels, brain_dims[2]))
 
                 sample = x[istart:iend, jstart:jend, kstart:kend]
-                # take a vote
-                new_x[i, j, k] = np.sum(sample == 1) > np.sum(sample == 0)
+
+                if method == 'majority':
+                    # the most common value in the previous cube of voxels is
+                    # the value of the new voxel
+                    new_x[i, j, k] = mode(sample, axis=None)[0][0]
+
+                    # take a vote
+                    # new_x[i, j, k] = np.sum(sample == 1) > np.sum(sample == 0)
+                elif method == 'avg':
+                    # the avg value in the previous cube of voxels is
+                    # the value of the new voxel
+                    new_x[i, j, k] = np.average(sample)
     return new_x
 
 

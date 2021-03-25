@@ -8,11 +8,10 @@ import sys
 
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-from ipywidgets import interact, fixed, IntSlider
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-
 import nibabel as nib
+import pandas as pd
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from ipywidgets import interact, fixed, IntSlider
 
 import cfl.util.brain_util as BU
 # %matplotlib inline
@@ -27,7 +26,6 @@ def plot_panels(brains, dims, mask_vec, save_path):
     along the given axis of each brain and plots the frequency of this
     binary map across all brains.
     If given a single brain, this function plots the raw summed intensities across each axis.
-
     arguments:
         brains: np array with shape of either [?, np.product(dims)] or
                 [np.product(dims),]
@@ -76,11 +74,8 @@ def plot_panels(brains, dims, mask_vec, save_path):
     return panels
 
 
-
-
-
 # note: this requires the full scan, not just the masked template area
-def plot_interactive_panels(brains, dims, mask_vec, dir_labels, figsize=(6,4), std_scale='std', colormap='coolwarm', column_titles=[]):
+def plot_interactive_panels(brains, dims, mask_vec, dir_labels, figsize=(6,4), std_scale='std', colormap='coolwarm', column_titles=[], step=1):
     ''' plots 3 panels along the three axes of the 3D brain volumes.
     If given a list of brains, it will plot the frequency of cell-wise
     binarization at a given slice along each axis determined by the interactive sliders
@@ -98,19 +93,25 @@ def plot_interactive_panels(brains, dims, mask_vec, dir_labels, figsize=(6,4), s
         panels: array of the three panels (each a 2D array) in the non-interactive case,
                 otherwise None
     '''
+
+    # create a copy to not alter the original array (otherwise the original gets modified)
+    brains_vis = np.asarray(brains, np.floating) #the array needs to be float type or else assigning the NaNs later won't work 
+
     # handle 1 brain case
-    if brains.ndim < 2:
-        brains = np.expand_dims(brains, 0)
+    if brains_vis.ndim < 2:
+        brains_vis = np.expand_dims(brains_vis, 0)
 
     # set voxels outside of template region to not plot
+    assert ~np.all(np.equal(mask_vec, 0)), "please give a mask vector with at least one non-zero value" #to avoid accidentally submitting a blank mask
     mask_regions = np.where(mask_vec==0)[0]
-    for bi in range(brains.shape[0]):
-        brains[bi,mask_regions] = np.nan
-    brains = np.ma.masked_invalid(brains)
+    for bi in range(brains_vis.shape[0]): 
+        brains_vis[bi,mask_regions] = np.nan 
+    brains_vis = np.ma.masked_invalid(brains_vis)
 
+    # volumes is list of unflattened mri images
     volumes = []
-    for bi in range(brains.shape[0]):
-        volumes.append(BU.unflatten(brains[bi], dims).astype(np.float32))
+    for bi in range(brains_vis.shape[0]):
+        volumes.append(BU.unflatten(brains_vis[bi], dims).astype(np.float32))
 
     vmin = None
     vmax = None
@@ -121,12 +122,12 @@ def plot_interactive_panels(brains, dims, mask_vec, dir_labels, figsize=(6,4), s
         mag = np.max([np.abs(np.nanmin(volumes)), np.abs(np.nanmax(volumes))])
         vmin = -mag
         vmax = mag
-    interact(update, volumes=fixed(volumes), dim=fixed(0), vmin=fixed(vmin), vmax=fixed(vmax), figsize=fixed(figsize), dir_labels=fixed(dir_labels), colormap=fixed(colormap), column_titles=fixed(column_titles), slice=IntSlider(min=0,max=dims[0]-1,step=5, continuous_update=False))
-    interact(update, volumes=fixed(volumes), dim=fixed(1), vmin=fixed(vmin), vmax=fixed(vmax), figsize=fixed(figsize), dir_labels=fixed(dir_labels), colormap=fixed(colormap), column_titles=fixed([]), slice=IntSlider(min=0,max=dims[1]-1,step=5, continuous_update=False))
-    interact(update, volumes=fixed(volumes), dim=fixed(2), vmin=fixed(vmin), vmax=fixed(vmax), figsize=fixed(figsize), dir_labels=fixed(dir_labels), colormap=fixed(colormap), column_titles=fixed([]), slice=IntSlider(min=0,max=dims[2]-1,step=5, continuous_update=False))
+    interact(update, volumes=fixed(volumes), dim=fixed(0), vmin=fixed(vmin), vmax=fixed(vmax), figsize=fixed(figsize), dir_labels=fixed(dir_labels), colormap=fixed(colormap), column_titles=fixed(column_titles), brain_slice=IntSlider(min=0,max=dims[0]-1,step=step, continuous_update=False))
+    interact(update, volumes=fixed(volumes), dim=fixed(1), vmin=fixed(vmin), vmax=fixed(vmax), figsize=fixed(figsize), dir_labels=fixed(dir_labels), colormap=fixed(colormap), column_titles=fixed([]), brain_slice=IntSlider(min=0,max=dims[1]-1,step=step, continuous_update=False))
+    interact(update, volumes=fixed(volumes), dim=fixed(2), vmin=fixed(vmin), vmax=fixed(vmax), figsize=fixed(figsize), dir_labels=fixed(dir_labels), colormap=fixed(colormap), column_titles=fixed([]), brain_slice=IntSlider(min=0,max=dims[2]-1,step=step, continuous_update=False))
 
 
-def update(volumes, dim, vmin, vmax, figsize, dir_labels, colormap, slice, column_titles):
+def update(volumes, dim, vmin, vmax, figsize, dir_labels, colormap, brain_slice, column_titles):
     fig,ax = plt.subplots(1, len(volumes),figsize=figsize)
     fig.subplots_adjust(right=0.8)
     cmap = plt.get_cmap()
@@ -145,12 +146,13 @@ def update(volumes, dim, vmin, vmax, figsize, dir_labels, colormap, slice, colum
     if not isinstance(ax, np.ndarray):
         ax = np.array([ax])
 
+    # i think this block of code graphs each column of mri slices (for each image)
     # print(len(column_titles))
     for bi in range(len(volumes)):
         [[x0, y0], [x1, y1]] = ax[bi].get_position().get_points()
         ax_nested = fig.add_axes([x0 + (x1-x0)*0.15, y0 + (y1-y0)*0.15, (x1-x0)*0.7, (y1-y0)*0.7])
         ax_nested.axis('off')
-        im = ax_nested.imshow(np.rot90(np.take(volumes[bi], slice, dim)), vmin=vmin, vmax=vmax, cmap=colormap)
+        im = ax_nested.imshow(np.rot90(np.take(volumes[bi], brain_slice, dim)), vmin=vmin, vmax=vmax, cmap=colormap)
         if len(column_titles) > 0:
             # print(bi)
             # print(column_titles[bi])
@@ -178,10 +180,9 @@ def update(volumes, dim, vmin, vmax, figsize, dir_labels, colormap, slice, colum
                 fontweight='bold')
 
 
-
         ax[bi].axis('off')
     # else:
-    #     im = ax.imshow(np.rot90(np.take(volumes[0],slice, dim)), vmin=vmin, vmax=vmax)
+    #     im = ax.imshow(np.rot90(np.take(volumes[0],brain_slice, dim)), vmin=vmin, vmax=vmax)
     #     ax.axis('off')
 
     # fig.subplots_adjust(right=0.8)

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from cfl.density_estimation_methods.condExpBase import CondExpBase
 
-class CondExpCNN(CondExpBase):
+class CondExpCNN3D(CondExpBase):
     ''' A child class of CondExpBase that defines a model specialized
         for the visual bars dataset and uses 2D convolutional layers interspersed
         with pooling layers instead of flattening the image data.
@@ -16,10 +16,10 @@ class CondExpCNN(CondExpBase):
     def __init__(self, data_info, params):
         ''' Initialize model and define network.
             Arguments:
+                name : name
                 data_info : a dictionary containing information about the data that will be passed in
                 params : dictionary containing parameters for the model
         '''
-
         self.name='CondExpCNN'
         super().__init__(data_info, params) #Main init stuff happens in block.py
 
@@ -43,31 +43,61 @@ class CondExpCNN(CondExpBase):
 
         self._check_params()
 
-        arch = []
-        first_layer = True
+        # arch = []
+        # first_layer = True
 
-        for filters,act,pad,kernel,pool in zip(self.params['filters'], self.params['conv_activation'],
-            self.params['padding'], self.params['kernel_size'], self.params['pool_size']):
+        # for filters,act,pad,kernel,pool in zip(self.params['filters'], self.params['conv_activation'],
+        #     self.params['padding'], self.params['kernel_size'], self.params['pool_size']):
 
-            # for the first layer of the model, the parameter 'input shape' needs to be added to the conv layer
-            if first_layer:
-                arch.append(tf.keras.layers.Conv2D(filters=filters, activation=act, padding=pad,
-                    kernel_size=kernel, input_shape= self.params['input_shape']))
-                arch.append(tf.keras.layers.MaxPooling2D(pool_size=pool))
-                first_layer = False
+        #     # for the first layer of the model, the parameter 'input shape' needs to be added to the conv layer
+        #     if first_layer:
+        #         arch.append(tf.keras.layers.Conv2D(filters=filters, activation=act, padding=pad,
+        #             kernel_size=kernel, input_shape= self.params['input_shape']))
+        #         arch.append(tf.keras.layers.MaxPooling2D(pool_size=pool))
+        #         first_layer = False
 
-            else:
-                arch.append(tf.keras.layers.Conv2D(filters=filters, activation=act, padding=pad, kernel_size=kernel))
-                arch.append(tf.keras.layers.MaxPooling2D(pool_size=pool))
+        #     else:
+        #         arch.append(tf.keras.layers.Conv2D(filters=filters, activation=act, padding=pad, kernel_size=kernel))
+        #         arch.append(tf.keras.layers.MaxPooling2D(pool_size=pool))
 
-        arch.append(tf.keras.layers.Flatten())
-        arch.append(tf.keras.layers.Dense(self.params['dense_units'], activation=self.params['dense_activation']))
-        # number of units in output layer is equal to number of features in Y
-        arch.append(tf.keras.layers.Dense(self.data_info['Y_dims'][1], activation= self.params['output_activation']))
+        # arch.append(tf.keras.layers.Flatten())
+        # arch.append(tf.keras.layers.Dense(self.params['dense_units'], activation=self.params['dense_activation']))
+        # # number of units in output layer is equal to number of features in Y
+        # arch.append(tf.keras.layers.Dense(self.data_info['Y_dims'][1], activation= self.params['output_activation']))
 
+        # model = tf.keras.models.Sequential(arch)
+
+        # return model
+
+
+        arch = [
+                tf.keras.layers.Conv3D(filters=self.params['filters'][0], kernel_size=self.params['kernel_size'][0], activation="relu", input_shape=self.params['input_shape']),
+                tf.keras.layers.MaxPool3D(pool_size=self.params['pool_size'][0]),
+                # tf.keras.layers.BatchNormalization(),
+
+                # tf.keras.layers.Conv3D(filters=self.params['filters'][1], kernel_size=self.params['kernel_size'][1], activation="relu"),
+                # tf.keras.layers.MaxPool3D(pool_size=self.params['pool_size'][1]),
+                # tf.keras.layers.BatchNormalization(),
+
+                # tf.keras.layers.Conv3D(filters=128, kernel_size=3, activation="relu")(x)
+                # tf.keras.layers.MaxPool3D(pool_size=2)(x)
+                # tf.keras.layers.BatchNormalization()(x)
+
+                # x = tf.keras.layers.Conv3D(filters=256, kernel_size=3, activation="relu")(x)
+                # x = tf.keras.layers.MaxPool3D(pool_size=2)(x)
+                # x = tf.keras.layers.BatchNormalization()(x)
+
+                tf.keras.layers.GlobalAveragePooling3D(),
+                tf.keras.layers.Dense(units=self.params['dense_units'][0], activation="relu"),
+                tf.keras.layers.Dropout(0.2),
+                tf.keras.layers.Dense(units=self.params['dense_units'][1], activation="relu"),
+                tf.keras.layers.Dropout(0.2),
+                tf.keras.layers.Dense(units=self.data_info['Y_dims'][1], activation="linear")]
+
+        # Define the model.
         model = tf.keras.models.Sequential(arch)
-
         return model
+
 
     def _get_default_params(self):
 
@@ -99,7 +129,7 @@ class CondExpCNN(CondExpBase):
     def _check_params(self):
         '''verify that a valid CNN structure was specified in the input parameters'''
 
-        assert len(self.params['input_shape'])==3, "Input shape should be of the format (im_height, im_width, num_channels) but is {}".format(self.params['input_shape'])
+        assert len(self.params['input_shape'])==4, "Input shape should be of the format (im_height, im_width, num_channels) but is {}".format(self.params['input_shape'])
 
         assert len(self.params['filters']) > 0, "Filters not specified. Please specify filters in params['filters']"
         assert len(self.params['kernel_size']) > 0, "Kernel sizes not specified. Please specify in params['kernel_sizes']"
