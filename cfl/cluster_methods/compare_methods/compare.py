@@ -102,7 +102,7 @@ def main(data_path, dataset_list, method_list, params_list, save_path,
             np.save(os.path.join(series_save_path, 'best_cg_score'), best_cg_score)
 
             # generate plots
-            fig = plot_clusters(data_path, dataset, data_to_cluster, pred_labels, true_labels, series_save_path)
+            fig = plot_clusters_pred_vs_true(data_path, dataset, data_to_cluster, pred_labels, true_labels, series_save_path)
 
             # print summary
             print(f'best ground-truth score ({gt_score_type}): {best_gt_score}')
