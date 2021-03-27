@@ -5,6 +5,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.cm import get_cmap
 from cfl.experiment import Experiment
 from sklearn import metrics
 from sklearn.manifold import TSNE
@@ -72,7 +73,7 @@ def main(data_path, dataset_list, method_list, params_list, save_path):
             np.save(os.path.join(series_save_path, 'best_cg_score'), best_cg_score)
 
             # generate plots
-            fig = make_scatter(data_path, dataset, data_to_cluster, pred_labels, true_labels, series_save_path)
+            fig = plot_clusters(data_path, dataset, data_to_cluster, pred_labels, true_labels, series_save_path)
 
             # print summary
             print(f'best ground-truth score: {best_gt_score}')
@@ -231,9 +232,12 @@ def get_embedding(data_path, dataset):
 ###############################################################################
 # HELPER FUNCTIONS FOR VISUALIZATION AND ANALYSIS
 
-def make_scatter(data_path, dataset, data_to_cluster, pred, true, save_path=None):
+def plot_clusters(data_path, dataset, data_to_cluster, pred, true, save_path=None):
 
-    assert data_to_cluster.shape[1] >= 2, 'Data must be at least 2-dim. 1D vis is not handled yet.'
+    if data_to_cluster.ndim==1:
+        data_to_cluster = np.expand_dims(data_to_cluster, -1)
+
+    assert data_to_cluster.shape[1] >= 1, 'Data must be at least 1-dim.'
     
     # if data_to_cluster is > 2-dim, we need to embed it for visualization
     if data_to_cluster.shape[1] > 2:
@@ -243,17 +247,23 @@ def make_scatter(data_path, dataset, data_to_cluster, pred, true, save_path=None
     
     # make plot
     fig,ax = plt.subplots(1,2,figsize=(12,4))
-    titles = ['Embedding Colored by Predicted Class', 'Embedding Colored by True Class']
+    if (embedding.shape[1]==1) or (np.sum(embedding)==embedding.shape[0]):
+        titles = ['Distributions of Each Predicted Class', 'Distributions of Each True Class']
+    else:
+        titles = ['Embedding Colored by Predicted Class', 'Embedding Colored by True Class']
     labels = [pred, true]
     for i,(title,label) in enumerate(zip(titles,labels)):
-        scatter_helper(ax[i], embedding, label, title)
-    plt.savefig(os.path.join(save_path, 'scatter_plot'))
+        if (embedding.shape[1]==1) or (np.sum(embedding)==embedding.shape[0]):
+            _hist_helper(ax[i], embedding, label, title)
+        else:      
+            _scatter_helper(ax[i], embedding, label, title)
+    plt.savefig(os.path.join(save_path, 'cluster_plot'))
     plt.show()
     return fig
 
-def scatter_helper(ax, data, labels, title, subscript=None, xlabel='', ylabel=''):
+def _scatter_helper(ax, data, labels, title, subscript=None, xlabel='', ylabel=''):
     scatter = ax.scatter(data[:,0], data[:,1], c=labels, alpha=0.5, s=8, cmap=CMAP)
-    legend = ax.legend(*scatter.legend_elements(), title="Clusters")
+    legend = ax.legend(*scatter.legend_elements(), title='Clusters')
     ax.add_artist(legend)
     ax.set_title(title, fontweight='bold')
     ax.set_xlabel(xlabel, fontweight='bold')
@@ -265,6 +275,28 @@ def scatter_helper(ax, data, labels, title, subscript=None, xlabel='', ylabel=''
                 verticalalignment='bottom',
                 transform=ax.transAxes)
 
+def _hist_helper(ax, data, labels, title, subscript=None, xlabel=''):
+
+    ulabels = np.unique(labels)
+    cmap = get_cmap(CMAP)
+    colors = cmap(range(len(ulabels)))
+    # for i in range(len(ulabels)):
+    data_by_cluster = [data[labels==ulabel,0] for ulabel in ulabels]
+    hist = ax.hist( data_by_cluster, linewidth=4, histtype='step', color=colors, 
+                    label=np.arange(len(ulabels),dtype=int).astype(str))
+    ax.legend(title='Clusters')
+    # legend = ax.legend(*hist.legend_elements(), title="Clusters")
+    # ax.add_artist(legend)
+    ax.set_title(title, fontweight='bold')
+    ax.set_xlabel(xlabel, fontweight='bold')
+    ax.set_ylabel('Counts', fontweight='bold')
+    
+    if subscript is not None:
+        ax.text(.95, .01, subscript, size=12,
+                horizontalalignment='right',
+                verticalalignment='bottom',
+                transform=ax.transAxes)
+        
 
 def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=None):
     ''' build a 2D grid of scatter plots, where each row corresponds to 
@@ -322,7 +354,10 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=No
                 subscript = 'GTS: {}'.format(round(float(np.load(os.path.join(results_path, dataset, method, 'best_gt_score.npy'))), 2))
 
             # make subplot
-            scatter_helper(axs[di,mi], embedding, labels, title, subscript=subscript, ylabel=ylabel)
+            if (embedding.shape[1]==1) or (np.sum(embedding)==embedding.shape[0]):
+                _hist_helper(axs[di,mi], embedding, labels, title, subscript=subscript)
+            else:
+                _scatter_helper(axs[di,mi], embedding, labels, title, subscript=subscript, ylabel=ylabel)
     
     # save figure
     if fig_path is not None:
