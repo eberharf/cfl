@@ -210,19 +210,30 @@ def tune_cluster_params(data_to_cluster, true_labels, method, params, save_path,
     # store scores for each param config
     gt_scores = np.zeros((len(param_combinations),))
     cg_scores = np.zeros((len(param_combinations),))
-
+    pred_labels_all = []
     # generate clusters and scores for each param configuration
     for ci,cur_params in tqdm(enumerate(param_combinations)):
 
         # generate cfl clusters
         try:
             pred_labels = generate_cfl_clusters(data_to_cluster, method, cur_params, save_path)
+            pred_labels_all.append(pred_labels)
             gt_scores[ci] = compute_gt_score(pred_labels, true_labels, score_type=gt_score_type)
             cg_scores[ci] = compute_cg_score(data_to_cluster, pred_labels, score_type=cg_score_type)
         except:
             # TODO: we will have to change these placeholders if we use a min-opt gt score
+            pred_labels_all.append(None)
             gt_scores[ci] = -1
             cg_scores[ci] = -1
+
+    # save tuning results
+    with open(os.path.join(save_path, 'tuning_param_combinations.pickle'), 'wb') as handle:
+        pickle.dump(param_combinations, handle)
+    np.save(os.path.join(save_path,'tuning_pred_labels'), pred_labels_all)
+    np.save(os.path.join(save_path,'tuning_gt_scores'), gt_scores)
+    np.save(os.path.join(save_path,'tuning_cg_scores'), cg_scores)
+    
+
 
     # find best set of params
     best_idx = np.where(gt_scores==np.max(gt_scores))[0][0]
