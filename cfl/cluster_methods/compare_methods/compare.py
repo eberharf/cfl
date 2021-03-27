@@ -34,7 +34,8 @@ from tqdm import tqdm
 
 CMAP = 'Set3'
 
-def main(data_path, dataset_list, method_list, params_list, save_path):
+def main(data_path, dataset_list, method_list, params_list, save_path,
+         gt_score_type='adjusted_mutual_info_score', cg_score_type='silhouette_score'):
     ''' For each dataset and clustering method, this function iterates over
         all specified clustering parameters to find the combination of 
         parameters that yields the best closest clustering to ground truth. 
@@ -53,7 +54,12 @@ def main(data_path, dataset_list, method_list, params_list, save_path):
                           list. Look at construct_param_combinations for how
                           to specify parameters. (dict list)
             save_path : path to directory where results should be saved (str)
-
+            gt_score_type: name of ground-truth scoring metric to use from
+                           https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics
+                           (str)
+            cg_score_type: name of cluster-goodness scoring metric to use from
+                           https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics
+                           (str)
         Returns: None
     '''
 
@@ -73,7 +79,9 @@ def main(data_path, dataset_list, method_list, params_list, save_path):
                 os.makedirs(series_save_path)
 
             # tune clustering params
-            best_params,gt_scores,cg_scores = tune_cluster_params(data_to_cluster, true_labels, method, params, series_save_path)
+            best_params,gt_scores,cg_scores = tune_cluster_params(data_to_cluster, 
+                true_labels, method, params, series_save_path,
+                gt_score_type=gt_score_type, cg_score_type=cg_score_type)
             
             # make cfl_object, train, predict
             pred_labels = generate_cfl_clusters(data_to_cluster, method, best_params, series_save_path)
@@ -84,8 +92,8 @@ def main(data_path, dataset_list, method_list, params_list, save_path):
             np.save(os.path.join(series_save_path, 'pred_labels'), pred_labels)
 
             # compute clustering metrics
-            best_gt_score = compute_gt_score(true_labels, pred_labels)
-            best_cg_score = compute_cg_score(data_to_cluster, pred_labels)
+            best_gt_score = compute_gt_score(true_labels, pred_labels, gt_score_type)
+            best_cg_score = compute_cg_score(data_to_cluster, pred_labels, cg_score_type)
 
             # save metrics
             np.save(os.path.join(series_save_path, 'gt_scores'), gt_scores)
@@ -97,8 +105,8 @@ def main(data_path, dataset_list, method_list, params_list, save_path):
             fig = plot_clusters(data_path, dataset, data_to_cluster, pred_labels, true_labels, series_save_path)
 
             # print summary
-            print(f'best ground-truth score: {best_gt_score}')
-            print(f'best cluster-goodness score: {best_cg_score}')
+            print(f'best ground-truth score ({gt_score_type}): {best_gt_score}')
+            print(f'best cluster-goodness score ({cg_score_type}): {best_cg_score}')
             print(f'best params {best_params}')
 
 
@@ -164,12 +172,36 @@ def construct_param_combinations(params):
 
     return param_combinations         
 
-def tune_cluster_params(data_to_cluster, true_labels, method, params, save_path):
-    '''
+def tune_cluster_params(data_to_cluster, true_labels, method, params, save_path,
+                        gt_score_type, cg_score_type):
+    ''' For a given dataset and clustering method, iterate over combinations
+        of clustering parameters to find those which yield the best score
+        against ground truth.
+
+        Arguments:
+            data_to_cluster : (n_samples, n_features) np.array of data to 
+                              cluster (np.ndarray)
+            true_labels : (n_samples,) np.array of true clustering labels for 
+                          each sample in data_to_cluster
+            method : name of clustering method to use. Should be name of an 
+                     sklearn.cluster model:
+                     https://scikit-learn.org/stable/modules/classes.html#module-sklearn.cluster
+                     (str list)
+            params : dictionary of lists of parameters to grid search over (dict)
+            save_path : path to directory where results should be saved (str)
+            gt_score_type : name of ground-truth scoring metric to use from
+                            https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics
+                            (str)
+            cg_score_type : name of cluster-goodness scoring metric to use from
+                            https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics
+                            (str)
         Returns:
-            best_params: dict of params that give best clustering score against ground truth
-            gt_scores: list of scores against ground truth for each param configuration
-            cg_scores: list of clustering goodness scores without ground truth for each param configuration
+            best_params : dict of params that give best clustering score against 
+                          ground truth (dict)
+            gt_scores : list of scores against ground truth for each param 
+                        configuration (np.ndarray)
+            cg_scores : list of clustering goodness scores without ground truth 
+                        for each param configuration (np.ndarray)
     '''
 
     # construct every combination of params
@@ -185,8 +217,8 @@ def tune_cluster_params(data_to_cluster, true_labels, method, params, save_path)
         # generate cfl clusters
         try:
             pred_labels = generate_cfl_clusters(data_to_cluster, method, cur_params, save_path)
-            gt_scores[ci] = compute_gt_score(pred_labels, true_labels)
-            cg_scores[ci] = compute_cg_score(data_to_cluster, pred_labels)
+            gt_scores[ci] = compute_gt_score(pred_labels, true_labels, score_type=gt_score_type)
+            cg_scores[ci] = compute_cg_score(data_to_cluster, pred_labels, score_type=cg_score_type)
         except:
             # TODO: we will have to change these placeholders if we use a min-opt gt score
             gt_scores[ci] = -1
@@ -199,6 +231,22 @@ def tune_cluster_params(data_to_cluster, true_labels, method, params, save_path)
     return best_params, gt_scores, cg_scores
 
 def generate_cfl_clusters(data_to_cluster, method, params, save_path):
+    ''' For a given dataset, clustering method, and specific set of clustering
+        parameters, run a CFL clustering block to generate cluster labels.
+
+        Arguments:
+            data_to_cluster : (n_samples, n_features) np.array of data to 
+                              cluster (np.ndarray)
+            method : name of clustering method to use. Should be name of an 
+                     sklearn.cluster model:
+                     https://scikit-learn.org/stable/modules/classes.html#module-sklearn.cluster
+                     (str list)
+            params : dictionary of parameters to instantiate clusterer with (dict)
+            save_path : path to directory where results should be saved (str)
+
+        Returns:
+            pred_labels : (n_samples,) array of cluster labels (np.ndarray)
+    '''
 
     # make data placeholders to match CFL interface
     n_samples = data_to_cluster.shape[0]
@@ -210,7 +258,7 @@ def generate_cfl_clusters(data_to_cluster, method, params, save_path):
               'Y_type' : 'continuous' } 
                                 
     block_names = ['ClusterBase']
-    block_params = [build_cluster_params(method, params)]
+    block_params = [_build_cluster_params(method, params)]
 
     my_exp = Experiment(X_train=X, Y_train=Y, data_info=data_info, 
                         block_names=block_names, block_params=block_params, 
@@ -227,41 +275,89 @@ def generate_cfl_clusters(data_to_cluster, method, params, save_path):
 
     return pred_labels
 
-def build_cluster_params(method, params):
+def _build_cluster_params(method, params):
+    ''' Build a dictionary that CFL cluster objects expect.
+
+        Arguments:
+            method : name of clustering method to use. Should be name of an 
+                     sklearn.cluster model:
+                     https://scikit-learn.org/stable/modules/classes.html#module-sklearn.cluster
+                     (str list)
+            params : dictionary of parameters to instantiate clusterer with (dict)
+        
+        Returns:
+            cluster_params : clusterer parameter dict to pass to CFL (dict)
+    '''
+
     return {'x_model' : eval('skcluster.' + method)(**params),
             'y_model' : eval('skcluster.' + method)(**params),
             'cluster_effect' : False }
 
-def compute_gt_score(true, pred, score_type='AMI'):
-    # TODO: handle other score types
-    # TODO: if we do this, we need to account for min or max in tuning
+def compute_gt_score(true, pred, score_type):
+    ''' Compute clustering score against ground truth with a given metric.
+
+        Arguments:
+            true : (n_samples,) np.array of true cluster labels (np.ndarray)
+            pred : (n_samples,) np.array of predicted cluster labels (np.ndarray)
+            score_type: name of ground-truth scoring metric to use from
+                        https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics
+                        (str)
+        Returns:
+            gt_score : score against ground truth (float)
+    '''
+    # TODO: handle using min vs max in tuning depending on score type
+
     try:
-        gt_score = metrics.adjusted_mutual_info_score(true, pred)
+        gt_score = eval('metrics.' + score_type)(true, pred)
     except: 
         gt_score = -2 # TODO: confirm this will happen if pred only has one cluster
     return gt_score
 
-def compute_cg_score(data_to_cluster, pred, score_type='silhouette'):
-    # TODO: handle other score types
-    # TODO: can choose distance metric for silhouette, should we be using Euclidean?
+def compute_cg_score(data_to_cluster, pred, score_type='silhouette_score'):
+    ''' Compute clustering-goodness score with a given metric.
+
+        Arguments:
+            pred : (n_samples,) np.array of predicted cluster labels (np.ndarray)
+            score_type : name of cluster-goodness scoring metric to use from
+                        https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics
+                        (str)
+        Returns:
+            cg_score : cluster-goodness score (float)
+    '''
+
+    # TODO: can choose distance metric for silhouette, should we always be using Euclidean?
     try:
-        cg_score = metrics.silhouette_score(data_to_cluster, pred)
+        cg_score = eval('metrics.' + score_type)(data_to_cluster, pred)
     except:
         cg_score = -2 # TODO: confirm this will happen if pred only has one cluster
     return cg_score
 
 
-def get_embedding(data_path, dataset):
-    # TODO: this currently doesn't realize it needs to update the embedding if the associated data is changed!!!
+def get_embedding(data_path, dataset_name):
+    ''' Get a 2D embedding of a dataset. If an embedding has already been cached
+        at data_path, use that. Otherwise, compute embeddoing using TSNE
+        and cache at data_path.
+
+        Arguments:
+            data_path : path to data directory (str)
+            dataset_name : name of dataset to get embedding for (str)
+        
+        Returns: 
+            embedding : (n_samples, 2) embedding of data (np.ndarray)
+    '''
+
+    # TODO: this currently doesn't realize it needs to update the embedding if 
+    # the associated data is changed!!!
+
     # if embedding already cached, use that
-    if os.path.exists(os.path.join(data_path, dataset, 'embedding.npy')):
-        return np.load(os.path.join(data_path, dataset, 'embedding.npy'))
+    if os.path.exists(os.path.join(data_path, dataset_name, 'embedding.npy')):
+        return np.load(os.path.join(data_path, dataset_name, 'embedding.npy'))
     
     # otherwise, compute embedding and cache for future use
     else:
-        data_to_cluster = np.load(os.path.join(data_path, dataset, 'data_to_cluster.npy'))
+        data_to_cluster = np.load(os.path.join(data_path, dataset_name, 'data_to_cluster.npy'))
         embedding = TSNE(n_components=2).fit_transform(data_to_cluster)
-        np.save(os.path.join(data_path, dataset, 'embedding.npy'), embedding)
+        np.save(os.path.join(data_path, dataset_name, 'embedding.npy'), embedding)
         return embedding
 
 
@@ -269,7 +365,23 @@ def get_embedding(data_path, dataset):
 ###############################################################################
 # HELPER FUNCTIONS FOR VISUALIZATION AND ANALYSIS
 
-def plot_clusters(data_path, dataset, data_to_cluster, pred, true, save_path=None):
+def plot_clusters_pred_vs_true(data_path, dataset_name, data_to_cluster, pred, 
+                              true, save_path=None):
+    ''' Make two scatter plots of data_to_cluster (or histograms if data is 1D) 
+        colored by predicted and true clusters, respectively.
+        
+        Arguments:
+            data_path : path to data directory (str)
+            dataset_name : name of dataset to get embedding for (str)
+            data_to_cluster : (n_samples, n_features) np.array of data to 
+                              cluster (np.ndarray)
+            pred : (n_samples,) np.array of predicted cluster labels (np.ndarray)
+            true : (n_samples,) np.array of true cluster labels (np.ndarray)
+            save_path : path to directory where results should be saved (str)
+        
+        Returns:
+            fig : matplotlib fig object
+    '''
 
     if data_to_cluster.ndim==1:
         data_to_cluster = np.expand_dims(data_to_cluster, -1)
@@ -278,7 +390,7 @@ def plot_clusters(data_path, dataset, data_to_cluster, pred, true, save_path=Non
     
     # if data_to_cluster is > 2-dim, we need to embed it for visualization
     if data_to_cluster.shape[1] > 2:
-        embedding = get_embedding(data_path, dataset)
+        embedding = get_embedding(data_path, dataset_name)
     else:
         embedding = data_to_cluster
     
@@ -290,6 +402,7 @@ def plot_clusters(data_path, dataset, data_to_cluster, pred, true, save_path=Non
         titles = ['Embedding Colored by Predicted Class', 'Embedding Colored by True Class']
     labels = [pred, true]
     for i,(title,label) in enumerate(zip(titles,labels)):
+        # switch between hist and scatter depending on dimensionality
         if (embedding.shape[1]==1) or (np.sum(embedding)==embedding.shape[0]):
             _hist_helper(ax[i], embedding, label, title)
         else:      
@@ -299,6 +412,8 @@ def plot_clusters(data_path, dataset, data_to_cluster, pred, true, save_path=Non
     return fig
 
 def _scatter_helper(ax, data, labels, title, subscript=None, xlabel='', ylabel=''):
+    ''' Make scatter subplot colored by labels.'''
+
     scatter = ax.scatter(data[:,0], data[:,1], c=labels, alpha=0.5, s=8, cmap=CMAP)
     legend = ax.legend(*scatter.legend_elements(), title='Clusters')
     ax.add_artist(legend)
@@ -313,6 +428,7 @@ def _scatter_helper(ax, data, labels, title, subscript=None, xlabel='', ylabel='
                 transform=ax.transAxes)
 
 def _hist_helper(ax, data, labels, title, subscript=None, xlabel=''):
+    ''' Make histogram subplot colored by labels.'''
 
     ulabels = np.unique(labels)
     cmap = get_cmap(CMAP)
@@ -336,10 +452,20 @@ def _hist_helper(ax, data, labels, title, subscript=None, xlabel=''):
         
 
 def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=None):
-    ''' build a 2D grid of scatter plots, where each row corresponds to 
+    ''' Build a 2D grid of scatter plots, where each row corresponds to 
         a dataset and each column corresponds to a clustering method.
         Scatter plots will be colored by labeling from the given method.
         The first column should display the ground truth labels for comparison. 
+
+        Arguments: 
+            data_path : path to directory where datasets are saved (str)
+            results_path : path to directory where results from 'main' were saved 
+                           (this should be same as 'save_path' argument to 
+                           main). (str)
+            subfigsize : how big each subplot should be (2-tuple)
+            fig_path : filename to save figure as. Will not save if None. (str)
+        
+        Returns: None
     '''
     
     # infer datasets and methods used from directory structure
@@ -404,7 +530,17 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=No
 
 
 def compare_best_gt_scores(results_path, fig_path=None):
+    ''' Make grouped bar plot comparing ground-truth scores across methods
+        for each dataset.
 
+        Arguments:
+            results_path : path to directory where results from 'main' were saved 
+                           (this should be same as 'save_path' argument to 
+                           main). (str)
+            fig_path : filename to save figure as. Will not save if None. (str)
+        
+        Returns: None
+    '''
     # infer datasets and methods used from directory structure
     dataset_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, '*'))]
     assert len(dataset_list) > 0, 'No datasets available at results_path.'
