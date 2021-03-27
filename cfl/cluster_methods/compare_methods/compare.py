@@ -35,6 +35,25 @@ SKLEARN_MODELS = {  'AffinityPropagation' : skcluster.AffinityPropagation,
 CMAP = 'Set3'
 
 def main(data_path, dataset_list, method_list, params_list, save_path):
+    ''' For each dataset and clustering method, this function iterates over
+        all specified clustering parameters to find the combination of 
+        parameters that yields the best closest clustering to ground truth. 
+        It saves scores and visualizations for the best parameterization for
+        each dataset+clustering combination.
+
+        Arguments:
+            data_path : path to directory where datasets are saved (str)
+            dataset_list : list of dataset labels to iterate over (str list)
+            method_list : list of clustering methods to iterate over. Should
+                          be strings included in SKLEARN_MODELS.keys(). (str list)
+            params_list : list of dictionaries of parameters to search over.
+                          Each list element corresponds to elements in method
+                          list. Look at construct_param_combinations for how
+                          to specify parameters. (dict list)
+            save_path : path to directory where results should be saved (str)
+
+        Returns: None
+    '''
 
     # for each dataset
     for dataset in dataset_list:
@@ -82,29 +101,45 @@ def main(data_path, dataset_list, method_list, params_list, save_path):
 
 
 def load_data(dataset_path):
+    ''' Given a path to a dataset, unpack contents into data_to_cluster
+        and true_labels variables.
+        
+        Arguments:
+            dataset_path : path to dataset (str)
+        Returns:
+            data_to_cluster : (n_samples, n_features) np.array of data to 
+                              cluster (np.ndarray)
+            true_labels : (n_samples,) np.array of true clustering labels for 
+                          each sample in data_to_cluster
+    '''
+
     data_to_cluster = np.load(os.path.join(dataset_path, 'data_to_cluster.npy'))
     true_labels = np.load(os.path.join(dataset_path, 'true_labels.npy'))
     return data_to_cluster, true_labels
 
 def construct_param_combinations(params):
-    ''' for now, I will assume all params are scalars (as opposed to arrays), 
-        and that if I receive a tuple, I should pass those to np.linspace.
+    ''' Given a dict where keys are paramater names and values are lists
+        of parameter values, this function will construct a list of dicts
+        where each dict is one combination of parameters listed in the
+        input dict.
+
+        Arguments:
+            params : dictionary of parameter names (keys, str) and possible 
+                     values for this parameter to take on (values, list). (dict)
+        Returns:
+            param_combinations : list of dictionaries of every combination of
+                             parameters (dict list)
     '''
     formatted_params = {}
     # translate 3-tuple shorthand to lists of params to actually use,
     # translate scalars to np.arrays
     for key in params.keys():
         val = params[key]
-        # make 3-tuple into linspaced np array
-        if isinstance(val, tuple) and len(val)==3:
+        if hasattr(val, '__len__'):
             val_type = type(val[0])
-            formatted_params[key] = np.linspace(val[0], val[1], val[2]).astype(val_type)
-        # make scalars into an np array
         else:
-            # TODO: handle any np dtype
             val_type = type(val)
-            assert isinstance(val, (int, float, np.int64, np.float64)), f'Should be a number. Instead, got {type(val)}. val: {val}'
-            formatted_params[key] = np.array([val]).astype(val_type)
+        formatted_params[key] = np.array(val).astype(val_type)
 
     # construct grid of params
     param_combinations = [{}]
