@@ -18,19 +18,19 @@ import pandas as pd
 from tqdm import tqdm
 
 # constants
-SKLEARN_MODELS = {  'AffinityPropagation' : skcluster.AffinityPropagation, 
-                    'AgglomerativeClustering' : skcluster.AgglomerativeClustering, 
-                    'Birch' : skcluster.Birch,
-                    'DBSCAN' : skcluster.DBSCAN, 
-                    'FeatureAgglomeration' : skcluster.FeatureAgglomeration, 
-                    'KMeans' : skcluster.KMeans, 
-                    'MiniBatchKMeans' : skcluster.MiniBatchKMeans,
-                    'MeanShift' : skcluster.MeanShift, 
-                    'OPTICS' : skcluster.OPTICS, 
-                    'SpectralClustering' : skcluster.SpectralClustering,
-                    'SpectralBiclustering' : skcluster.SpectralBiclustering,
-                    'SpectralCoclustering' : skcluster.SpectralCoclustering,
-                }
+# SKLEARN_MODELS = {  'AffinityPropagation' : skcluster.AffinityPropagation, 
+#                     'AgglomerativeClustering' : skcluster.AgglomerativeClustering, 
+#                     'Birch' : skcluster.Birch,
+#                     'DBSCAN' : skcluster.DBSCAN, 
+#                     'FeatureAgglomeration' : skcluster.FeatureAgglomeration, 
+#                     'KMeans' : skcluster.KMeans, 
+#                     'MiniBatchKMeans' : skcluster.MiniBatchKMeans,
+#                     'MeanShift' : skcluster.MeanShift, 
+#                     'OPTICS' : skcluster.OPTICS, 
+#                     'SpectralClustering' : skcluster.SpectralClustering,
+#                     'SpectralBiclustering' : skcluster.SpectralBiclustering,
+#                     'SpectralCoclustering' : skcluster.SpectralCoclustering,
+#                 }
 
 CMAP = 'Set3'
 
@@ -45,7 +45,9 @@ def main(data_path, dataset_list, method_list, params_list, save_path):
             data_path : path to directory where datasets are saved (str)
             dataset_list : list of dataset labels to iterate over (str list)
             method_list : list of clustering methods to iterate over. Should
-                          be strings included in SKLEARN_MODELS.keys(). (str list)
+                          be name of an sklearn.cluster model:
+                          https://scikit-learn.org/stable/modules/classes.html#module-sklearn.cluster
+                          (str list)
             params_list : list of dictionaries of parameters to search over.
                           Each list element corresponds to elements in method
                           list. Look at construct_param_combinations for how
@@ -226,8 +228,8 @@ def generate_cfl_clusters(data_to_cluster, method, params, save_path):
     return pred_labels
 
 def build_cluster_params(method, params):
-    return {'x_model' : SKLEARN_MODELS[method](**params),
-            'y_model' : SKLEARN_MODELS[method](**params),
+    return {'x_model' : eval('skcluster.' + method)(**params),
+            'y_model' : eval('skcluster.' + method)(**params),
             'cluster_effect' : False }
 
 def compute_gt_score(true, pred, score_type='AMI'):
