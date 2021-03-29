@@ -101,7 +101,6 @@ class Clusterer(Block):
 
         default_params =  {'x_model' : DBSCAN(),
                            'y_model' : DBSCAN(),
-                           'cluster_effect' : True
                           }
         return default_params
 
@@ -130,15 +129,12 @@ class Clusterer(Block):
         self.xmodel.fit(pyx)
         x_lbls = self.xmodel.labels_
 
-        if self.params['cluster_effect']:
-            # sample P(Y|Xclass)
-            y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
+        # sample P(Y|Xclass)
+        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
 
-            # do y clustering
-            self.ymodel.fit(y_probs)
-            y_lbls = self.ymodel.labels_
-        else:
-            y_lbls = None
+        # do y clustering
+        self.ymodel.fit(y_probs)
+        y_lbls = self.ymodel.labels_
 
         self.trained = True
         results_dict = {'x_lbls' : x_lbls,
