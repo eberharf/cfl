@@ -8,7 +8,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-from cfl.block import do_bookkeeping
+from cfl.block import mark_as_trained
 
 from cfl.density_estimation_methods.cde_interface import Block #base class
 
@@ -108,7 +108,7 @@ class CondExpBase(Block):
 
         self.save_model(path)
 
-    @do_bookkeeping
+    @mark_as_trained
     def train(self, dataset, prev_results=None):
         ''' Full training loop. Constructs t.data.Dataset for training and
             testing, updates model weights each epoch and evaluates on test set
