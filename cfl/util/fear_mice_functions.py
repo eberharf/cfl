@@ -5,6 +5,17 @@ import nibabel as nib
 
 from cfl.util import brain_util as BU
 
+
+
+
+def region_num_to_name(atlas_names_df, region_num): 
+    '''see atlas_explorer.ipynb for what the atlas_names_df should look like 
+
+    given a region number, spits out the name of that brain region
+    '''
+    name = atlas_names_df.Full_Segment_Filename[atlas_names_df.Original_Invivo_Index == region_num].values[0]
+    return name
+
 def select_from_dict(dict, keywords):
     '''quick lil function to pull out only the arrays from a dict that match 
     a keyword (used to select only KO mris or only BL, etc). keywords is a list of 
@@ -26,7 +37,6 @@ def select_from_dict(dict, keywords):
                 selected_names.append(key)
     selected = np.array(selected)
     return selected, selected_names
-
 
 def get_global_values(): 
     '''return mri dims, affine, and dir_labels (only
