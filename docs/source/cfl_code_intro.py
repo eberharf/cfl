@@ -88,8 +88,10 @@ print(Y.shape)
 # 2. For most instances of CFL, `X` and `Y` should be reshaped such that that each one is a 2D array, where the first dimension is samples/observations and the second dimension is all the features 
 # %% [markdown]
 # ## Saving Results 
-# 
-# We will now set up an `ExperimentSaver`. This will save not only the results from each step of CFL, but also the parameters input to CFL. This is an optional step; if you do not create an `ExperimentSaver`, then the CFL parameters and results will not be saved. 
+# TODO: since experiment is optional, move it later in the process 
+# We will now set up an `Experiment`. This will save not only the results from each step of CFL, but also the parameters input to CFL and the trained models of each step.
+# TODO: what exactly does exp save? 
+#   This is an optional step; if you just want to run CFL quickly and are not concerned with saving  you do not create an `Experiment`. 
 # 
 # We will also pass the X and Y data and the `ExperimentSaver` into a `Dataset` object. (This step is necessary; CFL only accepts a `Dataset` object). By associating this dataset with an `ExperimentSaver`, the results from running this dataset through a CFL pipeline will be saved in an appropriate location. Then, every time we pass that `Dataset` through any part of the CFL pipeline, the results will automatically be stored in a directory associated with that `Dataset` and experiment.
 # 
