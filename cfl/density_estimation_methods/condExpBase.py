@@ -8,8 +8,6 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-from cfl.block import mark_as_trained
-
 from cfl.density_estimation_methods.cde_interface import Block #base class
 
 # Things that descend from this class should have a self.name attribute but this class doesn't 
@@ -108,7 +106,6 @@ class CondExpBase(Block):
 
         self.save_model(path)
 
-    @mark_as_trained
     def train(self, dataset, prev_results=None):
         ''' Full training loop. Constructs t.data.Dataset for training and
             testing, updates model weights each epoch and evaluates on test set

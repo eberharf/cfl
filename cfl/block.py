@@ -165,27 +165,6 @@ class Block(metaclass=ABCMeta):
     def get_params(self): 
         return self.params
 
-#TODO: create decorator here for load_block that sets trained to true 
-# TODO: document this thing 
-# TODO: add this decorator wherever it needs to be added (load pre-trained models or do training)
-def mark_as_trained(func): 
-    '''
-    decorator function that sets the self.trained attribute of an object to true
-    
-    Notes: 
-        is intended to be applied any function that trains the model or loads a trained model (eg, train() )
-        reason for doing this is that trained is an attribute that we care about for block/ experiment purposes , but the 
-        lower-level functions don't necessarily care about it, so this way we avoid messing with an attribute across different levels 
-        of code
-    '''
-    @wraps(func)   # functools.wraps preserves the information (doc string, name, etc) about the original function instead of changing that info to match wrapper()
-    def wrapper(self, *args, **kwargs): 
-        output = func(*args, **kwargs)
-        self.trained = True
-        return output
-    return wrapper
-#### ^what we're gonna do is apply these decorators to load_block in lower level files 
-
 
 def validate_data_info(data_info):
     ''' Make sure all information about data is correctly specified.'''
