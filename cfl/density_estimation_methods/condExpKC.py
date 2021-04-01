@@ -15,15 +15,15 @@ class CondExpKC(CondExpBase):
         See CondExpBase documentation for more details.
 
     '''
-    def __init__(self, name, data_info, params):
+    def __init__(self, data_info, params):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 params : dictionary containing parameters for the model
         '''
-        self.model_name = 'CondExpKC'
-        super().__init__(self.model_name, data_info, params)
+        self.name = 'CondExpKC'
+        super().__init__(data_info, params)
 
     def _get_default_params(self):
         '''model and learning parameters. Most of these parameters are actually used
@@ -37,7 +37,6 @@ class CondExpKC(CondExpBase):
                 'weights_path': None,
                 'loss'        : 'mean_squared_error',
                 'show_plot'   : True,
-                'name'        : self.name,
                 'standardize' : False,
                 'best'        : True,
             }

@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 
+#Note: i think this function is not currently in use elsewhere
 def standardize_train_test(data, dtype=np.float32):
     ''' Standardize data that has been split into training
         and test sets.

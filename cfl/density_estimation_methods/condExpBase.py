@@ -7,11 +7,14 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from cfl.util.data_processing import standardize_train_test
 
-from cfl.density_estimation_methods.cde_interface import CDE #base class
+from cfl.density_estimation_methods.cde_interface import Block #base class
 
-class CondExpBase(CDE):
+# Things that descend from this class should have a self.name attribute but this class doesn't 
+# since CondExpBase objects are not supposed to be created by the user 
+
+
+class CondExpBase(Block):
     ''' A class to define, train, and perform inference with conditional density
     estimators that fall under the "conditional expectation" umbrella. This
     subset of conditional density estimators (referred to as 'CondExp') learns
@@ -47,16 +50,16 @@ class CondExpBase(CDE):
         graph_results : helper function to graph training and validation loss
         predict : once the model is trained, predict for a given Dataset
         evaluate : return the model's prediction loss on a Dataset
-        load_parameters : load tensorflow model weights from a file into
+        load_model : load tensorflow model weights from a file into
                           self.model
-        save_parameters : save the current weights of self.model
+        save_model : save the current weights of self.model
         build_model : create and return a tensorflow model
         check_model_params : fill in any parameters that weren't provided in
                              params with the default value, and discard any
                              unnecessary paramaters that were provided.
     '''
 
-    def __init__(self, name, data_info, params):
+    def __init__(self, data_info, params):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data
@@ -69,9 +72,8 @@ class CondExpBase(CDE):
             Returns: None
         '''
 
-        super().__init__(name=name, data_info=data_info, params=params)
+        super().__init__(data_info=data_info, params=params)
 
-        # self.name = name
         # self.params = self._check_model_params(params)
 
         # set object attributes
@@ -80,7 +82,7 @@ class CondExpBase(CDE):
 
         # load model weights if specified
         if self.params['weights_path'] is not None:
-            self.load_parameters(self.params['weights_path'])
+            self.load_model(self.params['weights_path'])
             self.weights_loaded = True
             self.trained = True
 
@@ -92,7 +94,7 @@ class CondExpBase(CDE):
             Returns: None
         '''
 
-        self.load_parameters(path)
+        self.load_model(path)
         self.trained = True
 
     def save_block(self, path):
@@ -102,8 +104,7 @@ class CondExpBase(CDE):
             Returns: None
         '''
 
-        self.save_parameters(path)
-
+        self.save_model(path)
 
     def train(self, dataset, prev_results=None):
         ''' Full training loop. Constructs t.data.Dataset for training and
@@ -133,11 +134,7 @@ class CondExpBase(CDE):
         # train-test split
         dataset.split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
 
-        # standardize if specified
-        if self.params['standardize']:
-            dataset.split_data = standardize_train_test(dataset.split_data)
         Xtr, Xts, Ytr, Yts = dataset.split_data
-
 
         # build optimizer
         optimizer = tf.keras.optimizers.get({ 'class_name' : self.params['optimizer'],
@@ -186,7 +183,7 @@ class CondExpBase(CDE):
 
         # load in best weights if specified
         if self.params['best']:
-            self.load_parameters('tmp_checkpoints/best_weights')
+            self.load_model('tmp_checkpoints/best_weights')
             shutil.rmtree('tmp_checkpoints')
 
 
@@ -255,7 +252,7 @@ class CondExpBase(CDE):
         return tf.reduce_mean(cost)
 
 
-    def load_parameters(self, file_path):
+    def load_model(self, file_path):
         ''' Load model weights from saved checkpoint into current model.
             Arguments:
                 file_path : path to checkpoint file (string)
@@ -267,14 +264,17 @@ class CondExpBase(CDE):
         if self.params['verbose']>0:
             print("Loading parameters from ", file_path)
         self.model.load_weights(file_path)
+
+        #TODO: does tensorflow keep track of if model is trained? 
         self.trained = True
 
-    def save_parameters(self, file_path):
+    def save_model(self, file_path):
         ''' Save model weights from current model.
             Arguments:
                 file_path : path to checkpoint file (string)
             Returns: None
         '''
+        # TODO : add check to only save trained models? (bc of load model setting train to true )
         if self.params['verbose']>0:
             print("Saving parameters to ", file_path)
         self.model.save_weights(file_path)
@@ -287,6 +287,3 @@ class CondExpBase(CDE):
             Returns: the model (tf.keras.models.Model object)
         '''
         ...
-
-    def get_params(self):
-        return self.params

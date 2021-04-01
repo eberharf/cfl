@@ -5,8 +5,8 @@ import os
 
 class CDE(Block):
 
-    def __init__(self, name, data_info, params):
-        super().__init__(name=name, data_info=data_info, params=params)
+    def __init__(self, data_info, params):
+        super().__init__(data_info=data_info, params=params)
 
     # @abstractmethod
     # def train(self,dataset, prev_results=None):

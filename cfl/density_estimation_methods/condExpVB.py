@@ -16,7 +16,7 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
 
     '''
 
-    def __init__(self, name, data_info, params):
+    def __init__(self, data_info, params):
 
         ''' Initialize model and define network.
             Arguments:
@@ -24,7 +24,8 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 params : dictionary containing parameters for the model
         '''
-        super().__init__(name, data_info, params)
+        self.name = 'CondExpVB'
+        super().__init__(data_info, params)
 
     def _get_default_params(self):
         '''model and learning parameters. Most of these parameters are actually used
@@ -37,7 +38,6 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
                 'weights_path': None,
                 'loss'        : 'mean_squared_error',
                 'show_plot'   : True,
-                'name'  : self.name,
                 'standardize' : False,
                 'best'        : True,
             }

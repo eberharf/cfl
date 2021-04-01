@@ -13,14 +13,15 @@ class CondExpMod(CondExpBase):
         See CondExpBase documentation for more details.
 
     '''
-    def __init__(self, name, data_info, params):
+    def __init__(self, data_info, params):
         ''' Initialize model and define network.
             Arguments:
                 data_info : a dictionary containing information about the data that will be passed in
                 params : dictionary containing parameters for the model
 
         '''
-        super().__init__(name=name, data_info=data_info, params=params)
+        self.name = 'CondExpMod'
+        super().__init__(data_info=data_info, params=params)
 
     def _get_default_params(self):
         '''model and learning parameters. Most of these parameters are actually used
@@ -36,7 +37,6 @@ class CondExpMod(CondExpBase):
                 'weights_path': None,
                 'loss'        : 'mean_squared_error',
                 'show_plot'   : True,
-                'name'  : self.name,
                 'standardize' : False,
                 'best'        : True,
             }
