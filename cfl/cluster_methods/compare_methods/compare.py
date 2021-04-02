@@ -122,7 +122,7 @@ def load_data(dataset_path):
             true_labels : (n_samples,) np.array of true clustering labels for 
                           each sample in data_to_cluster
     '''
-
+    print('dataset_path passed in is', dataset_path)
     data_to_cluster = np.load(os.path.join(dataset_path, 'data_to_cluster.npy'))
     true_labels = np.load(os.path.join(dataset_path, 'true_labels.npy'))
     return data_to_cluster, true_labels
@@ -268,7 +268,7 @@ def generate_cfl_clusters(data_to_cluster, method, params, save_path):
               'Y_dims' : Y.shape, 
               'Y_type' : 'continuous' } 
                                 
-    block_names = ['ClusterBase']
+    block_names = ['Clusterer']
     block_params = [_build_cluster_params(method, params)]
 
     my_exp = Experiment(X_train=X, Y_train=Y, data_info=data_info, 
@@ -277,7 +277,7 @@ def generate_cfl_clusters(data_to_cluster, method, params, save_path):
 
     # feed data_to_cluster in through prev_results
     train_results = my_exp.train(prev_results={'pyx' : data_to_cluster})
-    pred_labels = train_results['ClusterBase']['x_lbls']
+    pred_labels = train_results['CLusterer']['x_lbls']
 
     # we don't need to save Experiments right now
     exp_paths = glob(os.path.join(save_path, 'experiment*'))
@@ -462,7 +462,7 @@ def _hist_helper(ax, data, labels, title, subscript=None, xlabel=''):
                 transform=ax.transAxes)
         
 
-def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=None):
+def compare_scatter_plots(data_path, results_path, dataset_list, method_list, subfigsize=(6,4), fig_path=None):
     ''' Build a 2D grid of scatter plots, where each row corresponds to 
         a dataset and each column corresponds to a clustering method.
         Scatter plots will be colored by labeling from the given method.
@@ -480,12 +480,14 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=No
     '''
     
     # infer datasets and methods used from directory structure
-    dataset_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, '*'))]
-    assert len(dataset_list) > 0, 'No datasets available at results_path.'
+    # results_path = results_path.replace('\\', '/') # replace \\ with / (for consistency - Windows uses the \\ but Mac uses /) 
 
-    method_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, dataset_list[0], '*'))]
-    assert len(dataset_list) > 0, 'No methods available for datasets at results_path.'
-    method_list = ['ground_truth'] + method_list # plot ground truth in first column
+    # dataset_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, '*'))] #split data names based on /
+    # assert len(dataset_list) > 0, 'No datasets available at results_path.'
+
+    # method_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, dataset_list[0], '*'))]
+    # assert len(dataset_list) > 0, 'No methods available for datasets at results_path.'
+    # method_list = ['ground_truth'] + method_list # plot ground truth in first column
 
     # make figure
     fig,axs = plt.subplots(len(dataset_list), len(method_list), \
@@ -495,6 +497,7 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=No
     for di,dataset in enumerate(dataset_list):
         
         # load dataset
+        print('dataset is ', dataset)
         data_to_cluster,true_labels = load_data(os.path.join(data_path, dataset))
 
         # if data_to_cluster is > 2-dim, we need to embed it for visualization
@@ -509,7 +512,11 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=No
             if method=='ground_truth':
                 labels = true_labels
             else:
-                labels = np.load(os.path.join(results_path, dataset, method, 'pred_labels.npy'))
+                print('results path i s', results_path)
+                print('dataset is ', dataset)
+                print('method is', method)
+                labels = np.load(os.path.join(results_path, dataset, method, 'tuning_pred_labels.npy'), allow_pickle=True)
+
             
             # set title for first row
             title = ''
@@ -525,7 +532,7 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=No
             if method=='ground_truth':
                 subscript = 'N/A'
             else:
-                subscript = 'GTS: {}'.format(round(float(np.load(os.path.join(results_path, dataset, method, 'best_gt_score.npy'))), 2))
+                subscript = 'GTS: {}'.format(round(float(np.load(os.path.join(results_path, dataset, method, 'tuning_gt_scores.npy'))), 2))
 
             # make subplot
             if (embedding.shape[1]==1) or (np.sum(embedding)==embedding.shape[0]):

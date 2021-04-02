@@ -16,7 +16,7 @@ get_dataset()
 load_dataset_results()
 _build_block()
 _make_exp_dir()
-_propagate_verbosity()
+_propogate_verbosity()
 
 '''
 
@@ -528,5 +528,3 @@ def get_next_dirname(path):
     while os.path.exists(os.path.join(path, 'experiment{}'.format(str(i).zfill(4)))):
         i += 1  
     return 'experiment{}'.format(str(i).zfill(4))
-
-
