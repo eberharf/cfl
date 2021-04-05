@@ -42,18 +42,20 @@ import matplotlib.pyplot as plt
 class VisualBarsData():
 
     def __init__(self, n_samples=1000, im_shape=(10, 10), noise_lvl=0, set_random_seed=None, hBarFreq=0.5, vBarFreq=0.5):
-        '''the constructor generates n_samples binary vertical bars images,
+    '''the constructor generates n_samples binary vertical bars images,
         generates the ground labels for each image, and generates the target behavior associated
         with each image in separate, aligned np arrays
 
-        Parameters
-        n_samples (int): number of images to generate
-        im_shape (tuple with two numbers): size of images to generate in pixels
-        noise_lvl (float between 0 and 1): the amount of random noise that the images should contain (default is 0)
-        set_random_seed (int): Optional, if enabled sets the random generator to a specific seed, allowing reproducible random results
-        hBarFreq, vBarFreq (float between 0 and 1): the frequency with which a horizontal bar and a vertical bar (respectively) appear
-                    in
-        '''
+        Parameters:
+            n_samples (int): number of images to generate
+            im_shape (tuple with two numbers): size of each image to generate, in pixels
+            noise_lvl (float between 0 and 1): the amount of random noise that each image should contain (default is 0)
+            set_random_seed (int): Optional, if enabled sets the random generator to a specific seed, allowing reproducible random results
+            hBarFreq, vBarFreq (float between 0 and 1): the frequency with which a horizontal bar and a vertical bar (respectively) appear in the set of images
+
+        Returns: 
+            None
+        '''  
         assert 0 <= noise_lvl <= 1, "noise_lvl must be between 0 and 1 but is {}".format(
             noise_lvl)
         assert len(
@@ -87,14 +89,21 @@ class VisualBarsData():
 
     def _generate_images(self, n_samples, im_shape, noise_lvl, hBarFreq, vBarFreq):
         '''
-        generates binary images containing some combination of vertical
-        bars and/or horizontal bars (or neither)
+        Generates the 'ground truth'
+        classification labels for each image based on whether hidden variable is
+        active and/or horizontal bars present
 
-        inputs:
-        n_samples = number of images to generate
-        im_shape = dimensions of each image
-        noise_lvl = amount of noise in images (can be between 0 and 1)
-        hBarFreq, vBarFreq = the frequency of images with horizontal bars and vertical bars (respectively)
+        Parameters:
+            X_images (np array) : array of binary images 
+            Hs (np array) :  aligned with X_images, where Hs[i] indicates whether the hidden variable
+                is active for X_images[i]
+            HBs (np array) :  aligned with X_images, where HBs[i] indicates whether there is a horizontal bar
+                in X_images[i] or not 
+
+        Note:
+            modified from the behave() function in ai_gratings.py (Chalupka 2015)
+            #TODO: proper citation ?
+
         '''
 
         # X_images = array containing each image (each val in array represents a pixel)
@@ -156,25 +165,28 @@ class VisualBarsData():
             H2 = self.HBs[i]
 
             if H2 == 0 and H1 == 0:
-                gt_labels[i] = 0  # e.g. p(T|H2,H1) = 0.1
+                gt_labels[i] = 0  
             if H2 == 0 and H1 == 1:
-                gt_labels[i] = 1  # p(T|H2,H1) = 0.4
+                gt_labels[i] = 1  
             if H2 == 1 and H1 == 0:
-                gt_labels[i] = 2  # P(T|H2,H1) = 0.7
+                gt_labels[i] = 2 
             if H2 == 1 and H1 == 1:
-                gt_labels[i] = 3  # P(T|H2,H) = 1.
+                gt_labels[i] = 3  
 
         return gt_labels.astype(int)
 
     def _generate_target(self):
         '''probabilistically generates the target behavior for each image, based on the
          ground truth probabilities expressed at the top of this file'''
-        p_dict = {0: 0.1, 1: 0.4, 2: 0.7, 3: 1.}
+        
+        # this is the ground truth probability distribution 
+        # key= macrovariable class of image, value= probability that target equals one
+        P_DICT = {0: 0.1, 1: 0.4, 2: 0.7, 3: 1.}
 
         target_vals = np.zeros(self.n_samples)
 
         for i in range(self.n_samples):
-            currentP = p_dict[self.gt_labels[i]]
+            currentP = P_DICT[self.gt_labels[i]]
             target_vals[i] = (self.random.random() < currentP)
         return target_vals
 
