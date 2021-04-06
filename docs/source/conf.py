@@ -34,22 +34,23 @@ release = '0.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc', #for auto-using docstrings
-              'sphinx.ext.napoleon', #for converting Numpy/Google style-doc strings to rst
-              'nbsphinx' # for incorporating jupyter notebooks into docs
-]
+              'sphinx.ext.napoleon', #for converting Numpy/Google style-doc strings to reST
+              'nbsphinx', # for incorporating jupyter notebooks into docs
+              'recommonmark' # for parsing markdown files
+            ]
 
 ## Napoleon settings (for docstring formatting)
-napoleon_google_docstring=False
+napoleon_google_docstring=True
 napoleon_include_init_with_doc=True
 napoleon_include_private_with_doc=True
 napoleon_use_param=True
 
 source_parsers = {'.md': CommonMarkParser}
 
-source_suffix = ['.rst',
-                 '.md',
-                 '.ipynb'
-                 ]
+source_suffix = {'.rst': 'restructuredtext',
+                 '.md': 'markdown',
+                #  '.ipynb'
+                }   
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
