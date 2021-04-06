@@ -32,7 +32,7 @@ from tqdm import tqdm
 #                     'SpectralCoclustering' : skcluster.SpectralCoclustering,
 #                 }
 
-CMAP = 'Set3'
+CMAP = 'Set2'
 
 def main(data_path, dataset_list, method_list, params_list, save_path,
          gt_score_type='adjusted_mutual_info_score', cg_score_type='silhouette_score'):
@@ -268,7 +268,7 @@ def generate_cfl_clusters(data_to_cluster, method, params, save_path):
               'Y_dims' : Y.shape, 
               'Y_type' : 'continuous' } 
                                 
-    block_names = ['ClusterBase']
+    block_names = ['Clusterer']
     block_params = [_build_cluster_params(method, params)]
 
     my_exp = Experiment(X_train=X, Y_train=Y, data_info=data_info, 
@@ -277,7 +277,7 @@ def generate_cfl_clusters(data_to_cluster, method, params, save_path):
 
     # feed data_to_cluster in through prev_results
     train_results = my_exp.train(prev_results={'pyx' : data_to_cluster})
-    pred_labels = train_results['ClusterBase']['x_lbls']
+    pred_labels = train_results['Clusterer']['x_lbls']
 
     # we don't need to save Experiments right now
     exp_paths = glob(os.path.join(save_path, 'experiment*'))
@@ -438,7 +438,7 @@ def _scatter_helper(ax, data, labels, title, subscript=None, xlabel='', ylabel='
                 verticalalignment='bottom',
                 transform=ax.transAxes)
 
-def _hist_helper(ax, data, labels, title, subscript=None, xlabel=''):
+def _hist_helper(ax, data, labels, title, subscript=None, xlabel='', ylabel=''):
     ''' Make histogram subplot colored by labels.'''
 
     ulabels = np.unique(labels)
@@ -453,7 +453,7 @@ def _hist_helper(ax, data, labels, title, subscript=None, xlabel=''):
     # ax.add_artist(legend)
     ax.set_title(title, fontweight='bold')
     ax.set_xlabel(xlabel, fontweight='bold')
-    ax.set_ylabel('Counts', fontweight='bold')
+    ax.set_ylabel(ylabel, fontweight='bold')
     
     if subscript is not None:
         ax.text(.95, .01, subscript, size=12,
@@ -461,8 +461,32 @@ def _hist_helper(ax, data, labels, title, subscript=None, xlabel=''):
                 verticalalignment='bottom',
                 transform=ax.transAxes)
         
+def _get_dataset_method_lists(results_path, sort=False):
+    ''' Helper function to infer dataset names and clustering method names from
+        results directory structure.
 
-def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=None):
+        Arguments:
+            results_path : path to directory where results from 'main' were saved 
+                           (this should be same as 'save_path' argument to 
+                           main). (str)
+        Returns:
+            dataset_list : list of dataset names (str list)
+            method_list : list of clustering method names (str list)
+    '''
+
+    # infer datasets and methods used from directory structure
+    dataset_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, '*'))]
+    assert len(dataset_list) > 0, 'No datasets available at results_path.'
+    if sort:
+        idx = np.argsort([int(dl.split('_')[-1]) for dl in dataset_list])
+        dataset_list = [dataset_list[i] for i in idx]
+
+    method_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, dataset_list[0], '*'))]
+    assert len(dataset_list) > 0, 'No methods available for datasets at results_path.'
+
+    return dataset_list, method_list
+
+def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), sort=False, fig_path=None):
     ''' Build a 2D grid of scatter plots, where each row corresponds to 
         a dataset and each column corresponds to a clustering method.
         Scatter plots will be colored by labeling from the given method.
@@ -480,11 +504,7 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=No
     '''
     
     # infer datasets and methods used from directory structure
-    dataset_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, '*'))]
-    assert len(dataset_list) > 0, 'No datasets available at results_path.'
-
-    method_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, dataset_list[0], '*'))]
-    assert len(dataset_list) > 0, 'No methods available for datasets at results_path.'
+    dataset_list, method_list = _get_dataset_method_lists(results_path, sort=sort)
     method_list = ['ground_truth'] + method_list # plot ground truth in first column
 
     # make figure
@@ -529,7 +549,7 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=No
 
             # make subplot
             if (embedding.shape[1]==1) or (np.sum(embedding)==embedding.shape[0]):
-                _hist_helper(axs[di,mi], embedding, labels, title, subscript=subscript)
+                _hist_helper(axs[di,mi], embedding, labels, title, subscript=subscript, ylabel=ylabel)
             else:
                 _scatter_helper(axs[di,mi], embedding, labels, title, subscript=subscript, ylabel=ylabel)
     
@@ -539,10 +559,36 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), fig_path=No
 
     plt.show()
 
+def _get_best_scores(results_path, score_mode='gt', sort=False):
+    ''' Returns np.array of scores (either ground-truth or cluster-goodness) 
+        for each dataset and method combination stored at results_path.
 
-def compare_best_gt_scores(results_path, fig_path=None):
-    ''' Make grouped bar plot comparing ground-truth scores across methods
-        for each dataset.
+        Arguments:
+            results_path : path to directory where results from 'main' were saved 
+                           (this should be same as 'save_path' argument to 
+                           main). (str)
+            score_mode : either 'gt' for ground-truth or 'cg' for 
+                         cluster-goodness. (str)
+        
+        Returns: 
+            best_scores : n_datasets x n_methods np.array (np.ndarray)
+    '''
+
+    # infer datasets and methods used from directory structure
+    dataset_list, method_list = _get_dataset_method_lists(results_path, sort=sort)
+
+    # pull best scores
+    best_scores = np.zeros((len(dataset_list), len(method_list)))
+    for di,dataset in enumerate(dataset_list):
+        for mi,method in enumerate(method_list):
+            best_scores[di,mi] = float(np.load(os.path.join(results_path, 
+                                    dataset, method, f'best_{score_mode}_score.npy')))
+    
+    return best_scores
+
+def compare_best_scores(results_path, score_mode='gt', sort=False, fig_path=None):
+    ''' Make grouped bar plot comparing ground-truth or cluster-goodness 
+        scores across methods for each dataset.
 
         Arguments:
             results_path : path to directory where results from 'main' were saved 
@@ -553,27 +599,63 @@ def compare_best_gt_scores(results_path, fig_path=None):
         Returns: None
     '''
     # infer datasets and methods used from directory structure
-    dataset_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, '*'))]
-    assert len(dataset_list) > 0, 'No datasets available at results_path.'
+    dataset_list, method_list = _get_dataset_method_lists(results_path, sort=sort)
 
-    method_list = [r.split('/')[-1] for r in glob(os.path.join(results_path, dataset_list[0], '*'))]
-    assert len(dataset_list) > 0, 'No methods available for datasets at results_path.'
-
-    # pull best_gt_scores
-    best_gt_scores = np.zeros((len(dataset_list), len(method_list)))
-    for di,dataset in enumerate(dataset_list):
-        for mi,method in enumerate(method_list):
-            best_gt_scores[di,mi] = float(np.load(os.path.join(results_path, dataset, method, 'best_gt_score.npy')))
+    # pull best_scores
+    best_scores = _get_best_scores(results_path, score_mode=score_mode, sort=sort)
     
     # convert to dataframe for plotting
-    df = pd.DataFrame(best_gt_scores, columns=method_list)
+    df = pd.DataFrame(best_scores, columns=method_list)
     df['dataset'] = dataset_list
 
     # generate bar plot
-    df.plot(x='dataset', y=method_list, kind="bar",figsize=(9,8), cmap=CMAP, ylabel='Ground Truth Score (AMI)')
+    df.plot(x='dataset', y=method_list, kind="bar",figsize=(9,8), cmap=CMAP, 
+            ylabel=f'{score_mode} score')
 
     # save figure
     if fig_path is not None:
         plt.savefig(fig_path)
+
+    plt.show()
+
+
+def compare_gt_cg_scores(results_path, fig_path, sort=False):
+    ''' Plot ground-truth and cluster-goodness scores on same plot
+        for comparison across a set of datasets.
+
+        Arguments:
+            results_path : path to directory where results from 'main' were saved 
+                           (this should be same as 'save_path' argument to 
+                           main). (str)
+            fig_path : filename to save figure as. Will not save if None. (str)
+        
+        Returns: None
+    '''
+    
+    # pull scores
+    gt_scores = _get_best_scores(results_path, 'gt', sort=sort)
+    cg_scores = _get_best_scores(results_path, 'cg', sort=sort)
+    
+    # infer datasets and methods used from directory structure
+    dataset_list, method_list = _get_dataset_method_lists(results_path, sort=sort)
+    assert gt_scores.shape[0] == len(dataset_list)
+    assert gt_scores.shape[1] == len(method_list)
+    assert gt_scores.shape == cg_scores.shape
+
+    # plot
+    fig,ax = plt.subplots(1,len(method_list), figsize=(20,4), sharey=True)
+    for mi,method in enumerate(method_list):
+        ax[mi].plot(gt_scores[:,mi], label='ground-truth score')
+        ax[mi].plot(cg_scores[:,mi], label='cluster-goodness score')
+        ax[mi].set_xticks(range(len(dataset_list)))
+        ax[mi].set_xticklabels(dataset_list, rotation=45)
+        ax[mi].set_xlabel('Dataset')
+        ax[mi].set_ylabel('Score')
+        ax[mi].set_title(method)
+        ax[mi].legend()
+
+    # save figure
+    if fig_path is not None:
+        plt.savefig(fig_path, bbox_inches = "tight")
 
     plt.show()

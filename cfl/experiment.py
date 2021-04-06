@@ -114,8 +114,8 @@ class Experiment():
 
         # add verbosity to params that don't specify
         self.verbose = verbose
-        if block_params is not None:
-            block_params = self._propagate_verbosity(self.verbose, block_params)
+        # if block_params is not None:
+        #     block_params = self._propagate_verbosity(self.verbose, block_params)
         
         # build experiment directory
         self.save_path = self._make_exp_dir(results_path)

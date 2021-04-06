@@ -108,7 +108,7 @@ class CondExpBase(Block):
 
         self.save_model(path)
 
-    @mark_as_trained
+    # @mark_as_trained
     def train(self, dataset, prev_results=None):
         ''' Full training loop. Constructs t.data.Dataset for training and
             testing, updates model weights each epoch and evaluates on test set
