@@ -1,16 +1,30 @@
 Background 
 ---------------------
 
-Macrovariables are a useful way to summarize the relevant features detailed, low-level data at a higher level. For example, instead of keeping track of the kinetic energy of every particle in a room, we can instead monitor just the temperature of the room. In this case, 'temperature' is a macrovariable which summarizes the kinetic energy in the room. Additionally, all the particle configurations which have the same temperature (i.e. are part of the same macrovariable class) may differ in some ways, but for many purposes, are functionally the same. Thus, macrovariables can abstract away unnecessary information while preserving important distinctions. Which features are important to distinguish depends on the task for which the macrovariable is being used. 
+Macrovariables are a useful way to summarize the relevant features in detailed, low-level data at a higher level. For example, instead of attempting to track of the kinetic energy of every particle in a room, we can instead monitor just the temperature of the room. In this case, 'temperature' is a macrovariable which summarizes 'kinetic energy of each particle in the room', a micro-state. Temperature is a useful macrovariable because all the particle configurations which have the same temperature are functionally identical for many purposes. This is an example of how macrovariables can abstract away unnecessary details while preserving important distinctions. The relevant features to preserve depend on the task for which the macrovariable is being used. 
 
-Causal Feature Learning (CFL) is an algorithm designed to construct macrovariables from low-level data in an unsupervised manner while accounting for the causal relationships between these macrovariables. CFL is designed to take two data sets as input. The `X` dataset contains all of the features which may potentially cause the effects seen in the `Y` dataset. The word "potentially" is used because both datasets may contain features which turn out not to be causally relevant; if that is the case, then CFL should not consider them when assigning a macrovariable label. CFL partitions each input dataset into a set of macrovariables: `X` into a set of macro-causes (e.g. the temperature of the room) and `Y` into a set of macro-effects (e.g. whether someone turns on the air conditioner). 
+Causal Feature Learning (CFL) is an unsupervised algorithm designed to construct macrovariables by preserving the causal relationships between variables. 
+<<< more explanation on what this means >>> 
 
-CFL works by first learning the conditional probability distribution _P(Y|X)_ (or some reasonable proxy for this distibution). This step is called conditional density estimation, or CDE. It then clusters together `X`s for which the equivalence relation :math:`P(Y|X=x_1) = P(Y|X=x_2)`
+CFL works in two steps to create macrovariables: first, it estimates a conditional probability distribution; and second, it clusters based on that distribution. This allows 
 
- is (approximately) true, followed by clustering `Y`s for which the relation :math:`P(Y=y_1|X) = P(Y=y_2|X)` approximately holds. Thus, CFL works in two steps: first, it estimates a conditional probability distribution; and second, it clusters based on that distribution. The image below provides a visual overview of the inputs and outputs of each step of CFL. 
+The image below provides a visual overview of the inputs and outputs of each step of CFL.
+
+
+CFL is designed to take two micro-level data sets as input: a 'causal' data set (`X`) and an 'effect' data set (`Y`). CFL partitions each data set into a set of macrovariables: the causal data into a set of macro-causes (e.g. the temperature of the room) and effect data into a set of macro-effects (e.g. whether or not the air conditioner turns on). 
+
+
 
 .. image:: img/CFLpipeline.png
   :width: 800
   :alt: Overview of CFL pipeline
 
-.. As stated above, CFL learns a method to partition the sample space of each dataset. This information is contained in the parameters of the trained model. These parameters generate the labels that are output at the end of training and can be used to classify new data into macrovariables.
+.. 
+
+
+
+CFL goes through two steps to create the macrovariables. First, CFL learns the conditional probability distribution _P(Y|X)_ (or some reasonable proxy for this distibution). This step is called conditional density estimation (CDE). CFL then clusters together `X`s for which the equivalence relation :math:`P(Y|X=x_1) = P(Y|X=x_2)` is (approximately) true, followed by clustering `Y`s for which the relation :math:`P(Y=y_1|X) = P(Y=y_2|X)` approximately holds. 
+
+
+
+As stated above, CFL learns a method to partition the sample space of each dataset. This information is contained in the parameters of the trained model. These parameters generate the labels that are output at the end of training and can be used to classify new data into macrovariables.
