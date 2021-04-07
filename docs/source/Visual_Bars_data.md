@@ -1,9 +1,7 @@
 Background: Visual Bars Data
 ------------------------------------
 
-#TODO: reformat this into rst (image imports, etc) 
-
-For this experiment, we will use the Visual Bars dataset (from Chalupka 2015). 
+The Visual Bars dataset is adapted from Chalupka 2015. 
 
 The causal dataset consists of a set of binary (black-and-white) images. These images each have a black background 
 and contain white pixels of random noise. Each image may also contain either a white vertical and/or a horizontal bar. Below are a few sample images. 
@@ -34,3 +32,8 @@ So, for this data set, we want CFL to separate the images into four observationa
 The table below shows the 'ground truth' probability of the target value being $1$, given each possible state of the hidden variables. These values are used to generate the target values. At the end of the CDE step of CFL, we want to recover these probabilities as accurately as possible, and by the end of the clustering step, recover these four categories.
 
 <img src="img/VisualBarsProbs.png" alt="probability table for visual bars" height="150"/>
+
+
+#### References 
+
+Chalupka, K., Perona, P., Eberhardt, F. (2015). Visual Causal Feature Learning. Proceedings of the Thirty-First Conference on Uncertainty in Artificial Intelligence. 
