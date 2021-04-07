@@ -8,6 +8,8 @@ Causal Feature Learning (CFL) is a novel algorithm designed to construct macrova
 
 Macrovariables are a useful way to summarize the relevant features of detailed, low-level data. For example, instead of attempting to keep track of the kinetic energy of every particle in a room, we can instead monitor just the temperature of the room. In this case, 'temperature' is a macrovariable which summarizes 'kinetic energy of each particle in the room', a micro-state. Temperature is a useful macrovariable because all the particle configurations which have the same temperature are functionally identical for many purposes. This is an example of how macrovariables can abstract away unnecessary details while preserving important distinctions. The relevant features to preserve depend on the task for which the macrovariable is being used. 
 
+#### TODO: add macrovariable figure 
+
 ### How does CFL work? 
 
 CFL is designed to take two micro-level data sets as input: a 'causal' data set (`X`) and an 'effect' data set (`Y`). CFL partitions each data set into a set of macrovariables: the causal data into a set of macro-causes (e.g. the temperature of the room) and effect data into a set of macro-effects (e.g. whether or not the air conditioner turns on). 
@@ -20,9 +22,4 @@ In addition, the 'rules' to predict the macrovariable class of any data point ar
 
 The image below provides a visual overview of the inputs and outputs of each step of CFL.
 
-.. image:: img/CFLpipeline.png
-   :width: 800px
-   :alt: Overview of CFL pipeline
-   :align: center
-
-
+![Overview of CFL pipeline](img/CFLpipeline.png "overview of CFL pipeline")

@@ -4,7 +4,6 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-
 from recommonmark.parser import CommonMarkParser # for parsing Markdown files
 
 # -- Path setup --------------------------------------------------------------
@@ -17,6 +16,9 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../../cfl'))
 
+# further modules needed for autodoc
+import nibabel 
+import tensorflow
 
 # -- Project information -----------------------------------------------------
 
