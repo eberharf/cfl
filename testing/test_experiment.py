@@ -69,6 +69,7 @@ def test_cde_experiment():
 
     dataset_train_cde = Dataset(x,y,name='dataset_train_cde')
     train_results_cde = my_exp_cde.train(dataset=dataset_train_cde, prev_results=None)
+    print('HERE:::::: ', train_results_cde.keys())
     
     # check output of CDE block
     assert 'pyx' in train_results_cde['CondExpMod'].keys(), \
