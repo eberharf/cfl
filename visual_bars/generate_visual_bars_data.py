@@ -43,18 +43,18 @@ class VisualBarsData():
 
     def __init__(self, n_samples=1000, im_shape=(10, 10), noise_lvl=0, set_random_seed=None, hBarFreq=0.5, vBarFreq=0.5):
         '''the constructor generates n_samples binary vertical bars images,
-            generates the ground labels for each image, and generates the target behavior associated
-            with each image in separate, aligned np arrays
+        generates the ground labels for each image, and generates the target behavior associated
+        with each image in separate, aligned np arrays
 
-            Parameters:
-                n_samples (int): number of images to generate
-                im_shape (tuple with two numbers): size of each image to generate, in pixels
-                noise_lvl (float between 0 and 1): the amount of random noise that each image should contain (default is 0)
-                set_random_seed (int): Optional, if enabled sets the random generator to a specific seed, allowing reproducible random results
-                hBarFreq, vBarFreq (float between 0 and 1): the frequency with which a horizontal bar and a vertical bar (respectively) appear in the set of images
+        Parameters:
+            n_samples (int): number of images to generate
+            im_shape (2-tuple): size of each image to generate, in pixels
+            noise_lvl (float [0,1]): the amount of random noise that each image should contain (default is 0)
+            set_random_seed (int): Optional, if enabled sets the random generator to a specific seed, allowing reproducible random results
+            hBarFreq, vBarFreq (float between 0 and 1): the frequency with which a horizontal bar and a vertical bar (respectively) appear in the set of images
 
-            Returns: 
-                None
+        Returns: 
+            None
         '''  
         assert 0 <= noise_lvl <= 1, "noise_lvl must be between 0 and 1 but is {}".format(
             noise_lvl)
