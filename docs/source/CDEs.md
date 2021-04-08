@@ -11,11 +11,11 @@ In the current implementation of CFL, we calculate the conditional _expection_ d
 
 ## Input Shape for CDEs 
 
-- Most CDEs 
+- **Most CDEs**
 
 Most of the CDEs provided expect a 2-D input with the shape **(n_samples, n_features)** for both the `X` and the `Y` data. 
 
-- CNNs
+- **CNNs**
 
 The `CondExpCNN` and `CondExpCNN` are examples of convolutional neural networks (CNNs). CNNs are well-suited to processing image data. A CNN expects 4-D input images with the shape **(n_samples, n_rows, n_cols, n_channels)** and a 2-D `Y` input. 
 
@@ -46,6 +46,8 @@ The `CondExpCNN` and `CondExpCNN` are examples of convolutional neural networks 
     >>> (150, 4)
 ```
 
+
+---------------------------------------------------------------------------------------------------------
 ## Parameter Details 
 When constructing a new CDE object, you can customize its parameters. 
 This allows you to specify the configuration of your CDE model during instantiation.

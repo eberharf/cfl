@@ -20,4 +20,9 @@ DBSCAN
     - Advantages: does not force you to pre-define number of clusters, can detect clusters of any shape, you can maybe get away with only tuning one parameter (eps)
     - Disadvantages: has two  parameters (eps and min_samples) (even though eps is more important to tune than min_samples), can be tricky to tune well, may not correctly distinguish two clusters if there is overlap between the clusters 
 
-    - Note: Shared Nearest Neighbor (SNN) clustering is a derivative of DBSCAN designed to perform well on high dimensional data. 
+---
+**NOTE**
+
+Shared Nearest Neighbor (SNN) clustering is a derivative of DBSCAN designed to perform well on high dimensional data
+
+---
