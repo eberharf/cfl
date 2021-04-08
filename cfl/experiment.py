@@ -1,4 +1,25 @@
-''' Experiment class '''
+''' Experiment class
+ 
+- Pipeline to pass data through the different blocks of CFL 
+- Save parameters, models, results for reuse 
+
+
+Methods: 
+
+train()
+predict()
+_save_results()
+_save_params()
+_load_params()
+add_dataset()
+get_dataset()
+load_dataset_results()
+_build_block()
+_make_exp_dir()
+_propagate_verbosity()
+
+'''
+
 import pickle
 import json
 import os
@@ -6,16 +27,18 @@ import numpy as np
 from cfl.dataset import Dataset
 from cfl.block import Block
 import cfl.density_estimation_methods as cdem
-import cfl.cluster_methods as ccm
-from cfl.util.dir_util import get_next_dirname
-from cfl.util.arg_validation_util import validate_data_info
+# import cfl.cluster_methods as ccm
+from cfl.cluster_methods import clusterer
 
 # TODO: this is a placeholder until we have a block registration system.
+# NOTE: the name in the registry has to match the self.name in each block's __init__ 
 BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB, 
-                'CondExpKC' : cdem.condExpKC.CondExpKC,
-                'CondExpCNN'  : cdem.condExpCNN.CondExpCNN,
-                'CondExpMod'  : cdem.condExpMod.CondExpMod,
-                'Kmeans' : ccm.kmeans.KMeans }
+                'CondExpKC'     :   cdem.condExpKC.CondExpKC,
+                'CondExpCNN'    : cdem.condExpCNN.CondExpCNN,
+                'CondExpCNN3D'  : cdem.condExpCNN3D.CondExpCNN3D,
+                'CondExpMod'    : cdem.condExpMod.CondExpMod,
+                'Clusterer'     : clusterer.Clusterer } #TODO: maybe change this so that instead of 
+                                                            # calling clusterer, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods  
 
 class Experiment():
 
@@ -30,7 +53,7 @@ class Experiment():
             Y_train : an (n_samples, n_y_features) 2D array. (np.array)
             data_info : a dictionary of information about this Experiment's
                         associated data. Refer to 
-                        cfl.util.arg_validation_util.validate_data_info for 
+                        cfl.block.validate_data_info() for 
                         more information. (dict)
             past_exp_path : path to directory associated with a previously
                             trained Experiment. (str)
@@ -81,7 +104,6 @@ class Experiment():
         # attribute enforces the definition that an Experiment is a unique 
         # configuration of a trained CFL.
         self.is_trained = False
-        validate_data_info(data_info)
         self.data_info = data_info
         self.datasets = {}
         self.dataset_train = self.add_dataset(X=X_train, Y=Y_train, \
@@ -123,7 +145,7 @@ class Experiment():
         # TODO: check that interfaces match
         # TODO: assert in the function itself so we can give more info
         # about what exactly is incompatible
-        assert self.check_blocks_compatibility(), 'Specified blocks are incompatible'
+        # assert self.check_blocks_compatibility(), 'Specified blocks are incompatible'
         
         # save configuration parameters for each block
         self._save_params()
@@ -152,9 +174,9 @@ class Experiment():
                 print('Training CFL pipeline.')
 
             # pull specified dataset
-            if dataset is None:
+            if dataset is None: #if you don't specify a dataset, use the one specified in initialization
                 dataset = self.get_dataset('dataset_train')
-            elif isinstance(dataset, str):
+            elif isinstance(dataset, str): #otherwise, they can pass a string specifying a particular dataset to use
                 if dataset != 'dataset_train':
                     if self.verbose > 0:
                         print('Warning: you are not using the dataset_train ' + \
@@ -168,6 +190,8 @@ class Experiment():
                         'specified for training in Experiment initialization.')
 
             all_results = {}
+
+            # this is the main logic - train each block 
             for block in self.blocks:
                 # train current block
                 results = block.train(dataset, prev_results)
@@ -427,27 +451,27 @@ class Experiment():
             'added to BLOCK_KEY yet. Please do so before proceeding. Note: ' + \
             'this is a temporary system until we set up Block registration.' 
 
-        return BLOCK_KEY[block_name](name=block_name, data_info=self.data_info, 
+        return BLOCK_KEY[block_name](data_info=self.data_info, 
                                      params=block_param)
 
 
-    def check_blocks_compatibility(self):
-        ''' Check that each Block in self.blocks is compatible with the Blocks
-            that precede and follow it. 
-            TODO: This is currently not implemented and simply states that all
-            Blocks are always compatible. We may use class registration here
-            to determine block compatibility. Alternatively, we may have each
-            Block descendent specify it's argument expectations and return
-            guarantees. 
+    # def check_blocks_compatibility(self):
+    #     ''' Check that each Block in self.blocks is compatible with the Blocks
+    #         that precede and follow it. 
+    #         TODO: This is currently not implemented and simply states that all
+    #         Blocks are always compatible. We may use class registration here
+    #         to determine block compatibility. Alternatively, we may have each
+    #         Block descendent specify it's argument expectations and return
+    #         guarantees. 
 
-            Arguments: None
+    #         Arguments: None
             
-            Returns:
-                compatible : whether or not self.blocks is a compatible
-                             composition of Blocks. (bool) 
-        '''
+    #         Returns:
+    #             compatible : whether or not self.blocks is a compatible
+    #                          composition of Blocks. (bool) 
+    #     '''
 
-        return True
+    #     return True
 
     
     def _make_exp_dir(self, results_path):
@@ -491,3 +515,18 @@ class Experiment():
                 modified_params['verbose'] = verbose
                 block_params[pi] = modified_params
         return block_params
+
+def get_next_dirname(path):
+    ''' gets the next subdirectory name in numerical order. i.e. if  'path' 
+    contains 'run0000' and 'run0001', this will return 'run0002'. 
+    Arguments: 
+        path: path of directory in which to find next subdirectory name (string)
+    Returns:
+        next subdirectory name. 
+    '''
+    i = 0
+    while os.path.exists(os.path.join(path, 'experiment{}'.format(str(i).zfill(4)))):
+        i += 1  
+    return 'experiment{}'.format(str(i).zfill(4))
+
+

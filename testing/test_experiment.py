@@ -8,6 +8,11 @@ from cfl.dataset import Dataset
 import shutil
 import random
 
+<<<<<<< HEAD
+=======
+from sklearn.cluster import DBSCAN
+
+>>>>>>> prep_for_master
 # Note: change if you want results somewhere else (folder will be deleted at end of run)
 save_path = 'testing/tmp_test_results'
 
@@ -54,7 +59,10 @@ def test_cde_experiment():
                     'dropouts': [0.2, 0.5, 0.5, 0],
                     'weights_path': None,
                     'loss': 'mean_squared_error',
+<<<<<<< HEAD
                     'name': 'CondExpMod',
+=======
+>>>>>>> prep_for_master
                     'standardize': False,
                     'best': True}
 
@@ -68,6 +76,10 @@ def test_cde_experiment():
 
     dataset_train_cde = Dataset(x,y,name='dataset_train_cde')
     train_results_cde = my_exp_cde.train(dataset=dataset_train_cde, prev_results=None)
+<<<<<<< HEAD
+=======
+    print('HERE:::::: ', train_results_cde.keys())
+>>>>>>> prep_for_master
     
     # check output of CDE block
     assert 'pyx' in train_results_cde['CondExpMod'].keys(), \
@@ -91,10 +103,16 @@ def test_cde_experiment():
 
 
     ## CDE and cluster experiment 
+<<<<<<< HEAD
     cluster_params = {'n_Xclusters': 4,
                       'n_Yclusters': 2} 
 
     block_names = ['CondExpMod', 'Kmeans']
+=======
+    cluster_params = {} 
+
+    block_names = ['CondExpMod', 'Clusterer']
+>>>>>>> prep_for_master
     block_params = [condExp_params, cluster_params]
 
     my_exp_clust = Experiment(X_train=x, Y_train=y, data_info=data_info, 
@@ -108,9 +126,15 @@ def test_cde_experiment():
         prev_results=train_results_cde)
 
     # check output of clusterer block
+<<<<<<< HEAD
     assert 'x_lbls' in train_results_clust['Kmeans'].keys(), \
         'Clusterer train fxn should specify x_lbls in results'
     assert 'y_lbls' in train_results_clust['Kmeans'].keys(), \
+=======
+    assert 'x_lbls' in train_results_clust['Clusterer'].keys(), \
+        'Clusterer train fxn should specify x_lbls in results'
+    assert 'y_lbls' in train_results_clust['Clusterer'].keys(), \
+>>>>>>> prep_for_master
         'Clusterer train fxn should specify y_lbls in results'
     
 
@@ -136,10 +160,17 @@ def test_clusterer_experiment():
                 'Y_dims': y.shape, 
                 'Y_type': 'categorical'}
 
+<<<<<<< HEAD
     cluster_params = {'n_Xclusters' : 4, 
                       'n_Yclusters' : 2}
 
     block_names = ['Kmeans']
+=======
+    cluster_params = {'x_model' : DBSCAN(),
+                      'y_model' : DBSCAN()}
+
+    block_names = ['Clusterer']
+>>>>>>> prep_for_master
     block_params = [cluster_params]
 
     # make new CFL Experiment with clusterer only
@@ -149,6 +180,7 @@ def test_clusterer_experiment():
     
     # make artificial pyx
     rng = np.random.default_rng(12345) # create a Random Number Gen to set reproducible random seed
+<<<<<<< HEAD
     pyx = np.random.rand(y.shape[0], y.shape[1])
     prev_results = {'pyx' : pyx}
     
@@ -161,6 +193,18 @@ def test_clusterer_experiment():
     # # # tmp save
     # # np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['Kmeans']['x_lbls'])
     # # np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['Kmeans']['y_lbls'])
+=======
+    pyx = rng.random((y.shape[0], y.shape[1]))
+    prev_results = {'pyx' : pyx}
+    
+    # train Experiment with pyx provided
+    dataset_train_cluster = Dataset(x,y, name='dataset_train_cluster', Xraw=None, Yraw=None)
+    train_results_cluster = my_exp_cluster.train(dataset=dataset_train_cluster, prev_results=prev_results)
+    
+    # # tmp save
+    # np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['Clusterer']['x_lbls'])
+    # np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['Clusterer']['y_lbls'])
+>>>>>>> prep_for_master
     
     # # load in correct labels
     # x_lbls_expected = np.load('testing/resources/test_experiment/x_lbls.npy')

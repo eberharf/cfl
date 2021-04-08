@@ -6,20 +6,20 @@ class Dataset():
     """Dataset class stores the X and Y datasets so that they can be easily 
     passed through steps of CFL and saved in a consistent way"""
 
-    def __init__(self, X, Y, Xraw=None, Yraw=None, name='dataset'):
+    def __init__(self, X, Y, name='dataset', Xraw=None, Yraw=None):
         ''' Initialize Dataset.
             Arguments:
                 X : X data to pass through CFL pipeline, dimensions 
                     n_samples x n_x_features. (np.ndarray)
                 Y : Y data to pass through CFL pipeline, dimensions 
                     n_samples x n_y_features. (np.ndarray)
+                name : name of Dataset. Defaults to 'dataset'. (str)
                 Xraw : Optional raw form of X before preprocessing to remain
                        associated with X for visualization. Defaults to None.
                        (np.ndarray)
                 Yraw : Optional raw form of Y before preprocessing to remain
                        associated with Y for visualization. Defaults to None. 
                        (np.ndarray)
-                name : name of Dataset. Defaults to 'dataset'. (str)
             
             Returns: None
         '''

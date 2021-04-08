@@ -1,6 +1,4 @@
-
 from abc import ABCMeta, abstractmethod
-from cfl.util.arg_validation_util import validate_data_info
 
 class Block(metaclass=ABCMeta):
     '''
@@ -13,12 +11,11 @@ class Block(metaclass=ABCMeta):
     '''
 
 
-    def __init__(self, name, data_info, params):
+    def __init__(self, data_info, params):
         '''
         Instantiate the specified model.
 
         Arguments:
-            name : name of model (str)
             data_info : dict of information about associated datasets (dict)
             model_params : parameters for this model (dict)
 
@@ -26,13 +23,11 @@ class Block(metaclass=ABCMeta):
         '''
 
         # check input argument types
-        assert isinstance(name, str), 'name should be of type str.'
         assert isinstance(data_info, dict), 'data_info should be of type dict.'
         assert isinstance(params, dict), 'params should be of type dict.'
 
         # set object attributes
         self.trained = False
-        self.name = name
         self.data_info = data_info
 
         # validate parameter dictionaries
@@ -89,6 +84,7 @@ class Block(metaclass=ABCMeta):
         '''
         ...
 
+    # TODO: how to document that an object that inherits from block must have a name attribute 
     def get_name(self):
         '''
         Return name of model.
@@ -146,7 +142,7 @@ class Block(metaclass=ABCMeta):
             if param not in default_params.keys():
                 paramsToRemove.append(param)
                 if verbose > 0:
-                    print('{} specified but not used by {}'.format(param, self.name))
+                    print(f'{param} specified but not used by this block type')
 
         # remove unnecessary parameters after we're done iterating
         # to not cause problems
@@ -161,7 +157,30 @@ class Block(metaclass=ABCMeta):
                     print('{} not specified in input, defaulting to {}'.format(param, default_params[param]))
                 input_params[param] = default_params[param]
 
-        input_params['name'] = self.name
+        # input_params['name'] = self.name #TODO: remove?
 
         return input_params
 
+    def get_params(self): 
+        return self.params
+
+
+def validate_data_info(data_info):
+    ''' Make sure all information about data is correctly specified.'''
+
+    # CFL expects the following entries in data_info:
+    #   - X_dims: (n_examples X, n_features X)
+    #   - Y_dims: (n_examples Y, n_featuers Y)
+    #   - Y_type: 'continuous' or 'categorical'
+    correct_keys = ['X_dims', 'Y_dims', 'Y_type']
+    assert set(correct_keys) == set(data_info.keys()), \
+        'data_info must specify values for the following set of keys exactly: {}'.format(correct_keys)
+
+    assert type(data_info['X_dims'])==tuple, 'X_dims should specify a 2-tuple.'
+    assert type(data_info['Y_dims'])==tuple, 'Y_dims should specify a 2-tuple.'
+    # assert len(data_info['X_dims'])==2, 'X_dims should specify a 2-tuple.' #TODO: for CNN, X_dims should be 4-D
+    assert len(data_info['Y_dims'])==2, 'Y_dims should specify a 2-tuple.'
+    correct_Y_types = ['continuous', 'categorical']
+    assert data_info['Y_type'] in correct_Y_types, 'Y_type can take the following values: {}'.format(correct_Y_types)
+
+    return True

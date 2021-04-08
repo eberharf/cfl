@@ -3,7 +3,6 @@ from cfl.density_estimation_methods.condExpMod import CondExpMod
 import tensorflow as tf
 # tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 import visual_bars.generate_visual_bars_data as vbd
-from cfl.save.experiment_saver import ExperimentSaver
 from cfl.dataset import Dataset
 import os
 import numpy as np
@@ -45,7 +44,8 @@ Y_DIM = 1
 WEIGHTS_PATH = 'testing/test_results/test_condExpBase_resources/experiment0000/dataset0/checkpoints/best_weights'
 
 DATA_INFO = { 'X_dims' : (N_TRAIN,X_DIM),
-              'Y_dims' : (N_TRAIN,Y_DIM) }
+              'Y_dims' : (N_TRAIN,Y_DIM), 
+              'Y_type' : 'categorical' }
 
 CDE_PARAMS = { 'batch_size'  : 32,
                'optimizer'   : 'adam',
@@ -62,28 +62,33 @@ CDE_PARAMS_WP['weights_path'] = WEIGHTS_PATH
 
 # generate results to test when weights_path is not supplied
 X, Y = get_data_helper(N_TRAIN)
-dtrain = Dataset(X, Y, dataset_label='dtrain', experiment_saver=None)
+dtrain = Dataset(X, Y, name='dtrain')
 
 ceb_obj = CondExpMod(  data_info=DATA_INFO,
-                        params=CDE_PARAMS,
-                        experiment_saver=None
+                        params=CDE_PARAMS                      
                     )
-tr_loss, ts_loss = ceb_obj.train(dataset=dtrain, standardize=False, best=False)
 
-dtest = Dataset(X[:N_PRED,:], Y[:N_PRED,:], dataset_label='dtest', experiment_saver=None)
+results_dict = ceb_obj.train(dataset=dtrain)
+tr_loss = results_dict['train_loss']
+ts_loss = results_dict['val_loss'] #TODO: same as line 88
+
+
+dtest = Dataset(X[:N_PRED,:], Y[:N_PRED,:], name='dtest')
 pred = ceb_obj.predict(dtest)
 
 # generate results to test when weights_path is supplied
-dtrain_wp = Dataset(X, Y, dataset_label='dtrain_wp', experiment_saver=None)
+dtrain_wp = Dataset(X, Y, name='dtrain_wp')
 
 ceb_obj_wp = CondExpMod(   data_info=DATA_INFO,
-                            params=CDE_PARAMS_WP,
-                            experiment_saver=None
+                            params=CDE_PARAMS_WP
                         )
-tr_loss_wp, ts_loss_wp = ceb_obj_wp.train(dataset=dtrain_wp, standardize=False, best=False)
 
-dtest_wp = Dataset(X[:N_PRED,:], Y[:N_PRED,:], dataset_label='dtest_wp', experiment_saver=None)
-pred_wp = ceb_obj.predict(dtest_wp)
+results_dict = ceb_obj_wp.train(dataset=dtrain_wp)
+tr_loss_wp = results_dict['train_loss']
+ts_loss_wp = results_dict['val_loss'] #TODO: I jenna changed this but i'm not totally sure that test loss is the same as validation loss? 
+
+dtest_wp = Dataset(X[:N_PRED,:], Y[:N_PRED,:], name='dtest_wp')
+pred_wp = ceb_obj.predict(dtest_wp)['pyx']
 
 ############################### TESTS #################################
 
@@ -93,8 +98,7 @@ def test_init():
             - since no weights_path was specified, model should be untrained
     '''
     ceb_obj_tmp = CondExpMod(   data_info=DATA_INFO,
-                                params=CDE_PARAMS,
-                                experiment_saver=None
+                                params=CDE_PARAMS
                             )
 
     assert ceb_obj_tmp.trained==False, "No weights_path was specified, so model shouldn't be trained yet."
@@ -106,8 +110,7 @@ def test_init_wp():
         - since no weights_path was specified, model should be untrained
     '''
     ceb_obj_tmp = CondExpMod(   data_info=DATA_INFO,
-                                params=CDE_PARAMS_WP,
-                                experiment_saver=None
+                                params=CDE_PARAMS_WP
                             )
     assert ceb_obj_tmp.trained==True, "Since weights_path was supplied, model is already trained."
     assert ceb_obj_tmp.weights_loaded==True, "Since weights_path was supplied, weights_loaded should be true."
@@ -165,8 +168,7 @@ def test_load_parameters():
     '''
 
     ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO,
-                                        params=CDE_PARAMS,
-                                        experiment_saver=None
+                                params=CDE_PARAMS
                                     )
 
     ceb_obj_tmp.load_parameters(WEIGHTS_PATH)
@@ -179,8 +181,7 @@ def test_save_parameters():
     '''
 
     ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO,
-                                params=CDE_PARAMS,
-                                experiment_saver=None
+                                params=CDE_PARAMS
                             )
 
     ceb_obj_tmp.load_parameters(WEIGHTS_PATH)
@@ -196,8 +197,7 @@ def test_check_save_model_params():
         - all keys in self.default_params show up in self.params
     '''
     ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO,
-                            params=CDE_PARAMS,
-                            experiment_saver=None
+                            params=CDE_PARAMS
                         )
 
     assert set(ceb_obj_tmp.default_params.keys())==set(ceb_obj_tmp.params.keys()), \
