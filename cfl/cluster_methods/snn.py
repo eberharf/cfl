@@ -38,6 +38,7 @@ def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     """Perform Shared Nearest Neighbor (SNN) clustering algorithm clustering.
 
     Parameters:
+
         X (array or sparse (CSR) matrix of shape (n_samples, n_features), or array of shape (n_samples, n_samples)):
             A feature array
         neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity
@@ -82,18 +83,20 @@ class SNN(BaseEstimator, ClusterMixin):
     """Class for performing the Shared Nearest Neighbor (SNN) clustering algorithm.
 
     Parameters:
-        neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity
 
+        neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity
         min_shared_neighbor_proportion (float [0, 1]): Proportion of the K nearest neighbors that
             need to share two data points to be considered part of the same cluster
 
     Attributes:
+
         self.labels_ : [assigned after fitting data]  Cluster labels for each point in the dataset given to
             fit(). Noisy samples are given the label -1
         self.core_sample_indices_ : [assigned after fitting data] Indices of core samples
         self.components_ : [assigned after fitting data] Copy of each core sample found by training
 
-    Note: Naming conventions for attributes are based on the analogous ones of DBSCAN. Some documentation
+    Note: 
+        Naming conventions for attributes are based on the analogous ones of DBSCAN. Some documentation
         copied from the sklearn DBSCAN documentation
     """
 

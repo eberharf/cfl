@@ -59,11 +59,9 @@ published research work, we
 encourage you to cite this
 repository:
 
-
 ::
 
-   Causal Feature Learning (2021).
-   https://github.com/eberharf/cfl
+   Causal Feature Learning (2021). https://github.com/eberharf/cfl
 
 or use the BibTex reference:
 
