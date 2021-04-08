@@ -71,5 +71,6 @@ def one_hot_decode(data):
     ohd = np.zeros((data.shape[0],))
     for i,sample in enumerate(data):
         ohd[i] = np.squeeze(np.where(sample==1))
+
     return ohd
 

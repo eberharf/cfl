@@ -16,7 +16,6 @@ class CondExpCNN(CondExpBase):
     def __init__(self, data_info, params):
         ''' Initialize model and define network.
             Arguments:
-                name : name
                 data_info : a dictionary containing information about the data that will be passed in
                 params : dictionary containing parameters for the model
         '''

@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from functools import wraps # for decorator functions
 
 class Block(metaclass=ABCMeta):
     '''

@@ -4,14 +4,9 @@ from cfl.block import Block
 # fake Block class for testing
 class BabyBlock(Block):
 
-<<<<<<< HEAD
-    def __init__(self, name, data_info, params):
-        super().__init__(name=name, data_info=data_info, params=params)
-=======
     def __init__(self, data_info, params):
         super().__init__(data_info=data_info, params=params)
         self.name = 'bb'
->>>>>>> prep_for_master
 
     # functions that need to be instantiated but don't do anythin    
     def load_block(self, path): 
@@ -45,11 +40,7 @@ def test_check_model_params():
     params = {  'param1'  : 10,
                 'chicken' : 'sandwich'}
              
-<<<<<<< HEAD
-    bb = BabyBlock(name='bb', data_info=data_info, params=params)
-=======
     bb = BabyBlock(data_info=data_info, params=params)
->>>>>>> prep_for_master
 
     # check that 'param1' is overriden by input
     assert bb.params['param1'] == 10, "'param1' value should be equal to value in input but instead is {}".format(bb.params['param1']) 
