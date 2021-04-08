@@ -1,47 +1,50 @@
-# Conditional Density Estimators (CDEs)
-this is where we put some info on CDEs 
+# Some Notes on Conditional Density Estimators (CDEs)
 
-## how the conditional expectation calculation works 
+A CDE is a machine learning model that, given variables `x` and `y`, learns to estimate the probability of `y` given `x`. The CDE is the first step of CFL. 
+
+## How the CDE step of CFL works 
+
+In the current implementation of CFL, we calculate the conditional _expection_ during the CDE step. Conditional Expectation takes as input the causal data set `X` and the effect data set `Y` and outputs the expectation (mean) of the probability distribution `P(Y | X= x)` for each sample, `x` in the dataset `X`. These expectations are then clustered in the second step of CFL. 
+
+![Sample CFL Workflow](img/SampleCFLworkflow.png "Sample CFL Workflow")
 
 
 ## Input Shape for CDEs 
 
-
 - Most CDEs 
 
+Most of the CDEs provided expect a 2-D input with the shape **(n_samples, n_features)** for both the `X` and the `Y` data. 
+
+- CNNs
+
+The `CondExpCNN` and `CondExpCNN` are examples of convolutional neural networks (CNNs). CNNs are well-suited to processing image data. A CNN expects 4-D input images with the shape **(n_samples, n_rows, n_cols, n_channels)** and a 2-D `Y` input. 
+
+
 ```
-   << show the code to reshape the CDE>> 
-```
-
-
-As a default, the CDEs we use expect a 2-D input. If you are working with a higher dimensional input (such as images), you can flatten it before inputting. 
-
-
-- CNNs 
-
-``` 
+    # Here is some example code showing how to reshape your data to the correct dimensionality 
     import numpy as np 
+    from sklearn.datasets import load_iris
 
-    # make X images
-    X = 
+    # get some data 
+    two_D = load_iris().data
+    two_D.shape
+    >>> (150, 4)
+
+    # make this dataset 3D for demo
+    X = np.reshape(two_D, (two_D.shape[0], 2, 2))
     X.shape 
-    >>> (100, 10, 10) 
+    >>> (150, 2, 2)
 
-    # reshape X for a CNN 
+    # 3-D to 4-D (for a CNN)
     X_new = np.expand_dims(X, -1) 
-
     X_new.shape
-    >>> (100, 10, 10, 1) 
+    >>> (150, 2, 2, 1) 
+
+    # flatten a 3-D dataset 
+    X_flat = np.reshape(X, (X.shape[0], np.prod(X.shape[1], X.shape[2])))
+    X_flat.shape 
+    >>> (150, 4)
 ```
-
-The main exceptions are **convolutional neural networks (CNN)**. CNNs are well-suited to processing image data. A CNN expects input images with the shape **(n_samples, n_rows, n_cols, n_channels)**.
-
-
-## CDE Output  
-
-- what the interpretation of the output is 
-
-
 
 ## Parameter Details 
 When constructing a new CDE object, you can customize its parameters. 
