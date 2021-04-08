@@ -1,27 +1,37 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
-class Clusterer(ABC):
+from cfl.block import Block
+
+# purpose: provide guidance for someone who wants to create their own, from 
+# scratch cluster method 
+class Clusterer(Block):
 
     @abstractmethod
-    def __init__(self, params, save_path):
+    def __init__(self, data_info, params):
+        """
+        initialize Clusterer object
+
+        Parameters
+            params (dict) : a dictionary of relevant hyperparameters for clustering
+
+        Return
+            None
+        """
+
+        #attributes:
+        # self.name
+
+        # pass
+
+        super().__init__(data_info=data_info, params=params)
+
+    @abstractmethod
+    def train(self, dataset, prev_results):
+        """trains clusterer object"""
         ...
 
     @abstractmethod
-    def train(self, pyx, Y, saver=None):
-        ... #return x_lbls, y_lbls
-    
-    @abstractmethod
-    def predict(self, pyx, Y, saver=None):
-        ... # return x_lbls, y_lbls
-    
-    @abstractmethod
-    def save_model(self, dir_path):
-        ...
-        
-    @abstractmethod
-    def load_model(self, dir_path):
-        ...
-
-    @abstractmethod
-    def evaluate_clusters(self, pyx, Y):
+    def predict(self, dataset, prev_results):
+        """predicts X,Y macrovariables from data, without modifying the parameters
+        of the clustering algorithm"""
         ...

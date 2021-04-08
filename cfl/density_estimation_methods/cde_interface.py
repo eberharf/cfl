@@ -1,18 +1,20 @@
 from abc import ABC, abstractmethod
+from cfl.block import Block
+import json
+import os
 
-class CDE(ABC):
+class CDE(Block):
 
-    @abstractmethod
-    def __init__(self, data_info, model_params):
-        ...
+    def __init__(self, data_info, params):
+        super().__init__(data_info=data_info, params=params)
 
-    @abstractmethod
-    def train(self,dataset, standardize, best):
-        ...
+    # @abstractmethod
+    # def train(self,dataset, prev_results=None):
+    #     ...
 
-    @abstractmethod
-    def predict(self, dataset):
-        ...
+    # @abstractmethod
+    # def predict(self, dataset):
+    #     ...
 
     @abstractmethod
     def evaluate(self, dataset):
@@ -25,5 +27,3 @@ class CDE(ABC):
     @abstractmethod
     def save_parameters(self, dir_path):
         ...
-
-    # TODO: more tools for assessing density estimator performance 

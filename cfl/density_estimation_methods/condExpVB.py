@@ -7,43 +7,61 @@ from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class CondExpVB(CondExpBase): # TODO: this class should be renamed
     ''' A child class of CondExpBase that defines a model specialized
-        for the visual bars dataset. 
-        
-        See CondExpBase documentation for more details. 
+        for the visual bars dataset.
+
+
+        IT DOES NOT WORK WELL ON VB DATA USE AT YOUR OWN RISK
+
+        See CondExpBase documentation for more details.
 
     '''
 
-    def __init__(self, data_info, params, experiment_saver=None):
+    def __init__(self, data_info, params):
+
         ''' Initialize model and define network.
             Arguments:
-                data_info : a dictionary containing information about the data 
+                data_info : a dictionary containing information about the data
                     that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
                 params : dictionary containing parameters for the model
         '''
-        self.model_name = 'CondExp'
-        super().__init__(data_info, params, experiment_saver, self.model_name)
+        self.name = 'CondExpVB'
+        super().__init__(data_info, params)
 
+    def _get_default_params(self):
+        '''model and learning parameters. Most of these parameters are actually used
+        in the learning step (implemented in CondExpBase), not model construction here '''
+        return {'batch_size'  : 32,
+                'n_epochs'    : 20,
+                'optimizer'   : 'adam',
+                'opt_config'  : {},
+                'verbose'     : 1,
+                'weights_path': None,
+                'loss'        : 'mean_squared_error',
+                'show_plot'   : True,
+                'standardize' : False,
+                'best'        : True,
+            }
 
-    def build_model(self):
+    def _build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
             Eventually, this architecture will have to become more dynamic (TODO).
 
-            Right now the architecture is optimized for visual bars 1000 10x10 images 
+            Right now the architecture is optimized for visual bars 1000 10x10 images
             Arguments: None
             Returns: the model (tf.keras.models.Model object)
         '''
         reg = tf.keras.regularizers.l2(0.0001)
         model = tf.keras.models.Sequential([
             tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],)),
-            tf.keras.layers.Dropout(rate=0.2, activity_regularizer=reg), 
-            tf.keras.layers.Dense(units=50, activation='linear', 
-                kernel_initializer='he_normal', activity_regularizer=reg), 
+            tf.keras.layers.Dropout(rate=0.2, activity_regularizer=reg),
+            tf.keras.layers.Dense(units=50, activation='linear',
+                kernel_initializer='he_normal', activity_regularizer=reg),
             tf.keras.layers.Dropout(rate=0.5, activity_regularizer=reg),
-            tf.keras.layers.Dense(units=10, activation='linear', 
-                kernel_initializer='he_normal', activity_regularizer=reg), 
+            tf.keras.layers.Dense(units=10, activation='linear',
+                kernel_initializer='he_normal', activity_regularizer=reg),
             tf.keras.layers.Dropout(rate=0.5, activity_regularizer=reg),
-            tf.keras.layers.Dense(units=self.data_info['Y_dims'][1], activation='linear', 
-                kernel_initializer='he_normal', activity_regularizer=reg), 
+            tf.keras.layers.Dense(units=self.data_info['Y_dims'][1], activation='linear',
+                kernel_initializer='he_normal', activity_regularizer=reg),
         ])
 
         return model

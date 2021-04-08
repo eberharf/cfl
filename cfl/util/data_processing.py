@@ -2,20 +2,21 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 
+#Note: i think this function is not currently in use elsewhere
 def standardize_train_test(data, dtype=np.float32):
     ''' Standardize data that has been split into training
         and test sets.
 
         Arguments:
-            data : an array of 2D np.arrays to z-score along axis=1 (array). 
-                   For example, data could equal [Xtr, Xts, Ytr, Yts], where: 
+            data (array) : an array of 2D np.arrays to z-score along axis=1
+                   For example, data could equal [Xtr, Xts, Ytr, Yts], where:
                        - Xtr.shape = (n_train_samples, n_x_features)
                        - Xts.shape = (n_test_samples , n_x_features)
                        - Ytr.shape = (n_train_samples, n_y_features)
                        - Yts.shape = (n_test_samples , n_y_features)
-            dtype : data type to return values of all np.arrays in (type)
+            dtype (type): data type to return values of all np.arrays in
         Returns:
-            data : standardized version of the data argument (array)
+            data (array): standardized version of the data argument
     '''
 
     for di in range(len(data)):
@@ -39,15 +40,37 @@ def one_hot_encode(data, unique_labels):
         [[1, 0, 0], [0, 0, 1], [0, 1, 0], [0, 0, 1]].
 
         Arguments:
-            data : an int array of categorical labels. (np.array)
-            unique_labels : unique set of labels included in 
-                            data (i.e. result of np.unique(data)) (np.array)
-        
+            data : an int array of categorical labels. (np.ndarray)
+            unique_labels : unique set of labels included in
+                            data (i.e. result of np.unique(data)) (np.ndarray)
+
         Returns:
-            ohe : one-hot encoding of data (2D np.array)
+            ohe : one-hot encoding of data (np.ndarray)
     '''
-    
+
     ohe = np.zeros((data.shape[0], len(unique_labels)))
     for uli,ul in enumerate(unique_labels):
         ohe[:,uli] = data==ul
     return ohe
+
+def one_hot_decode(data):
+    ''' Convert one-hot-encoded samples to standard categorical labels. For
+        examples, if data = [[0,1],[1,0],[1,0]], one_hot_decode(data) will
+        return [1,0,0].
+
+    Arguments:
+        data : a 2D int array comprised only of ones and zeros. (np.ndarray)
+
+    Returns:
+        ohd : a 1D int array holding the one-hot decoding of data. (np.ndarray)
+    '''
+    assert isinstance(data, np.ndarray), 'data must be of type np.ndarray'
+    assert data.ndim==2, 'data should be 2-dimensional.'
+    assert all([[d in [0,1] for d in dd] for dd in data]), 'data should only contain ones and zeros.'
+
+    ohd = np.zeros((data.shape[0],))
+    for i,sample in enumerate(data):
+        ohd[i] = np.squeeze(np.where(sample==1))
+
+    return ohd
+
