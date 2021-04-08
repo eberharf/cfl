@@ -2,7 +2,10 @@
 
 # How to Use Data Version Control (DVC)
 
-## Initial Setup (I have already done this for the cfl repo)
+## Initial Setup 
+
+### (This has already been done for the cfl repo)
+
 Reference: https://dvc.org/doc/start
 
 1. Clone your repository 

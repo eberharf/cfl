@@ -50,9 +50,9 @@ napoleon_use_param=True
 source_parsers = {'.md': CommonMarkParser}
 
 source_suffix = {'.rst': 'restructuredtext',
-                 '.md': 'markdown',
-                #  '.ipynb'
-                }   
+                 '.md':  'markdown',
+                 '.ipynb': ''
+                 }   
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

@@ -13,6 +13,8 @@ Welcome to CFL
 
    SETUP
    cfl_intro
+   examples/cfl_code_intro.ipynb
+   examples/el_nino_example.ipynb
 
 .. toctree:: 
    :maxdepth: 1
@@ -21,6 +23,7 @@ Welcome to CFL
    Visual_Bars_data
    CDEs
    clustering
+   examples/dvc_intro
 
 .. toctree:: 
    :maxdepth: 2
