@@ -4,6 +4,6 @@
 recommonmark == 0.7.1
 nbsphinx == 0.8.1
 
-# add these back in when we start doing more autodoc stuff (for now they just take too long to load) 
-# tensorflow 
-# nibabel
+# needed for autodoc stuff 
+tensorflow 
+nibabel
