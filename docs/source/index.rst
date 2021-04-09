@@ -20,9 +20,14 @@ Causal Feature Learning (CFL) is an unsupervised algorithm designed to construct
    :caption: Getting Started
 
    SETUP
-   cfl_intro
-   examples/cfl_code_intro
-   examples/el_nino_example
+   cfl_intro.md
+
+.. toctree:: 
+   :maxdepth: 1
+   :caption: Examples 
+   
+   examples/cfl_code_intro.ipynb
+   examples/el_nino_example.ipynb
 
 .. toctree:: 
    :maxdepth: 1

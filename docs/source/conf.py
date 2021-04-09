@@ -52,7 +52,7 @@ source_parsers = {'.md': CommonMarkParser}
 
 # source_suffix = {'.rst': 'restructuredtext',
 #                  '.md':  'markdown',
-#                  '.ipynb': 'jupyter'
+#                  '.ipynb': 'jupyter' #This line doesn't work 
 #                  }   
 
 source_suffix = ['.rst', '.md', '.iypnb']
