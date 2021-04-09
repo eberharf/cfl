@@ -38,7 +38,8 @@ release = '0.0'
 extensions = ['sphinx.ext.autodoc', #for auto-using docstrings
               'sphinx.ext.napoleon', #for converting Numpy/Google style-doc strings to reST
               'nbsphinx', # for incorporating jupyter notebooks into docs
-              'recommonmark' # for parsing markdown files
+              'recommonmark', # for parsing markdown files
+              'sphinx.ext.mathjax' #nbsphinx asks for this 
             ]
 
 ## Napoleon settings (for docstring formatting)
@@ -49,10 +50,12 @@ napoleon_use_param=True
 
 source_parsers = {'.md': CommonMarkParser}
 
-source_suffix = {'.rst': 'restructuredtext',
-                 '.md':  'markdown',
-                 '.ipynb': ''
-                 }   
+# source_suffix = {'.rst': 'restructuredtext',
+#                  '.md':  'markdown',
+#                  '.ipynb': 'jupyter'
+#                  }   
+
+source_suffix = ['.rst', '.md', '.iypnb']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

@@ -4,6 +4,9 @@
 recommonmark == 0.7.1
 nbsphinx == 0.8.1
 
+# for jupyter notebooks
+ipykernel
+
 # needed for autodoc stuff 
 tensorflow 
 nibabel
