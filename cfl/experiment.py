@@ -57,15 +57,14 @@ class Experiment():
                         more information. 
             past_exp_path (str) : path to directory associated with a previously
                             trained Experiment. 
-            block_names (list of strs) : list of block names to use (i.e. ['CondExpVB', 'KMeans']). 
+            block_names (list of strs) : list of block names to use (i.e. `['CondExpVB', 'KMeans']`). 
                           Full list of names can be found here: <TODO>. 
             block_params (list of dicts) : list of dicts specifying parameters for each block specified
                            in block_names. Default is None. 
             blocks (list of Blocks): list of block objects. Default is None.
-            results_path (str) : path to directory to save this experiment to. Default is ''. 
+            results_path (str) : path to directory to save this experiment to. Default is `''`. 
 
-        Note: Specifying Blocks
-            There are three ways to specify Blocks: 
+        Note: There are three ways to specify Blocks: 
                 1) specify `past_exp_path`
                 2) specify both `block_names` and `block_params`
                 3) specify `blocks`. 
@@ -219,12 +218,12 @@ class Experiment():
         ''' Predict using the trained CFL pipeline. 
 
             Arguments:
-                dataset : dataset name or object. (str or Dataset)
-                prev_results : dict of results to pass to first Block to
-                               predict with, if needed. (dict)
+                dataset (str or Dataset) : dataset name or object.
+                prev_results (dict) : dict of results to pass to first Block to
+                               predict with, if needed.
 
             Returns: 
-                all_results : dict of results dicts from all Blocks. (dict dict)
+                 (dict of dicts) : dict of results dictionaries from all Blocks.
         '''
 
         # check inputs
@@ -399,14 +398,14 @@ class Experiment():
             through the Experiment pipeline.
 
             Arguments: 
-                dataset_name : name of Dataset to load results for. Defaults
+                dataset_name (str) : name of Dataset to load results for. Defaults
                                to the dataset used to train the pipeline, 
-                               'dataset_train'. (str)
+                               'dataset_train'. 
 
             Returns:
-                results : dictionary of results-dictionaries. The first key
-                          specifies which block the results come from. The
-                          second key specifies the result name. (dict dict)
+                dict of dicts : dictionary of results-dictionaries. The first key
+                          specifies which Block the results come from. The
+                          second key specifies the specific result.
         '''
 
         # check inputs
