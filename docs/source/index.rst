@@ -13,7 +13,7 @@ Causal Feature Learning (CFL) is an unsupervised algorithm designed to construct
    :maxdepth: 2
    :caption: User API Reference
 
-   cfl 
+   autodoc/cfl 
 
 .. toctree::
    :maxdepth: 1
