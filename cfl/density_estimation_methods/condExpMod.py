@@ -23,7 +23,7 @@ class CondExpMod(CondExpBase):
         self.name = 'CondExpMod'
         super().__init__(data_info=data_info, params=params)
 
-    def _get_default_params(self):
+    def __get_default_params(self):
         '''model and learning parameters. Most of these parameters are actually used
         in the learning step (implemented in CondExpBase), not model construction here '''
         return {'batch_size'  : 32,
@@ -42,7 +42,7 @@ class CondExpMod(CondExpBase):
             }
 
 
-    def _check_params(self):
+    def __check_params(self):
         '''verify that a valid NN structure was specified in the input parameters'''
 
         assert self.params['dense_units'] is not {}, "Please specify layer sizes in params['dense_units']."
@@ -58,7 +58,7 @@ class CondExpMod(CondExpBase):
         return
 
 
-    def _build_model(self):
+    def __build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
             This model takes specifications through the self.params dict to define
             it's architecture.
@@ -67,7 +67,7 @@ class CondExpMod(CondExpBase):
             Returns: the model (tf.keras.models.Model object)
         '''
 
-        self._check_params()
+        self.__check_params()
 
         arch = [tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],))] # input layer
         for units,act,dropout in zip(self.params['dense_units'], self.params['activations'], self.params['dropouts']):

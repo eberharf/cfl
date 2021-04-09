@@ -24,7 +24,7 @@ class CondExpCNN(CondExpBase):
         super().__init__(data_info, params) #Main init stuff happens in block.py
 
 
-    def _build_model(self):
+    def __build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
 
             This creates a convolutional neural net with the structure
@@ -41,7 +41,7 @@ class CondExpCNN(CondExpBase):
             Returns: the model (tf.keras.models.Model object)
         '''
 
-        self._check_params()
+        self.__check_params()
 
         arch = []
         first_layer = True
@@ -69,7 +69,7 @@ class CondExpCNN(CondExpBase):
 
         return model
 
-    def _get_default_params(self):
+    def __get_default_params(self):
 
         default_params = { # parameters for model creation
                           'filters'          : [32, 16],
@@ -96,7 +96,7 @@ class CondExpCNN(CondExpBase):
                          }
         return default_params
 
-    def _check_params(self):
+    def __check_params(self):
         '''verify that a valid CNN structure was specified in the input parameters'''
 
         assert len(self.params['input_shape'])==3, "Input shape should be of the format (im_height, im_width, num_channels) but is {}".format(self.params['input_shape'])

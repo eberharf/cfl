@@ -27,7 +27,7 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
         self.name = 'CondExpVB'
         super().__init__(data_info, params)
 
-    def _get_default_params(self):
+    def __get_default_params(self):
         '''model and learning parameters. Most of these parameters are actually used
         in the learning step (implemented in CondExpBase), not model construction here '''
         return {'batch_size'  : 32,
@@ -42,7 +42,7 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
                 'best'        : True,
             }
 
-    def _build_model(self):
+    def __build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
             Eventually, this architecture will have to become more dynamic (TODO).
 

@@ -25,7 +25,7 @@ class CondExpKC(CondExpBase):
         self.name = 'CondExpKC'
         super().__init__(data_info, params)
 
-    def _get_default_params(self):
+    def __get_default_params(self):
         '''model and learning parameters. Most of these parameters are actually used
         in the learning step (implemented in CondExpBase), not model construction here '''
 
@@ -41,7 +41,7 @@ class CondExpKC(CondExpBase):
                 'best'        : True,
             }
 
-    def _build_model(self):
+    def __build_model(self):
         ''' Define the neural network based on dimensions passed in during initialization.
             This model is roughly modeled off of Chalupka 2015 visual bars code.
             Arguments: None
