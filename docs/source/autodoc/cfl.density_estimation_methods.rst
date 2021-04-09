@@ -8,46 +8,57 @@ cfl.density\_estimation\_methods.cde\_interface module
 ------------------------------------------------------
 
 .. automodule:: cfl.density_estimation_methods.cde_interface
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 cfl.density\_estimation\_methods.condExpBase module
 ---------------------------------------------------
 
-.. automodule:: cfl.density_estimation_methods.condExpBase
+.. module:: cfl.density_estimation_methods.condExpBase
+
+.. autoclass:: cfl.density_estimation_methods.condExpBase.CondExpBase
    :members:
    :undoc-members:
    :show-inheritance:
+
 
 cfl.density\_estimation\_methods.condExpCNN module
 --------------------------------------------------
 
-.. automodule:: cfl.density_estimation_methods.condExpCNN
+.. module:: cfl.density_estimation_methods.condExpCNN
+
+.. autoclass:: cfl.density_estimation_methods.condExpCNN.CondExpCNN
    :members:
    :undoc-members:
    :show-inheritance:
+
 
 cfl.density\_estimation\_methods.condExpKC module
 -------------------------------------------------
 
-.. automodule:: cfl.density_estimation_methods.condExpKC
+.. module:: cfl.density_estimation_methods.condExpKC
+
+.. autoclass:: cfl.density_estimation_methods.condExpKC.CondExpKC
    :members:
    :undoc-members:
    :show-inheritance:
+
 
 cfl.density\_estimation\_methods.condExpMod module
 --------------------------------------------------
 
-.. automodule:: cfl.density_estimation_methods.condExpMod
+.. module:: cfl.density_estimation_methods.condExpMod
+
+.. autoclass:: cfl.density_estimation_methods.condExpMod.CondExpMod
    :members:
    :undoc-members:
    :show-inheritance:
 
+
 cfl.density\_estimation\_methods.condExpVB module
 -------------------------------------------------
 
-.. automodule:: cfl.density_estimation_methods.condExpVB
+.. module:: cfl.density_estimation_methods.condExpVB
+
+.. autoclass:: cfl.density_estimation_methods.condExpVB.CondExpVB
    :members:
    :undoc-members:
    :show-inheritance:
