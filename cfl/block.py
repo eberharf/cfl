@@ -3,12 +3,12 @@ from functools import wraps # for decorator functions
 
 class Block(metaclass=ABCMeta):
     '''
-    A Block is an object that can be trained and that can:
+    A Block is an object that can:
         1) be trained on a Dataset
         2) predict some target for a Dataset.
-    Blocks are intended to be components of a graph workflow in an Experiment.
+    Blocks are intended to be the components of a graph workflow in an Experiment.
     For example, if the graph Block_A->Block_B is constructed in an Experiment,
-    the output of Block_A.predict will provide input to Block_B.predict.
+    the output of Block_A will provide input to Block_B.
     '''
 
 
@@ -17,10 +17,11 @@ class Block(metaclass=ABCMeta):
         Instantiate the specified model.
 
         Arguments:
-            data_info : dict of information about associated datasets (dict)
-            model_params : parameters for this model (dict)
+            data_info (dict): dict of information about associated datasets
+            model_params (dict): parameters for this model 
 
-        Returns: None
+        Returns: 
+            None
         '''
 
         # check input argument types
@@ -33,7 +34,7 @@ class Block(metaclass=ABCMeta):
 
         # validate parameter dictionaries
         validate_data_info(data_info)
-        self.params = self._check_model_params(params)
+        self.params = self.__check_model_params(params)
 
     @abstractmethod
     def load_block(self, path):
@@ -90,8 +91,10 @@ class Block(metaclass=ABCMeta):
         '''
         Return name of model.
 
-        Arguments: None
-        Returns: name (str)
+        Arguments:
+            None
+        Returns: 
+            name (str)
         '''
         return self.name
 
@@ -107,12 +110,16 @@ class Block(metaclass=ABCMeta):
 
     @abstractmethod
     def _get_default_params(self):
-        ''' Return a dict of default parameters for the Block.
-            Arguments: None
-            Returns: dictionary of default parameters. (dict) '''
+        ''' Get the default parameters for the Block.
+            
+            Arguments: 
+                None
+            Returns: 
+                (dict) dictionary of default parameters.
+        '''
         ...
 
-    def _check_model_params(self, input_params):
+    def __check_model_params(self, input_params):
         """
          Check that all expected model parameters have been provided,
             and substitute the default if not. Remove any unused but
@@ -163,6 +170,12 @@ class Block(metaclass=ABCMeta):
         return input_params
 
     def get_params(self): 
+        """get the current parameter settings for the Block
+
+        Returns:
+            params (dict): dictionary of current parameters
+        """
+
         return self.params
 
 
