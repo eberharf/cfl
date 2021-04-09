@@ -162,9 +162,10 @@ class Clusterer(Block):
             'Generate pyx predictions with CDE before clustering.'
             return
 
-        x_lbls = self.xmodel.predict(pyx)
+        x_lbls = self.xmodel.fit_predict(pyx)# NOTE: fit_predict is different than predict, so this is wrong 
+                                            # however, kmeans is the only clustering function in sklearn that has a predict function defined so we're doing this for now
         y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
-        y_lbls = self.ymodel.predict(y_probs)
+        y_lbls = self.ymodel.fit_predict(y_probs)
 
         results_dict = {'x_lbls' : x_lbls,
                         'y_lbls' : y_lbls}

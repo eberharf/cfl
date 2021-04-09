@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 
-from cfl.util.x_lbl_util import rows_where_each_x_class_occurs
+from cfl.util.find_xlbl_locations import rows_where_each_x_class_occurs
 
 
 def view_class_examples(images, im_shape, n_examples, x_lbls):
