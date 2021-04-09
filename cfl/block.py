@@ -1,9 +1,8 @@
 from abc import ABCMeta, abstractmethod
-from functools import wraps # for decorator functions
+
 
 class Block(metaclass=ABCMeta):
-    '''
-    A Block is an object that can:
+    '''A Block is an object that can:
         1) be trained on a Dataset
         2) predict some target for a Dataset.
     Blocks are intended to be the components of a graph workflow in an Experiment.
@@ -41,13 +40,14 @@ class Block(metaclass=ABCMeta):
         '''
         Load a Block that has already been trained in a previous Experiment.
         All Blocks should be load-able with just a path name. The specific
-        Block type is responsible for making sure it's loaded all relevant
+        Block type is responsible for making sure that it has loaded all relevant
         fields.
 
         Arguments:
             path : path to load from
 
-        Returns: None
+        Returns: 
+            None
         '''
         ...
 
@@ -60,7 +60,8 @@ class Block(metaclass=ABCMeta):
         Arguments:
             path : path to save at
 
-        Returns: None
+        Returns: 
+            None
         '''
         ...
 
@@ -70,8 +71,8 @@ class Block(metaclass=ABCMeta):
         Train model attribute.
 
         Arguments:
-            dataset : dataset to train model with (Dataset)
-            prev_results : any results needed from previous Block training (dict)
+            dataset (Dataset) : dataset to train model with 
+            prev_results (dict): any results needed from previous Block training 
         '''
         ...
 
@@ -81,8 +82,8 @@ class Block(metaclass=ABCMeta):
         Make prediction for the specified dataset with the model attribute.
 
         Arguments:
-            dataset : dataset for model to predict on (Dataset)
-            prev_results : any results needed from previous Block prediction (dict)
+            dataset (Dataset): dataset for model to predict on 
+            prev_results (dict) : any results needed from previous Block prediction
         '''
         ...
 
@@ -94,7 +95,7 @@ class Block(metaclass=ABCMeta):
         Arguments:
             None
         Returns: 
-            name (str)
+            str: name of the model 
         '''
         return self.name
 
@@ -102,8 +103,10 @@ class Block(metaclass=ABCMeta):
         '''
         Return whether this block has been trained yet.
 
-        Arguments: None
-        Returns: whether the block has been trained (bool)
+        Arguments: 
+            None
+        Returns: 
+            bool: whether the block has been trained 
         '''
         return self.trained
 
@@ -115,7 +118,7 @@ class Block(metaclass=ABCMeta):
             Arguments: 
                 None
             Returns: 
-                (dict) dictionary of default parameters.
+                dict: dictionary of default parameters.
         '''
         ...
 
@@ -124,8 +127,10 @@ class Block(metaclass=ABCMeta):
          Check that all expected model parameters have been provided,
             and substitute the default if not. Remove any unused but
             specified parameters.
-            Arguments: params (dictionary, where keys are parameter names)
-            Returns: Verified parameter dictionary
+            Arguments: 
+                params (dict): dictionary, where keys are parameter names)
+            Returns: 
+                dict: Verified parameter dictionary
         """
 
         # check inputs
@@ -172,20 +177,27 @@ class Block(metaclass=ABCMeta):
     def get_params(self): 
         """get the current parameter settings for the Block
 
+        Parameters: 
+            None
+
         Returns:
-            params (dict): dictionary of current parameters
+            dict: dictionary of current parameters
         """
 
         return self.params
 
 
 def validate_data_info(data_info):
-    ''' Make sure all information about data is correctly specified.'''
+    ''' Make sure all information about data is correctly specified.
+    
+    Parameters: 
+        data_info (dict): a dictionary of information about the data
+            CFL expects the following entries in data_info:
+            - X_dims: (n_examples X, n_features X)
+            - Y_dims: (n_examples Y, n_featuers Y)
+            - Y_type: 'continuous' or 'categorical'
+    '''
 
-    # CFL expects the following entries in data_info:
-    #   - X_dims: (n_examples X, n_features X)
-    #   - Y_dims: (n_examples Y, n_featuers Y)
-    #   - Y_type: 'continuous' or 'categorical'
     correct_keys = ['X_dims', 'Y_dims', 'Y_type']
     assert set(correct_keys) == set(data_info.keys()), \
         'data_info must specify values for the following set of keys exactly: {}'.format(correct_keys)
