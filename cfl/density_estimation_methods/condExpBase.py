@@ -10,11 +10,13 @@ from sklearn.model_selection import train_test_split
 
 from cfl.density_estimation_methods.cde_interface import Block #base class
 
-# Things that descend from this class should have a self.name attribute but this class doesn't 
-# since CondExpBase objects are not supposed to be created by the user 
+# Things that descend from this class should have a self.name attribute but 
+# this class doesn't since CondExpBase objects are not supposed to be created 
+# by the user 
 
 
 class CondExpBase(Block):
+    # TODO: update Class docstring
     ''' A class to define, train, and perform inference with conditional density
     estimators that fall under the "conditional expectation" umbrella. This
     subset of conditional density estimators (referred to as 'CondExp') learns
@@ -60,16 +62,18 @@ class CondExpBase(Block):
     '''
 
     def __init__(self, data_info, params):
-        ''' Initialize model and define network.
-            Arguments:
-                data_info : a dictionary containing information about the data
-                            that will be passed in. Should contain 'X_dims' and
-                            'Y_dims' as keys
-                params : dictionary containing parameters for the model
-                model : name of the model so that the model type can be
-                        recovered from saved parameters (str)
+        ''' 
+        Initialize model and define network.
 
-            Returns: None
+        Arguments:
+            data_info (dict) : a dictionary containing information about the 
+                data that will be passed in. Should contain 'X_dims',
+                'Y_dims', and 'Y_type' as keys.
+            params (dict) : dictionary containing parameters for the model.
+            model (str) : name of the model so that the model type can be
+                recovered from saved parameters.
+        Returns: 
+            None
         '''
 
         super().__init__(data_info=data_info, params=params)
@@ -88,43 +92,47 @@ class CondExpBase(Block):
 
 
     def load_block(self, path):
-        ''' load model saved at path into this model.
-            Arguments:
-                path : path to saved weights. (str)
-            Returns: None
+        ''' 
+        Load model saved at path into this model.
+        Arguments:
+            path (str) : path to saved weights.
+        Returns: 
+            None
         '''
 
         self.load_model(path)
         self.trained = True
 
     def save_block(self, path):
-        ''' save trained model to specified path.
-            Arguments:
-                path : path to save to. (str)
-            Returns: None
+        ''' 
+        Save trained model to specified path.
+        
+        Arguments:
+            path (str) : path to save to.
+        Returns: 
+            None
         '''
 
         self.save_model(path)
 
     def train(self, dataset, prev_results=None):
-        ''' Full training loop. Constructs t.data.Dataset for training and
-            testing, updates model weights each epoch and evaluates on test set
-            periodically.
-            Arguments:
-                dataset: Dataset object containing X and Y data for this
-                         training run (Dataset)
-                standardize: whether or not to z-score X and Y (bool)
-                TODO: eventually standardize should be kept within Dataset and
-                specify for X and Y separately
-                best: whether to use weights from epoch with best test-loss,
-                      or from most recent epoch for future prediction(bool)
-            Returns:
-                train_loss: array of losses on train set (or [] if model has
-                            already been trained) (np.array)
-                test_loss: array of losses on test set (or [] if model has
-                           already been trained) (np.array)
+        ''' 
+        Full training loop. Constructs t.data.Dataset for training and
+        testing, updates model weights each epoch and evaluates on test set
+        periodically.
+
+        Arguments:
+            dataset (Dataset): Dataset object containing X and Y data for this
+                training run.
+            best (bool) : whether to use weights from epoch with best test-loss,
+                or from most recent epoch for future prediction.
+        Returns:
+            dict : dictionary of CDE training results. Specifically, this will 
+                contain 'pyx', the predicted conditional probabilites for the 
+                training dataset. 
         '''
-        #TODO: do a more formalized checking that actual dimensions match expected
+        #TODO: do a more formalized checking that actual dimensions match 
+        # expected
         #TODO: say what expected vs actual are
 
         if self.weights_loaded:
@@ -132,13 +140,15 @@ class CondExpBase(Block):
             return {'pyx' : self.model.predict(dataset.X)}
 
         # train-test split
-        dataset.split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
+        dataset.split_data = train_test_split(dataset.X, dataset.Y, 
+                                              shuffle=True, train_size=0.75)
 
         Xtr, Xts, Ytr, Yts = dataset.split_data
 
         # build optimizer
-        optimizer = tf.keras.optimizers.get({ 'class_name' : self.params['optimizer'],
-                                              'config' : self.params['opt_config']})
+        optimizer = tf.keras.optimizers.get(
+            { 'class_name' : self.params['optimizer'],
+              'config' : self.params['opt_config']})
 
         # compile model
         self.model.compile(
@@ -178,7 +188,8 @@ class CondExpBase(Block):
         # handle results
         train_loss = history.history['loss']
         val_loss = history.history['val_loss']
-        fig = self._graph_results(train_loss, val_loss, show=self.params['show_plot'])
+        fig = self._graph_results(train_loss, val_loss, 
+            show=self.params['show_plot'])
         pyx = self.model.predict(dataset.X)
 
         # load in best weights if specified
@@ -199,49 +210,63 @@ class CondExpBase(Block):
 
 
     def __graph_results(self, train_loss, val_loss, show=True):
-        '''graphs the training vs testing loss across all epochs of training'''
+        '''
+        Graph training and testing loss across training epochs.
+
+        Arguments:
+            train_loss (np.ndarray) : (n_epochs,) array of training losses per 
+                epoch.
+            val_loss (np.ndarray) : (n_epochs,) array of validation losses per 
+                epoch.
+            show (bool) : displays figure if show=True. Defaults to True. 
+        Returns:
+            plt.figure : figure object.
+        '''
         fig,ax = plt.subplots()
         ax.plot(range(len(train_loss)), train_loss, label='train_loss')
-        ax.plot(np.linspace(0,len(train_loss),len(val_loss)).astype(int), val_loss, label='val_loss')
+        ax.plot(np.linspace(0,len(train_loss),len(val_loss)).astype(int), 
+            val_loss, label='val_loss')
         ax.set_xlabel('Epochs')
         ax.set_ylabel(self.params['loss'])
         ax.set_title('Training and Test Loss')
         plt.legend(loc='upper right')
-        # if save_path is not None:
-        #     plt.savefig(save_path)
+
         if show:
             plt.show()
         else:
             plt.close()
         return fig
 
-
     def predict(self, dataset, prev_results=None):
-        # TODO: deal with Y=None weirdness
-        ''' Given a set of observations X, get neural network output.
-            Arguments:
-                dataset: Dataset object containing X and Y data for this
-                         training run (Dataset)
-            Returns: model prediction (np.array) (TODO: check if this is really np.array or tf.Tensor)
-        '''
-        # if Y is not None:
-        #     raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
+        ''' 
+        Given a Dataset of microvariable observations, estimate macrovariable
+        states.
 
+        Arguments:
+            dataset (Dataset): Dataset object containing X and Y data to
+                estimate macrovariable states for.
+        Returns: 
+            dict : dictionary of prediction results. Specifically, this will 
+                contain 'pyx', the predicted conditional probabilites for the 
+                given Dataset. 
+        '''
+        
         assert self.trained, "Remember to train the model before prediction."
         pyx = self.model.predict(dataset.X)
-        # if dataset.to_save:
-        #     np.save(dataset.saver.get_save_path('pyx'), dataset.pyx)
 
         results_dict = {'pyx' : pyx}
         return results_dict
 
     def evaluate(self, dataset):
-        ''' Compute the mean squared error (MSE) between ground truth and
-            prediction.
-            Arguments:
-                dataset: Dataset object containing X and Y data for this
-                         training run (Dataset)
-            Returns: the average MSE for this batch (float)
+        ''' 
+        Compute the loss specified in self.params['loss] between ground truth 
+        and model prediction.
+
+        Arguments:
+            dataset (Dataset): Dataset object containing X and Y data for this
+                        training run
+        Returns: 
+            float : the average loss for this batch
         '''
 
         assert self.trained, "Remember to train the model before evaluation."
@@ -253,10 +278,12 @@ class CondExpBase(Block):
 
 
     def load_model(self, file_path):
-        ''' Load model weights from saved checkpoint into current model.
-            Arguments:
-                file_path : path to checkpoint file (string)
-            Returns: None
+        ''' 
+        Load model weights from saved checkpoint into current model.
+        Arguments:
+            file_path (str) : path to checkpoint file
+        Returns: 
+            None
         '''
 
         assert hasattr(self, 'model'), 'Build model before loading parameters.'
@@ -269,21 +296,28 @@ class CondExpBase(Block):
         self.trained = True
 
     def save_model(self, file_path):
-        ''' Save model weights from current model.
-            Arguments:
-                file_path : path to checkpoint file (string)
-            Returns: None
+        ''' 
+        Save model weights from current model.
+
+        Arguments:
+            file_path (str) : path to checkpoint file
+        Returns: 
+            None
         '''
-        # TODO : add check to only save trained models? (bc of load model setting train to true )
+        # TODO : add check to only save trained models? (bc of load model 
+        # setting train to true )
         if self.params['verbose']>0:
             print("Saving parameters to ", file_path)
         self.model.save_weights(file_path)
 
     @abstractmethod
     def __build_model(self):
-        ''' Define the neural network based on dimensions passed in during
-            initialization.
+        ''' 
+        Define the neural network based on specifications in self.params.
 
-            Returns: the model (tf.keras.models.Model object)
+        Arguments:
+            None
+        Returns: 
+            tf.keras.models.Model : untrained model specified in self.params.
         '''
         ...
