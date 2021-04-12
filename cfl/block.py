@@ -112,7 +112,7 @@ class Block(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def _get_default_params(self):
+    def __get_default_params(self):
         ''' Get the default parameters for the Block.
             
             Arguments: 
@@ -138,7 +138,7 @@ class Block(metaclass=ABCMeta):
             'input_params should be of type dict.'
 
         # dictionary of default values for each parameter
-        default_params = self._get_default_params()
+        default_params = self.__get_default_params()
 
         # temporarily set verbosity
         if 'verbose' in input_params.keys():
