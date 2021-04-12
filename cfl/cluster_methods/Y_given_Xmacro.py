@@ -88,6 +88,9 @@ def _categorical_Y(Y_data, x_lbls):
     for row, y in enumerate(Y_data):
         for col, cluster_vals in enumerate(ys_in_each_x_class):
             cond_Y_prob[row][col] = np.sum(cluster_vals==y) / cluster_vals.shape[0]
+                
+        # normalize so that sum of distances is 1
+        cond_Y_prob[row] = cond_Y_prob[row] / np.sum(cond_Y_prob[row])
     return cond_Y_prob
 
 
@@ -177,7 +180,11 @@ def _continuous_Y(Y_data, x_lbls):
     # Y_data point and X class combination
     cond_Y_prob = np.zeros((Y_data.shape[0], n_x_classes))
     for y_id in tqdm(range(Y_data.shape[0])):
-        cond_Y_prob[y_id,:] = np.mean(xclass_dist_matrix[:,y_id,:4], axis=1)
+        # compute average distance to nearest neighbors per class
+        raw_dist = np.mean(xclass_dist_matrix[:,y_id,:4], axis=1)
+
+        # normalize so that sum of distances is 1
+        cond_Y_prob[y_id,:] = raw_dist / np.sum(raw_dist)
 
     return cond_Y_prob
 
