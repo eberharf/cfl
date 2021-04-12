@@ -1,7 +1,5 @@
 #### A pip install requirements file
 #### contains the packages needed to build the documentation
-cfl
-
 recommonmark == 0.7.1
 nbsphinx == 0.8.1
 
