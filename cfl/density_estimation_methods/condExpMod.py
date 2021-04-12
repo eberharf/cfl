@@ -105,7 +105,7 @@ class CondExpMod(CondExpBase):
             tf.keras.models.Model : untrained model specified in self.params.
         '''
 
-        self.__check_params()
+        self.__check_param_shapes()
 
         # input layer
         arch = [tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],))]
