@@ -33,7 +33,7 @@ class Block(metaclass=ABCMeta):
 
         # validate parameter dictionaries
         validate_data_info(data_info)
-        self.params = self.__check_model_params(params)
+        self.params = self._check_model_params(params)
 
     @abstractmethod
     def load_block(self, path):
@@ -112,7 +112,7 @@ class Block(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def __get_default_params(self):
+    def _get_default_params(self):
         ''' Get the default parameters for the Block.
             
             Arguments: 
@@ -122,7 +122,7 @@ class Block(metaclass=ABCMeta):
         '''
         ...
 
-    def __check_model_params(self, input_params):
+    def _check_model_params(self, input_params):
         """
          Check that all expected model parameters have been provided,
             and substitute the default if not. Remove any unused but
@@ -138,7 +138,7 @@ class Block(metaclass=ABCMeta):
             'input_params should be of type dict.'
 
         # dictionary of default values for each parameter
-        default_params = self.__get_default_params()
+        default_params = self._get_default_params()
 
         # temporarily set verbosity
         if 'verbose' in input_params.keys():

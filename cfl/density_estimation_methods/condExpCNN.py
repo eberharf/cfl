@@ -34,7 +34,7 @@ class CondExpCNN(CondExpBase):
         super().__init__(data_info, params) #Main init stuff happens in block.py
 
 
-    def __build_model(self):
+    def _build_model(self):
         '''         
         Define the neural network based on specifications in self.params.
 
@@ -56,7 +56,7 @@ class CondExpCNN(CondExpBase):
             tf.keras.models.Model : untrained model specified in self.params.
         '''
 
-        self.__check_param_shapes()
+        self._check_param_shapes()
 
         arch = []
         first_layer = True
@@ -99,7 +99,7 @@ class CondExpCNN(CondExpBase):
 
         return model
 
-    def __get_default_params(self):
+    def _get_default_params(self):
         ''' 
         Returns the default parameters specific to this type of Block.
 
@@ -134,7 +134,7 @@ class CondExpCNN(CondExpBase):
                          }
         return default_params
 
-    def __check_param_shapes(self):
+    def _check_param_shapes(self):
         '''
         Verify that a valid CNN structure was specified in self.params.
         

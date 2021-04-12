@@ -33,7 +33,7 @@ class CondExpKC(CondExpBase):
         self.name = 'CondExpKC'
         super().__init__(data_info, params)
 
-    def __get_default_params(self):
+    def _get_default_params(self):
         ''' 
         Returns the default parameters specific to this type of Block.
 
@@ -55,7 +55,7 @@ class CondExpKC(CondExpBase):
                 'best'        : True,
             }
 
-    def __build_model(self):
+    def _build_model(self):
         ''' 
         Define the neural network based on specifications in self.params.
 

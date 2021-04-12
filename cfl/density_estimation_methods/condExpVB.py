@@ -35,7 +35,7 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
         self.name = 'CondExpVB'
         super().__init__(data_info, params)
 
-    def __get_default_params(self):
+    def _get_default_params(self):
         ''' 
         Returns the default parameters specific to this type of Block.
 
@@ -56,7 +56,7 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
                 'best'        : True,
             }
 
-    def __build_model(self):
+    def _build_model(self):
         ''' 
         Define the neural network based on specifications in self.params.
 

@@ -55,8 +55,8 @@ class CondExpBase(Block):
         load_model : load tensorflow model weights from a file into
                           self.model
         save_model : save the current weights of self.model
-        __build_model : create and return a tensorflow model
-        __check_model_params : fill in any parameters that weren't provided in
+        build_model : create and return a tensorflow model
+        _check_model_params : fill in any parameters that weren't provided in
                              params with the default value, and discard any
                              unnecessary paramaters that were provided.
     '''
@@ -78,11 +78,11 @@ class CondExpBase(Block):
 
         super().__init__(data_info=data_info, params=params)
 
-        # self.params = self.__check_model_params(params)
+        # self.params = self._check_model_params(params)
 
         # set object attributes
         self.weights_loaded = False
-        self.model = self.__build_model()
+        self.model = self._build_model()
 
         # load model weights if specified
         if self.params['weights_path'] is not None:
@@ -209,7 +209,7 @@ class CondExpBase(Block):
         return results_dict
 
 
-    def __graph_results(self, train_loss, val_loss, show=True):
+    def _graph_results(self, train_loss, val_loss, show=True):
         '''
         Graph training and testing loss across training epochs.
 
@@ -311,7 +311,7 @@ class CondExpBase(Block):
         self.model.save_weights(file_path)
 
     @abstractmethod
-    def __build_model(self):
+    def _build_model(self):
         ''' 
         Define the neural network based on specifications in self.params.
 

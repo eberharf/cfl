@@ -94,7 +94,7 @@ class Clusterer(Block):
     def get_params(self):
         return self.params
 
-    def __get_default_params(self):
+    def _get_default_params(self):
         """I made the default clusterer a DBSCAN object with 
         sklearn's default params cause that seems like a solid all-purpose clusterer. 
         You should probably not use the default though"""
