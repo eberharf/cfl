@@ -13,8 +13,8 @@ tensorflow
 nibabel
 
 tqdm # progress bar
-matplotlib=3.3.1  # creates plots (used for visualization)
+matplotlib  # creates plots (used for visualization)
 keras
-numpy=1.19.2 # array manipulation and fast computing
-scikit-learn=0.23.2 # used to import clustering methods and other algorithms/metrics
+numpy # array manipulation and fast computing
+scikit-learn # used to import clustering methods and other algorithms/metrics
 jupyter # for jupyter notebooks
