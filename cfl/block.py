@@ -143,7 +143,7 @@ class Block(metaclass=ABCMeta):
             if param not in default_params.keys():
                 paramsToRemove.append(param)
                 if verbose > 0:
-                    print('{} specified but not used by {}'.format(param, self.name))
+                    print(f'{param} specified but not used by this block type')
 
         # remove unnecessary parameters after we're done iterating
         # to not cause problems
