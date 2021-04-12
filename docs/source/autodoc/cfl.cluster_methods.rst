@@ -12,18 +12,18 @@ cfl.cluster\_methods.Y\_given\_Xmacro module
    :undoc-members:
    :show-inheritance:
 
-cfl.cluster\_methods.clusterer\_interface module
-------------------------------------------------
+cfl.cluster\_methods.clusterer module
+-------------------------------------
 
-.. automodule:: cfl.cluster_methods.clusterer_interface
+.. automodule:: cfl.cluster_methods.clusterer
    :members:
    :undoc-members:
    :show-inheritance:
 
-cfl.cluster\_methods.kmeans module
-----------------------------------
+cfl.cluster\_methods.clusterer\_interface module
+------------------------------------------------
 
-.. automodule:: cfl.cluster_methods.kmeans
+.. automodule:: cfl.cluster_methods.clusterer_interface
    :members:
    :undoc-members:
    :show-inheritance:
@@ -36,10 +36,10 @@ cfl.cluster\_methods.snn module
    :undoc-members:
    :show-inheritance:
 
-cfl.cluster\_methods.snn\_helper module
----------------------------------------
+cfl.cluster\_methods.time\_Y\_given\_Xmacro module
+--------------------------------------------------
 
-.. automodule:: cfl.cluster_methods.snn_helper
+.. automodule:: cfl.cluster_methods.time_Y_given_Xmacro
    :members:
    :undoc-members:
    :show-inheritance:

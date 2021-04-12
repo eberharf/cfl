@@ -24,6 +24,13 @@ cfl.block module
    :undoc-members:
    :show-inheritance:
 
+cfl.cfl\_wrapper module
+-----------------------
+
+.. automodule:: cfl.cfl_wrapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 cfl.dataset module
 ------------------

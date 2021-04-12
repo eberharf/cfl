@@ -52,6 +52,14 @@ cfl.util.fear\_mice\_functions module
    :undoc-members:
    :show-inheritance:
 
+cfl.util.find\_xlbl\_locations module
+-------------------------------------
+
+.. automodule:: cfl.util.find_xlbl_locations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cfl.util.x\_lbl\_util module
 ----------------------------
 
