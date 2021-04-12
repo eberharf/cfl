@@ -20,22 +20,19 @@ cfl.block module
 ----------------
 
 .. automodule:: cfl.block
+
+.. autoclass:: cfl.block.Block
    :members:
    :undoc-members:
    :show-inheritance:
 
-cfl.cfl\_wrapper module
------------------------
-
-.. automodule:: cfl.cfl_wrapper
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 cfl.dataset module
 ------------------
 
 .. automodule:: cfl.dataset
+
+.. autoclass:: cfl.dataset.Dataset
    :members:
    :undoc-members:
    :show-inheritance:
