@@ -14,8 +14,10 @@ from recommonmark.parser import CommonMarkParser # for parsing Markdown files
 #
 import os
 import sys
-# sys.path.insert(0, os.path.abspath('../../cfl'))
-sys.path.insert(0, os.path.abspath('../..'))
+
+# set path to root directory 
+# don't set it to the main cfl code directory (ie '../../cfl'), because that will make readthedocs not work
+sys.path.insert(0, os.path.abspath('../..')) 
 
 # further modules needed for autodoc
 import nibabel 
