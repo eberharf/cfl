@@ -16,10 +16,6 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../../cfl'))
 
-# insert paths to submodules (for autodoc) TEST
-sys.path.insert(0, os.path.abspath('../../cfl/cluster_methods'))
-sys.path.insert(0, os.path.abspath('../../cfl/density_estimation_methods'))
-
 
 # further modules needed for autodoc
 import nibabel 
@@ -71,10 +67,6 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 
-autodoc_default_options = {
-    'members': True,
-    'inherited-members': True
-}
 
 # -- Options for HTML output -------------------------------------------------
 
