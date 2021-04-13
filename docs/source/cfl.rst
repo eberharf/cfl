@@ -7,11 +7,11 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   autodoc/cfl.cluster_methods.rst
-   autodoc/cfl.density_estimation_methods.rst
-   autodoc/cfl.save.rst
-   autodoc/cfl.util.rst
-   autodoc/cfl.visualization_methods.rst
+   api/cfl.cluster_methods.rst
+   api/cfl.density_estimation_methods.rst
+   api/cfl.save.rst
+   api/cfl.util.rst
+   api/cfl.visualization_methods.rst
 
 Submodules
 ----------
