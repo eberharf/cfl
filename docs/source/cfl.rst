@@ -5,17 +5,13 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 0
 
    api/cfl.cluster_methods.rst
    api/cfl.density_estimation_methods.rst
    api/cfl.save.rst
    api/cfl.util.rst
    api/cfl.visualization_methods.rst
-
-Submodules
-----------
-
 cfl.block module
 ----------------
 
@@ -41,10 +37,4 @@ cfl.experiment module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
 
-.. automodule:: cfl
-   :members:
-   :undoc-members:
-   :show-inheritance:
