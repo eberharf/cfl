@@ -9,9 +9,10 @@ Subpackages
 
    api/cfl.cluster_methods.rst
    api/cfl.density_estimation_methods.rst
-   api/cfl.save.rst
    api/cfl.util.rst
    api/cfl.visualization_methods.rst
+
+
 cfl.block module
 ----------------
 

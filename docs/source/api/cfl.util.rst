@@ -67,11 +67,3 @@ cfl.util.x\_lbl\_util module
    :members:
    :undoc-members:
    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: cfl.util
-   :members:
-   :undoc-members:
-   :show-inheritance:
