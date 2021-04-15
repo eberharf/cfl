@@ -128,7 +128,7 @@ class CondExpBase(Block):
                 or from most recent epoch for future prediction.
         Returns:
             dict : dictionary of CDE training results. Specifically, this will 
-                contain 'pyx', the predicted conditional probabilites for the 
+                contain `pyx`, the predicted conditional probabilites for the 
                 training dataset. 
         '''
         #TODO: do a more formalized checking that actual dimensions match 
@@ -245,9 +245,9 @@ class CondExpBase(Block):
         Arguments:
             dataset (Dataset): Dataset object containing X and Y data to
                 estimate macrovariable states for.
-        Returns: 
-            dict : dictionary of prediction results. Specifically, this will 
-                contain 'pyx', the predicted conditional probabilites for the 
+        Returns:
+            dict : dictionary of prediction results. Specifically, this dictionary will
+                contain `pyx`, the predicted conditional probabilites for the 
                 given Dataset. 
         '''
         
@@ -280,6 +280,7 @@ class CondExpBase(Block):
     def load_model(self, file_path):
         ''' 
         Load model weights from saved checkpoint into current model.
+
         Arguments:
             file_path (str) : path to checkpoint file
         Returns: 
