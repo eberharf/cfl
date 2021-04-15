@@ -5,12 +5,12 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 0
+   :maxdepth: 1
 
-   api/cfl.cluster_methods.rst
-   api/cfl.density_estimation_methods.rst
-   api/cfl.util.rst
-   api/cfl.visualization_methods.rst
+   user_api/cfl.cluster_methods.rst
+   user_api/cfl.density_estimation_methods.rst
+   user_api/cfl.util.rst
+   user_api/cfl.visualization_methods.rst
 
 
 cfl.block module
