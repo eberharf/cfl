@@ -9,17 +9,10 @@ cfl.density\_estimation\_methods.condExpBase module
    :undoc-members:
    :show-inheritance:
 
-cfl.density\_estimation\_methods.cde\_interface module
-------------------------------------------------------
-
-.. automodule:: cfl.density_estimation_methods.cde_interface
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 Models 
-==================================================
+---------------------------
+
 
 cfl.density\_estimation\_methods.condExpCNN module
 --------------------------------------------------
