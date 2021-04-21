@@ -1,10 +1,27 @@
 ## Set-up instructions
 
+
+### Clone the repository
+
+First we will download a local copy of the `cfl` repository. Before starting this step, make sure you have [Git](https://git-scm.com/) installed on your computer.
+
+Open a terminal window. Navigate to the location where you would like the repository to be located, and clone the repository onto your computer:
+
+```
+git clone https://github.com/eberharf/cfl.git
+```
+
+You should now see a folder named `cfl` on your computer that contains all of the code for this project.
+
+
 ### Install Dependencies
 
 This package was developed with Python 3.7.4 and requires a compatible version of Python.
 
-You may either manually install the required packages (full list of requirements in [`requirements.yml`](https://github.com/eberharf/cfl/blob/master/requirements.yml)) or follow the instructions below to generate a `conda` virtual environment with all the required dependencies. We recommend using the `conda` environment.
+We recommend following the instructions below to create a `conda` virtual environment with all the required dependencies. However, if you wish, you may also manually install the required packages (full list of requirements in [`requirements.yml`](https://github.com/eberharf/cfl/blob/master/requirements.yml)).
+
+
+#### Install Anaconda 
 
 If you do not already have `conda` installed, see [this documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) for information on how to install it. For our purposes, either the full Anaconda distribution or the smaller Miniconda should work fine.
 
@@ -43,18 +60,6 @@ conda activate cfl-env
 ```
 
 If no error messages result from this command, then you have successfully activated the new environment.
-
-### Clone the repository
-
-Now we will download a local copy of the `cfl` repository. Before starting this step, make sure you have [Git](https://git-scm.com/) installed on your computer.
-
-Open a terminal window. Navigate to the location where you would like the repository to be located, and use the
-following command to clone the repository onto your computer:
-```
-git clone https://github.com/eberharf/cfl.git
-```
-
-You should now see a folder named `cfl` on your computer that contains all of the code for this project.
 
 
 ### Add `cfl` to path
