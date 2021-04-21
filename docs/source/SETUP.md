@@ -37,7 +37,7 @@ Use the terminal to navigate into the root directory of `cfl` and run the comman
 conda env create -f requirements.yml
 ```
 
-This command uses the information in the `requirements.yml` file as instructions to generate a new environment. It may take a couple of minutes to execute. You should see progress information output onto the screen as packages are successfully downloaded. At the end, you should see the output:
+This command uses the information in the `requirements.yml` file to generate a new `coonda` environment. It may take a few minutes to execute. You should see progress information output onto the screen as packages are successfully downloaded. At the end, you should see the output:
 
 ```
 #
@@ -65,13 +65,13 @@ If no error messages result from this command, then you have successfully activa
 ### Add `cfl` to path
 Before trying to run any code, add the path to the respository to your computer's `PYTHONPATH` variable. This will allow you to easily import the `cfl` package to use in any file, regardless of the location of that file.
 
-To do this, consult the Internet for system-specific instructions on how to [set your `PYTHONPATH` variable](https://bic-berkeley.github.io/psych-214-fall-2016/using_pythonpath.html), and add the path to the repository's root directory on your computer to the `PYTHONPATH`.
+To do this, consult the Internet for system-specific instructions on how to [set your `PYTHONPATH` variable](https://bic-berkeley.github.io/psych-214-fall-2016/using_pythonpath.html), and add the path to the repository's root directory to the `PYTHONPATH`.
 
 You must restart your session after modifying the `PYTHONPATH` to see the change take effect.
 
-You should now be ready to run `cfl`.
+You should now be ready to run `cfl`!
 
-Check that your installation has been successful by opening a new terminal window. Do not navigate to the `cfl` directory. Make sure that the cfl conda environment is active, and open a Python interpreter (type `python`). Then, from within Python, run the command `import cfl`:
+Check that your installation has been successful by opening a new terminal window. Do _not_ navigate to the `cfl` directory. Make sure that the cfl `conda` environment is active, and open a Python interpreter (type `python`). Then, from within Python, run the command `import cfl`:
 
 ```
 python
@@ -81,8 +81,11 @@ python
 
 If this command executes with no errors, then you are now ready to use `cfl`.
 
+#### Alternative: Temporarily adding directory to path 
 
-If you have difficulty permanently modifying the `PYTHONPATH` variable, as a workaround, you can add this block of code to the top of any file where you want to use `cfl`:
+If you have difficulty permanently modifying the `PYTHONPATH` variable, use the following workaround.
+
+Add this block of code to the top of any file where you want to use `cfl`:
 
 ```
 import sys
