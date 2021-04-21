@@ -69,23 +69,29 @@ To do this, consult the Internet for system-specific instructions on how to [set
 
 You must restart your session after modifying the `PYTHONPATH` to see the change take effect.
 
-You should now be ready to run `cfl`!
+You should now be ready to run `cfl`.
 
-Check that your installation has been successful by opening a new terminal window. Do _not_ navigate to the `cfl` directory. Make sure that the cfl `conda` environment is active, and open a Python interpreter (type `python`). Then, from within Python, run the command `import cfl`:
+Check that your installation has been successful by opening a new terminal window. Do _not_ navigate to the `cfl` directory. Make sure that the cfl `conda` environment is active:
+
+```
+conda activate cfl-env
+```
+
+and open a Python interpreter (type `python`). Then, from within Python, run the command `import cfl`:
 
 ```
 python
->>> import `cfl`
+>>> import cfl
 >>>
 ```
 
 If this command executes with no errors, then you are now ready to use `cfl`.
 
-#### Alternative: Temporarily adding directory to path 
+#### Alternative: Temporarily add `cfl` to path 
 
-If you have difficulty permanently modifying the `PYTHONPATH` variable, use the following workaround.
+If you have difficulty permanently modifying the `PYTHONPATH` variable, use this workaround:
 
-Add this block of code to the top of any file where you want to use `cfl`:
+Add the following block of code to the top of any file where you want to use `cfl`:
 
 ```
 import sys
@@ -94,10 +100,11 @@ sys.path.append('/Users/path/to/cfl')
 
 where `path/to/cfl` is the path to the root directory of the repository.
 
+(Copy and paste this )
 
 ### Add the cfl environment to the Jupyter notebook kernel
 
-Last step! In order to also be able to run CFL inside of a Jupyter notebook, we need to add `cfl-env` (the virtual environment which contains the dependencies for `cfl`) to the iPython kernel. This will allow Jupyter notebooks to access the packages we installed for `cfl`. Add `cfl-env` to the Jupyter kernel by running the following command:
+Last step! In order to also be able to run CFL inside of a Jupyter notebook, we need to add `cfl-env` (the `conda` environment which contains the dependencies for `cfl`) to the iPython kernel. This will allow Jupyter notebooks to access the packages we installed for `cfl`. Add `cfl-env` to the Jupyter kernel by running the following command:
 
 ```
  ipython kernel install --name cfl-env --user
@@ -106,7 +113,13 @@ Last step! In order to also be able to run CFL inside of a Jupyter notebook, we 
 If this step is sucessful, it will generate the message
 
 ```
-Installed kernelspec cfl-env in [C:/some/directory/]
+Installed kernelspec cfl-env in C:/some/directory/
 ```
 
-You can also test the success of this step by `cd`ing into the `examples` folder and opening one of the Jupyter notebooks. Select `cfl-env` as the kernel if prompted. If the import statements in the notebook can all be run without errors, then the setup has been successful!
+You can also test the success of this step by `cd`ing into the `examples` folder and starting a Jupyter Notebook server:
+
+```
+jupyter notebook
+```
+
+Open one of the notebooks. Select `cfl-env` as the kernel if prompted. Run the first few code blocks in the notebook. If the import statements in the notebook can be run without errors, then the setup has been successful!
