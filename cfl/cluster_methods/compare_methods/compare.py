@@ -122,7 +122,7 @@ def load_data(dataset_path):
             true_labels : (n_samples,) np.array of true clustering labels for 
                           each sample in data_to_cluster
     '''
-
+    print('dataset_path passed in is', dataset_path)
     data_to_cluster = np.load(os.path.join(dataset_path, 'data_to_cluster.npy'))
     true_labels = np.load(os.path.join(dataset_path, 'true_labels.npy'))
     return data_to_cluster, true_labels
@@ -519,6 +519,7 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), sort=False,
     for di,dataset in enumerate(dataset_list):
         
         # load dataset
+        print('dataset is ', dataset)
         data_to_cluster,true_labels = load_data(os.path.join(data_path, dataset))
 
         # if data_to_cluster is > 2-dim, we need to embed it for visualization

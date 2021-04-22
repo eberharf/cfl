@@ -16,7 +16,7 @@ get_dataset()
 load_dataset_results()
 _build_block()
 _make_exp_dir()
-_propagate_verbosity()
+_propogate_verbosity()
 
 '''
 
@@ -508,6 +508,14 @@ class Experiment():
         os.mkdir(os.path.join(save_path, 'trained_blocks'))
         return save_path
 
+    def _propagate_verbosity(self, verbose, block_params):
+        for pi in range(len(block_params)):
+            if 'verbose' not in block_params[pi].keys():
+                modified_params = block_params[pi]
+                modified_params['verbose'] = verbose
+                block_params[pi] = modified_params
+        return block_params
+
 def get_next_dirname(path):
     ''' gets the next subdirectory name in numerical order. i.e. if  'path' 
     contains 'run0000' and 'run0001', this will return 'run0002'. 
@@ -520,12 +528,3 @@ def get_next_dirname(path):
     while os.path.exists(os.path.join(path, 'experiment{}'.format(str(i).zfill(4)))):
         i += 1  
     return 'experiment{}'.format(str(i).zfill(4))
-
-
-    def _propagate_verbosity(self, verbose, block_params):
-        for pi in range(len(block_params)):
-            if 'verbose' not in block_params[pi].keys():
-                modified_params = block_params[pi]
-                modified_params['verbose'] = verbose
-                block_params[pi] = modified_params
-        return block_params
