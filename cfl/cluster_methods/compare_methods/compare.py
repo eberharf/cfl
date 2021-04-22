@@ -233,10 +233,13 @@ def tune_cluster_params(data_to_cluster, true_labels, method, params, save_path,
     np.save(os.path.join(save_path,'tuning_gt_scores'), gt_scores)
     np.save(os.path.join(save_path,'tuning_cg_scores'), cg_scores)
     
-
-
     # find best set of params
-    best_idx = np.where(gt_scores==np.max(gt_scores))[0][0]
+    if all(true_labels==-1): # we don't have ground truth, so optimize over 
+                             # cluster goodness
+        best_idx = np.where(cg_scores==np.max(cg_scores))[0][0]
+        print('using cg_scores instead')
+    else: # we have ground truth, so optimize over score against ground truth
+        best_idx = np.where(gt_scores==np.max(gt_scores))[0][0]
     best_params = param_combinations[best_idx]
 
     return best_params, gt_scores, cg_scores
@@ -486,7 +489,8 @@ def _get_dataset_method_lists(results_path, sort=False):
 
     return dataset_list, method_list
 
-def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), sort=False, fig_path=None):
+def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), sort=False, 
+                          fig_path=None):
     ''' Build a 2D grid of scatter plots, where each row corresponds to 
         a dataset and each column corresponds to a clustering method.
         Scatter plots will be colored by labeling from the given method.
@@ -525,34 +529,46 @@ def compare_scatter_plots(data_path, results_path, subfigsize=(6,4), sort=False,
 
         for mi,method in enumerate(method_list):
             
+            to_plot = True
+
             # pull out appropriate labels for scatter points
             if method=='ground_truth':
                 labels = true_labels
             else:
-                labels = np.load(os.path.join(results_path, dataset, method, 'pred_labels.npy'))
+                try:
+                    labels = np.load(os.path.join(results_path, dataset, 
+                                     method, 'pred_labels.npy'))
+                except:
+                    to_plot = False
             
-            # set title for first row
-            title = ''
-            if di==0:
-                title = method
+            if to_plot:
+                # set title for first row
+                title = ''
+                if di==0:
+                    title = method
 
-            # set ylabel for first column
-            ylabel = ''
-            if mi==0:
-                ylabel = dataset
-            
-            # pull gt_score for subscript
-            if method=='ground_truth':
-                subscript = 'N/A'
-            else:
-                subscript = 'GTS: {}'.format(round(float(np.load(os.path.join(results_path, dataset, method, 'best_gt_score.npy'))), 2))
+                # set ylabel for first column
+                ylabel = ''
+                if mi==0:
+                    ylabel = dataset
+                
+                # pull gt_score for subscript
+                if method=='ground_truth':
+                    subscript = 'N/A'
+                else:
+                    subscript = 'GTS: {}'.format(round(float(np.load(\
+                        os.path.join(results_path, dataset, method, \
+                        'best_gt_score.npy'))), 2))
 
-            # make subplot
-            if (embedding.shape[1]==1) or (np.sum(embedding)==embedding.shape[0]):
-                _hist_helper(axs[di,mi], embedding, labels, title, subscript=subscript, ylabel=ylabel)
-            else:
-                _scatter_helper(axs[di,mi], embedding, labels, title, subscript=subscript, ylabel=ylabel)
-    
+                # make subplot
+                if (embedding.shape[1]==1) or \
+                   (np.sum(embedding)==embedding.shape[0]):
+                    _hist_helper(axs[di,mi], embedding, labels, title,
+                                 subscript=subscript, ylabel=ylabel)
+                else:
+                    _scatter_helper(axs[di,mi], embedding, labels, title, 
+                                    subscript=subscript, ylabel=ylabel)
+        
     # save figure
     if fig_path is not None:
         plt.savefig(fig_path)
