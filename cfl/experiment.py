@@ -26,11 +26,11 @@ Methods in Experiment Class:
 '''
 # TODO: this is a placeholder until we have a block registration system.
 # NOTE: the name in the registry has to match the self.name in each block's __init__ 
-BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB, 
-                'CondExpKC'     :   cdem.condExpKC.CondExpKC,
-                'CondExpCNN'    : cdem.condExpCNN.CondExpCNN,
-                'CondExpCNN3D'  : cdem.condExpCNN3D.CondExpCNN3D,
-                'CondExpMod'    : cdem.condExpMod.CondExpMod,
+BLOCK_KEY = {   'CondExpVB'     : cdem.CondExpVB, 
+                'CondExpKC'     : cdem.CondExpKC,
+                'CondExpCNN'    : cdem.CondExpCNN,
+                'CondExpCNN3D'  : cdem.CondExpCNN3D,
+                'CondExpMod'    : cdem.CondExpMod,
                 'Clusterer'     : clusterer.Clusterer } #TODO: maybe change this so that instead of 
                                                             # calling clusterer, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods  
 
