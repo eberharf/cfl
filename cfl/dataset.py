@@ -1,27 +1,27 @@
 import numpy as np
 
-"""Dataset class"""
+"""Dataset Module"""
 
 class Dataset():
-    """Dataset class stores the X and Y datasets so that they can be easily 
-    passed through steps of CFL and saved in a consistent way"""
+    """The Dataset class stores the X and Y datasets so that they can be easily 
+    passed through steps of CFL and saved consistently"""
 
     def __init__(self, X, Y, name='dataset', Xraw=None, Yraw=None):
         ''' Initialize Dataset.
+
             Arguments:
-                X : X data to pass through CFL pipeline, dimensions 
-                    n_samples x n_x_features. (np.ndarray)
-                Y : Y data to pass through CFL pipeline, dimensions 
-                    n_samples x n_y_features. (np.ndarray)
-                name : name of Dataset. Defaults to 'dataset'. (str)
-                Xraw : Optional raw form of X before preprocessing to remain
+                X (np.ndarray) : X data to pass through CFL pipeline, dimensions 
+                    (n_samples, n_x_features). #TODO: dimensions different if going to use a CNN 
+                Y (np.ndarray) : Y data to pass through CFL pipeline, dimensions 
+                    (n_samples, n_y_features). 
+                name (str) : name of Dataset. Defaults to 'dataset'. 
+                Xraw (np.ndarray) : (Optional) raw form of X before preprocessing to remain
                        associated with X for visualization. Defaults to None.
-                       (np.ndarray)
-                Yraw : Optional raw form of Y before preprocessing to remain
+                Yraw (np.ndarray) : (Optional) raw form of Y before preprocessing to remain
                        associated with Y for visualization. Defaults to None. 
-                       (np.ndarray)
             
-            Returns: None
+            Returns: 
+                None
         '''
 
         # check data input types
@@ -54,24 +54,18 @@ class Dataset():
 
     def get_name(self):
         ''' Return the name of this Dataset.
-            Arguments: None
+
+            Arguments: 
+                None
             Returns:
-                name : name associated with this Dataset. (str)
+                str : name associated with this Dataset.
         '''
         return self.name
     
     def get_X(self):
-        ''' Return X.
-            Arguments: None
-            Returns:
-                X : X data associated with this Dataset. (np.ndarray)
-        '''
+        ''' Return X array associated with this Dataset'''
         return self.X
 
     def get_Y(self):
-        ''' Return Y.
-            Arguments: None
-            Returns:
-                Y : Y data associated with this Dataset. (np.ndarray)
-        '''
+        ''' Return Y array associated with this Dataset'''
         return self.Y

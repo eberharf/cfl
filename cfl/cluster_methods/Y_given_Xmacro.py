@@ -88,30 +88,33 @@ def _categorical_Y(Y_data, x_lbls):
     for row, y in enumerate(Y_data):
         for col, cluster_vals in enumerate(ys_in_each_x_class):
             cond_Y_prob[row][col] = np.sum(cluster_vals==y) / cluster_vals.shape[0]
+                
+        # normalize so that sum of distances is 1
+        cond_Y_prob[row] = cond_Y_prob[row] / np.sum(cond_Y_prob[row])
     return cond_Y_prob
 
 
 def _continuous_Y(Y_data, x_lbls):
     """
-    Estimates the conditional probability density P(Y=y|X=xClass)
+    Estimates the conditional probability density `P(Y=y|X=xClass)`
     for every y (observation in Y_data) and xClass (macrovariable constructed from X_data, the "causal" data set)
     when Y_data contains variable(s) over a continuous distribution.
 
-    This fun approximates the probability density P(Y=y1) by using the density of points around y1
-    (as determined by the average distance between the k nearest neighbors. Small distance=high
-    density, large distance=low density) as a proxy.)
+    This function approximates the probability density `P(Y=y_1)` by using the density of points
+    around `y_1`, as determined by the average distance between the k nearest neighbors. (Small 
+    distance=high density, large distance=low density) as a proxy.
 
     Parameters:
         Y_data (np array): the "effects" data set, the observations in which are to be clustered
-        x_lbls (1-D array): an array (same length/aligned with Y_data) of the CFL labels predicted for
-            the X (cause) data
+        x_lbls (1-D array): an array (same length/aligned with `Y_data`) of the CFL labels predicted
+            for the `X` (cause) data
 
     Returns:
         cond_Y_probs (2D array): an array with a row for each observation in Y_data and a column for each class in
-            x_lbls. The entries of the array contain the conditional probability P(y|x) for the corresponding y value, given that the x is a member of the corresponding class of that column
+            x_lbls. The entries of the array contain the conditional probability `P(y|x)` for the corresponding y value, given that the x is a member of the corresponding class of that column
 
     Note:
-        Why is P(y|xClass) calculated, instead of P(y|x) for each individual x? The clusters of x created immediately prior to this step are observational classes of X (see "Causal Feature Learning: An Overview" by Eberhardt, Chalupka, Pierona 2017). Observational classes are a type of equivalence class defined by the relationship P(y|x1)=P(y|x2) for any x1, x2 in the same class. So, theoretically, it should be redundant to check each x observation individually since each x in the same cluster should have the same effect on the conditional probability of y. This method also significantly reduces the amount of computation that needs to be done.
+        Why is `P(y|x_Class)` calculated, instead of `P(y|x)` for each individual `x`? The clusters of `x` created immediately prior to this step are observational classes of `X` (see "Causal Feature Learning: An Overview" by Eberhardt, Chalupka, Pierona 2017). Observational classes are a type of equivalence class defined by the relationship `P(y|x_1)=P(y|x_2)` for any `x_1`, `x_2` in the same class. So, theoretically, it should be redundant to check each `x` observation individually since each `x` in the same cluster should have the same effect on the conditional probability of `y`. This method also significantly reduces the amount of computation that needs to be done.
 
 
     """
@@ -177,7 +180,11 @@ def _continuous_Y(Y_data, x_lbls):
     # Y_data point and X class combination
     cond_Y_prob = np.zeros((Y_data.shape[0], n_x_classes))
     for y_id in tqdm(range(Y_data.shape[0])):
-        cond_Y_prob[y_id,:] = np.mean(xclass_dist_matrix[:,y_id,:4], axis=1)
+        # compute average distance to nearest neighbors per class
+        raw_dist = np.mean(xclass_dist_matrix[:,y_id,:4], axis=1)
+
+        # normalize so that sum of distances is 1
+        cond_Y_prob[y_id,:] = raw_dist / np.sum(raw_dist)
 
     return cond_Y_prob
 
