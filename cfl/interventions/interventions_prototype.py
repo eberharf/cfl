@@ -20,6 +20,10 @@ def main(pyx, cluster_labels, k_samples=100, eps=0.5, to_plot=True,
             cluster_labels (np.ndarray) : array of integer cluster labels
                                 aligned with pyx of shape
                                 (n_samples,)
+            k_samples (int) : number of samples to extract *per cluster*. If
+                              None, returns all cluster members. If greater 
+                              than number of cluster members, returns all 
+                              cluster members.
         Returns:
             np.ndarray : mask of shape (n_samples,) where value of 1 means 
                     that a) a point is considered high-density and 
@@ -28,7 +32,8 @@ def main(pyx, cluster_labels, k_samples=100, eps=0.5, to_plot=True,
     '''
 
     density = compute_density(pyx)
-    hd_mask = get_high_density_samples(density, k_samples=k_samples)
+    hd_mask = get_high_density_samples(density, cluster_labels, 
+                                       k_samples=k_samples)
     final_mask = discard_boundary_samples(pyx, hd_mask, cluster_labels, eps=eps)
     
     # plot clusters in pyx with high-confidence points in black
@@ -73,30 +78,51 @@ def compute_density(pyx):
     
 
 
-def get_high_density_samples(density, k_samples=None):
+def get_high_density_samples(density, cluster_labels, k_samples=None):
     ''' Returns the highest density samples per cluster. 
 
         Arguments:
             pyx (np.ndarray) : density metric for each sample in pyx, of shape
                                (n_samples,) 
-            k_samples (int) : maximum number of samples to return
+            k_samples (int) : number of samples to extract *per cluster*. If
+                              None, returns all cluster members. If greater 
+                              than number of cluster members, returns all 
+                              cluster members.
+                              Note: if several points have the same density
+                              at the cutoff density value, all will be returned
+                              so more than k_samples examples may be returned.
 
         Returns:
             np.ndarray : mask of shape (n_samples,) where value of 1 means 
                          that a point is considered high-density. 0 otherwise.
     '''
 
-    # default k_samples value
-    if k_samples is None:
-        k_samples = density.shape[0]
+    # instantiate mask
+    mask = np.zeros(density.shape, dtype=int)
 
-    # get density value to threshold at based on k_samples
-    sorted_density = np.sort(density)
-    threshold = sorted_density[k_samples]
+    n_clusters = len(np.unique(cluster_labels))
+    for ci in range(n_clusters):
+        
+        # pull out densities for cluster members
+        cluster_density = density[cluster_labels==ci]
 
-    # construct mask
-    mask = density < threshold
+        # handle k_samples edge cases:
+        n_cluster_samples = len(cluster_density)
+        if k_samples is None:
+            k_csamples = n_cluster_samples
+        elif k_samples > n_cluster_samples:
+            k_csamples = n_cluster_samples
+        else:
+            k_csamples = k_samples
+        print(f'Cluster {ci}: {k_csamples} samples')
+        # identify high-density cluster samples
+        sorted_cluster_density = np.sort(cluster_density)
+        cluster_thresh = sorted_cluster_density[k_csamples-1]
 
+        # add to mask
+        # note: we want points that have density < cluster_thresh because
+        #       smaller distances to neighbors indicate higher densities
+        mask[cluster_labels==ci] = density[cluster_labels==ci] <= cluster_thresh
     return mask
 
 def discard_boundary_samples(pyx, high_density_mask, cluster_labels, eps=0.5):
@@ -127,10 +153,10 @@ def discard_boundary_samples(pyx, high_density_mask, cluster_labels, eps=0.5):
     
     # for each high-density point, compute distance to each cluster center.
     # center dists will be a (n high-density samples, n_clusters) array of dists
-    center_dists = euclidean_distances(pyx[high_density_mask], cluster_centers)
+    center_dists = euclidean_distances(pyx[high_density_mask==1], cluster_centers)
 
     # get cluster labels for high-density points only
-    hd_cluster_labels = cluster_labels[high_density_mask]
+    hd_cluster_labels = cluster_labels[high_density_mask==1]
 
     # compute ratio: (distance to own-cluster) / (distance to other-cluster)
     center_dists_ratio = np.zeros(center_dists.shape)
@@ -150,6 +176,7 @@ def discard_boundary_samples(pyx, high_density_mask, cluster_labels, eps=0.5):
         # lie exactly between two cluster centers, fix this
         if any((center_dists_ratio[i,:] != 1) & 
            (abs(center_dists_ratio[i,:] - 1) < eps)):
+           # discard point
            non_boundary_mask[i] = 0
         
     # map non_boundary_mask (of shape (n_hd_samples,)) back to index across
