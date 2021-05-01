@@ -68,11 +68,11 @@ class CondExpMod(CondExpBase):
         '''
 
         self._check_params()
-
-        arch = [tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],))] # input layer
+        dtype = 'float32'
+        arch = [tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],),dtype=dtype)] # input layer
         for units,act,dropout in zip(self.params['dense_units'], self.params['activations'], self.params['dropouts']):
-            arch.append(tf.keras.layers.Dense(units=units, activation=act))
-            arch.append(tf.keras.layers.Dropout(dropout))
+            arch.append(tf.keras.layers.Dense(units=units, activation=act,dtype=dtype))
+            arch.append(tf.keras.layers.Dropout(dropout,dtype=dtype))
 
         model = tf.keras.models.Sequential(arch)
 

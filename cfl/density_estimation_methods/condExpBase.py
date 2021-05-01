@@ -9,9 +9,10 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 from cfl.density_estimation_methods.cde_interface import Block #base class
-
 # Things that descend from this class should have a self.name attribute but this class doesn't 
 # since CondExpBase objects are not supposed to be created by the user 
+
+from data_generator import DataGenerator
 
 
 class CondExpBase(Block):
@@ -106,6 +107,26 @@ class CondExpBase(Block):
 
         self.save_model(path)
 
+    def _get_generators(self, dataset):
+        BASE_PATH = '/home/ec2-user'
+        DATA_PATH = os.path.join(BASE_PATH, 'cfl_illustris/data/data_02_26_2021')
+        INPUT_PATH = os.path.join(DATA_PATH, 'inputs')
+        TARGET_PATH = os.path.join(DATA_PATH, 'targets')
+
+        n_samples = 18106
+        sample_ids = np.arange(n_samples)
+        np.random.shuffle(sample_ids)
+        train_ids,val_ids = sample_ids[:14000], sample_ids[14000:]
+        labels = [f'sample{str(i).zfill(5)}' for i in sample_ids]
+        train_generator = DataGenerator(train_ids, labels, INPUT_PATH, 
+            TARGET_PATH, to_fit=True, batch_size=self.params['batch_size'], 
+            xdim=45000, ydim=2, shuffle=True)
+        val_generator = DataGenerator(val_ids, labels, INPUT_PATH, 
+            TARGET_PATH, to_fit=True, batch_size=self.params['batch_size'], 
+            xdim=45000, ydim=2, shuffle=True)
+
+        return train_generator, val_generator
+
     def train(self, dataset, prev_results=None):
         ''' Full training loop. Constructs t.data.Dataset for training and
             testing, updates model weights each epoch and evaluates on test set
@@ -131,10 +152,12 @@ class CondExpBase(Block):
             print('No need to train CDE, specified weights loaded already.')
             return {'pyx' : self.model.predict(dataset.X)}
 
-        # train-test split
-        dataset.split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
+        # # train-test split
+        # dataset.split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
 
-        Xtr, Xts, Ytr, Yts = dataset.split_data
+        # Xtr, Xts, Ytr, Yts = dataset.split_data
+
+        train_generator, val_generator = self._get_generators(dataset)
 
         # build optimizer
         optimizer = tf.keras.optimizers.get({ 'class_name' : self.params['optimizer'],
@@ -164,13 +187,17 @@ class CondExpBase(Block):
                 save_best_only=True)
             callbacks = [model_checkpoint_callback]
 
+        log_dir = '/home/ec2-user/cfl_illustris/data_analysis/logs'
+        tb_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
+                                                    profile_batch='10, 15')
+        callbacks = callbacks + [tb_callback]
 
         # train model
         history = self.model.fit(
-            Xtr, Ytr,
+            train_generator,
             batch_size=self.params['batch_size'],
             epochs=self.params['n_epochs'],
-            validation_data=(Xts,Yts),
+            validation_data=val_generator,
             callbacks=callbacks,
             verbose=self.params['verbose']
         )
