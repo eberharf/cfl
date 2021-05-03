@@ -7,6 +7,10 @@
 # to generate a new version of this file from the current environment, run the command:
 #     conda env export --from-history > requirementsNEW.yml
 
+# TODO: this file duplicates some information in the setup.py file  
+# and also has some packages probably should not be included in the
+# 'distribution' of CFL 
+
 name: cfl-env
 channels:
   - defaults
@@ -14,7 +18,7 @@ channels:
 dependencies:
   - tqdm # progress bar
   - matplotlib=3.3.1  # creates plots (used for visualization)
-  - tensorflow  # machine learning
+  - tensorflow=2 # machine learning
   - numpy=1.19.2 # array manipulation and fast computing
   - joblib=0.16.0 # used to save/load data primarily for el nino example
   - scikit-learn=0.23.2 # used to import clustering methods, other algorithms/metrics
@@ -27,6 +31,10 @@ dependencies:
 # # cfl code, but may be needed to run some of the example notebooks
 # # or testing code.
   - pytest=6.0.1 # to run regression tests
+
+
+# # the following packages are things that we (Iman and Jenna) have
+# # used for some specific data analyses, but are not needed for examples published on main 
   - pandas # for formatting data frames (eg used for fear mice data)
   - nibabel # for reading/writing MRIs
   - ipywidgets  # for interactive widgets
