@@ -2,10 +2,11 @@
 
 ## Short instructions: 
 
+With Python 3.6-3.8: 
+
 ```
 pip install cfl
 ```
-
 
 ## Long instructions: 
 
@@ -32,8 +33,8 @@ conda create -n cfl-env python=3.8
 
 where `cfl-env` can be replaced with any name of your choice. 
 
-This will create a fresh environment, named `cfl-env` that contains the version
-of Python we specify (`cfl` was developed with Python 3.8)
+This will create a fresh environment, named `cfl-env`, that contains the version
+of Python we specified (`cfl` was developed with Python 3.8, so we're using that).
 
 Then activate the environment: 
 
@@ -87,4 +88,16 @@ You can also test the success of this step by downloading a notebook from the
 jupyter notebook
 ```
 
-Open one the notebook. Select `cfl-env` as the kernel if prompted. Run the first few code blocks in the notebook. If the import statements in the notebook can be run without errors, then setup has been successful!
+Open one the notebook. Select `cfl-env` as the kernel if prompted. Run the first
+few code blocks in the notebook. If the import statements in the notebook can be
+run without errors, then setup has been successful!
+
+
+### Troubleshooting 
+
+1. "No matching distribution found for tensorflow>=2.4.0" 
+
+Check that you are using a version of Python that is supported by the current
+version of Tensorflow
+(see https://www.tensorflow.org/install). If not, upgrade/downgrade your Python
+version to fit.
