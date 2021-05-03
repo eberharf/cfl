@@ -45,9 +45,9 @@ setup(
         'License :: Free for non-commercial use',
         # 'Operating System  :: MacOS :: MacOS X',
         # 'Operating System :: Microsoft :: Windows :: Windows 10',
+        'Programming Language :: Python :: 3.6', # TODO: other versions? 
         'Programming Language :: Python :: 3.7', # TODO: other versions? 
-        'Programming Language :: Python :: 3.8',  
-        'Programming Language :: Python :: 3.9', 
+        'Programming Language :: Python :: 3.8',   # NOt with python 3.9 at the moment bc of Tensorflow
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Mathematics',
         'Topic :: Scientific/Engineering :: Artificial Intelligence' #TODO: are these topics appropriate classifiers ?
