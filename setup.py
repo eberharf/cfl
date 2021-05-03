@@ -22,7 +22,7 @@ setup(
     install_requires=[ #TODO: this list contains semi-redundant information with requirements.yml
         'tqdm',
         'matplotlib',
-        'tensorflow==2', 
+        'tensorflow==2.4.0', 
         'numpy>=1.19.2', 
         'scikit-learn>=0.23',
         'jupyter', # for jupyter notebooks
