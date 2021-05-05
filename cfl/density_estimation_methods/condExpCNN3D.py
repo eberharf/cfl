@@ -123,6 +123,7 @@ class CondExpCNN3D(CondExpBase):
                             'show_plot'   : True,
                             'standardize' : False,
                             'best'        : True,
+                            'tb_log_path' : None,
                          }
         return default_params
 

@@ -40,6 +40,7 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
                 'show_plot'   : True,
                 'standardize' : False,
                 'best'        : True,
+                'tb_log_path' : None,
             }
 
     def _build_model(self):

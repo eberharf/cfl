@@ -107,25 +107,6 @@ class CondExpBase(Block):
 
         self.save_model(path)
 
-    def _get_generators(self, dataset):
-        BASE_PATH = '/home/ec2-user'
-        DATA_PATH = os.path.join(BASE_PATH, 'cfl_illustris/data/data_02_26_2021')
-        INPUT_PATH = os.path.join(DATA_PATH, 'inputs')
-        TARGET_PATH = os.path.join(DATA_PATH, 'targets')
-
-        n_samples = 18106
-        sample_ids = np.arange(n_samples)
-        np.random.shuffle(sample_ids)
-        train_ids,val_ids = sample_ids[:14000], sample_ids[14000:]
-        labels = [f'sample{str(i).zfill(5)}' for i in sample_ids]
-        train_generator = DataGenerator(train_ids, labels, INPUT_PATH, 
-            TARGET_PATH, to_fit=True, batch_size=self.params['batch_size'], 
-            xdim=45000, ydim=2, shuffle=True)
-        val_generator = DataGenerator(val_ids, labels, INPUT_PATH, 
-            TARGET_PATH, to_fit=True, batch_size=self.params['batch_size'], 
-            xdim=45000, ydim=2, shuffle=True)
-
-        return train_generator, val_generator
 
     def train(self, dataset, prev_results=None):
         ''' Full training loop. Constructs t.data.Dataset for training and
@@ -134,11 +115,6 @@ class CondExpBase(Block):
             Arguments:
                 dataset: Dataset object containing X and Y data for this
                          training run (Dataset)
-                standardize: whether or not to z-score X and Y (bool)
-                TODO: eventually standardize should be kept within Dataset and
-                specify for X and Y separately
-                best: whether to use weights from epoch with best test-loss,
-                      or from most recent epoch for future prediction(bool)
             Returns:
                 train_loss: array of losses on train set (or [] if model has
                             already been trained) (np.array)
@@ -148,16 +124,25 @@ class CondExpBase(Block):
         #TODO: do a more formalized checking that actual dimensions match expected
         #TODO: say what expected vs actual are
 
+
+        train_generator,val_generator,all_generator = dataset.get_generators()
+
+        use_generators = False
+        if train_generator is not None:
+            use_generators = True
+
         if self.weights_loaded:
             print('No need to train CDE, specified weights loaded already.')
-            return {'pyx' : self.model.predict(dataset.X)}
+            if use_generators:
+                return {'pyx' : self.model.predict(dataset.X)}
+            else:
+                return {'pyx' : self.model.predict(dataset.X)}
 
-        # # train-test split
-        # dataset.split_data = train_test_split(dataset.X, dataset.Y, shuffle=True, train_size=0.75)
 
-        # Xtr, Xts, Ytr, Yts = dataset.split_data
-
-        train_generator, val_generator = self._get_generators(dataset)
+        # train-test split
+        if not use_generators:
+            Xtr, Xvl, Ytr, Yvl = train_test_split(dataset.X, dataset.Y, 
+                                                  shuffle=True, train_size=0.75)
 
         # build optimizer
         optimizer = tf.keras.optimizers.get({ 'class_name' : self.params['optimizer'],
@@ -187,26 +172,42 @@ class CondExpBase(Block):
                 save_best_only=True)
             callbacks = [model_checkpoint_callback]
 
-        log_dir = '/home/ec2-user/cfl_illustris/data_analysis/logs'
-        tb_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
-                                                    profile_batch='10, 15')
-        callbacks = callbacks + [tb_callback]
+        # log training results to tensorboard
+        if self.params['tb_log_path'] is not None:
+            tb_callback = tf.keras.callbacks.TensorBoard(
+                            log_dir=self.params['tb_log_path'],
+                            profile_batch='10, 15') # TODO: let user set this?
+            callbacks = callbacks + [tb_callback]
 
         # train model
-        history = self.model.fit(
-            train_generator,
-            batch_size=self.params['batch_size'],
-            epochs=self.params['n_epochs'],
-            validation_data=val_generator,
-            callbacks=callbacks,
-            verbose=self.params['verbose']
-        )
+        if use_generators:
+            history = self.model.fit(
+                train_generator,
+                batch_size=self.params['batch_size'],
+                epochs=self.params['n_epochs'],
+                validation_data=val_generator,
+                callbacks=callbacks,
+                verbose=self.params['verbose']
+            )
+        else:
+            history = self.model.fit(
+                Xtr, Ytr,
+                batch_size=self.params['batch_size'],
+                epochs=self.params['n_epochs'],
+                validation_data=(Xvl, Yvl),
+                callbacks=callbacks,
+                verbose=self.params['verbose']
+            )
 
         # handle results
         train_loss = history.history['loss']
         val_loss = history.history['val_loss']
-        fig = self._graph_results(train_loss, val_loss, show=self.params['show_plot'])
-        pyx = self.model.predict(dataset.X)
+        fig = self._graph_results(train_loss, val_loss, 
+                                  show=self.params['show_plot'])
+        if use_generators:
+            pyx = self.model.predict(dataset.X)
+        else:
+            pyx = self.model.predict(dataset.X)
 
         # load in best weights if specified
         if self.params['best']:
@@ -255,7 +256,11 @@ class CondExpBase(Block):
         #     raise RuntimeWarning("Y was passed as an argument, but is not being used for prediction.")
 
         assert self.trained, "Remember to train the model before prediction."
-        pyx = self.model.predict(dataset.X)
+
+        train_generator, val_generator, all_generator = \
+            self._get_generators(dataset)
+        pyx = self.model.predict(all_generator)
+        # pyx = self.model.predict(dataset.X)
         # if dataset.to_save:
         #     np.save(dataset.saver.get_save_path('pyx'), dataset.pyx)
 

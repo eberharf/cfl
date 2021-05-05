@@ -43,14 +43,25 @@ BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB,
 class Experiment():
 
     def __init__(self, data_info, X_train, Y_train, X_train_raw=None, 
-                 Y_train_raw=None, past_exp_path=None, block_names=None, 
-                 block_params=None, blocks=None, verbose=1, results_path=''):
+                 Y_train_raw=None, generators=None, past_exp_path=None, 
+                 block_names=None, block_params=None, blocks=None, verbose=1, 
+                 results_path=''):
         ''' 
         Sets up and trains an Experiment.
 
         Arguments:
             X_train : an (n_samples, n_x_features) 2D array. (np.array)
             Y_train : an (n_samples, n_y_features) 2D array. (np.array)
+            X_train_raw : Optional raw form of X before preprocessing to remain
+                    associated with X for visualization. Defaults to None.
+                    (np.ndarray)
+            Y_train_raw : Optional raw form of Y before preprocessing to remain
+                    associated with Y for visualization. Defaults to None. 
+                    (np.ndarray)
+            generators : Optional three generator objects that inherit from the 
+                         Keras Sequence class. The three generators should 
+                         correspond to training data, validation data, and all 
+                         data. Defaults to None. (Sequence 3-tuple)
             data_info : a dictionary of information about this Experiment's
                         associated data. Refer to 
                         cfl.block.validate_data_info() for 
@@ -106,10 +117,12 @@ class Experiment():
         self.is_trained = False
         self.data_info = data_info
         self.datasets = {}
-        self.dataset_train = self.add_dataset(X=X_train, Y=Y_train, \
-                                              Xraw=X_train_raw, \
-                                              Yraw=Y_train_raw, \
-                                              dataset_name='dataset_train')
+        self.dataset_train = self.add_dataset(X=X_train, 
+                                              Y=Y_train,
+                                              Xraw=X_train_raw,
+                                              Yraw=Y_train_raw,
+                                              dataset_name='dataset_train',
+                                              generators=generators)
         self.datasets[self.dataset_train.get_name()] = self.dataset_train
 
         # add verbosity to params that don't specify
@@ -335,7 +348,8 @@ class Experiment():
         return block_graph, block_params
 
 
-    def add_dataset(self, X, Y, Xraw=None, Yraw=None, dataset_name='dataset'):
+    def add_dataset(self, X, Y, Xraw=None, Yraw=None, generators=None, 
+                    dataset_name='dataset'):
         ''' Add a new dataset to be tracked by this Experiment. 
             
             Arguments: 
@@ -370,7 +384,8 @@ class Experiment():
             'A Dataset named {} has already been added to this Experiment.'.format(dataset_name)
 
         # make new Dataset, add to Experiment's dict of datasets
-        dataset = Dataset(X=X, Y=Y, Xraw=Xraw, Yraw=Yraw, name=dataset_name)
+        dataset = Dataset(X=X, Y=Y, Xraw=Xraw, Yraw=Yraw, name=dataset_name,
+                          generators=generators)
         self.datasets[dataset_name] = dataset
         return dataset
 
@@ -518,11 +533,12 @@ class Experiment():
 
 def get_next_dirname(path):
     ''' gets the next subdirectory name in numerical order. i.e. if  'path' 
-    contains 'run0000' and 'run0001', this will return 'run0002'. 
+        contains 'experiment0000' and 'experiment0001', this will return 
+        'experiment0002'. 
     Arguments: 
         path: path of directory in which to find next subdirectory name (string)
     Returns:
-        next subdirectory name. 
+        str : next subdirectory name. 
     '''
     i = 0
     while os.path.exists(os.path.join(path, 'experiment{}'.format(str(i).zfill(4)))):

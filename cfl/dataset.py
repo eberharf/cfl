@@ -6,7 +6,8 @@ class Dataset():
     """Dataset class stores the X and Y datasets so that they can be easily 
     passed through steps of CFL and saved in a consistent way"""
 
-    def __init__(self, X, Y, name='dataset', Xraw=None, Yraw=None):
+    def __init__(self, X, Y, name='dataset', Xraw=None, Yraw=None, 
+                 generators=None):
         ''' Initialize Dataset.
             Arguments:
                 X : X data to pass through CFL pipeline, dimensions 
@@ -20,6 +21,10 @@ class Dataset():
                 Yraw : Optional raw form of Y before preprocessing to remain
                        associated with Y for visualization. Defaults to None. 
                        (np.ndarray)
+                generators : three generator objects that inherit from the Keras
+                         Sequence class. The three generators should correspond
+                         to training data, validation data, and all data. 
+                         (Sequence 3-tuple)
             
             Returns: None
         '''
@@ -37,6 +42,7 @@ class Dataset():
                 'Actual type: {}'.format(type(Yraw))
         assert isinstance(name, str), 'name should be of type str. ' + \
             'Actual type: {}'.format(type(name))
+        # TODO: check generator types
 
         self.X = X
         self.Y = Y
@@ -51,6 +57,14 @@ class Dataset():
             self.Yraw = Yraw
 
         self.name = name
+
+        if generators is not None:
+            self.train_generator,self.val_generator,self.all_generator = \
+                generators
+        else:
+            self.train_generator,self.val_generator,self.all_generator = \
+                None, None, None
+
 
     def get_name(self):
         ''' Return the name of this Dataset.
@@ -75,3 +89,13 @@ class Dataset():
                 Y : Y data associated with this Dataset. (np.ndarray)
         '''
         return self.Y
+
+    def get_generators(self):
+        ''' Return all three generators.
+            Arguments: None
+            Returns:
+                Sequence: generator for training data
+                Sequence: generator for validation data
+                Sequence: generator for full dataset
+        '''
+        return self.train_generator, self.val_generator, self.all_generator

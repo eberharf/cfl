@@ -129,16 +129,17 @@ class Clusterer(Block):
         self.xmodel.fit(pyx)
         x_lbls = self.xmodel.labels_
 
-        # sample P(Y|Xclass)
-        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
+        # # sample P(Y|Xclass)
+        # y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
 
-        # do y clustering
-        self.ymodel.fit(y_probs)
-        y_lbls = self.ymodel.labels_
+        # # do y clustering
+        # self.ymodel.fit(y_probs)
+        # y_lbls = self.ymodel.labels_
 
         self.trained = True
         results_dict = {'x_lbls' : x_lbls,
-                        'y_lbls' : y_lbls}
+                        # 'y_lbls' : y_lbls
+                        }
         return results_dict
 
     def predict(self, dataset, prev_results):
