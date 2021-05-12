@@ -1,59 +1,42 @@
-## Set-up instructions
+# Set-up instructions
 
+## Short instructions: 
 
-### Clone the repository
-
-First we will download a local copy of the `cfl` repository. Before starting this step, make sure you have [Git](https://git-scm.com/) installed on your computer.
-
-Open a terminal window. Navigate to the location where you would like the repository to be located, and clone the repository onto your computer:
+With Python 3.6-3.8: 
 
 ```
-git clone https://github.com/eberharf/cfl.git
+pip install cfl
 ```
 
-You should now see a folder named `cfl` on your computer that contains all of the code for this project.
+## Long instructions: 
 
 
-### Install Dependencies
+ We recommend installing `cfl` in a virtual environment to prevent unintended
+ interactions between different packages. If don't already have a virtual
+ environment system, follow steps 1 and 2. Otherwise, skip to step 3. 
 
-This package was developed with Python 3.7.4 and requires a compatible version of Python.
+**1. Install Anaconda**
 
-We recommend following the instructions below to create a `conda` virtual environment with all the required dependencies. However, if you wish, you may also manually install the required packages (full list of requirements in [`requirements.yml`](https://github.com/eberharf/cfl/blob/master/requirements.yml)).
+We use the `conda` environment management system system. 
+You can install `conda`
+[here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/). For
+our purposes, either the full Anaconda distribution or the smaller Miniconda
+should work fine.
 
+**2. Create a conda environment**
 
-#### Install Anaconda 
-
-If you do not already have `conda` installed, see [this documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) for information on how to install it. For our purposes, either the full Anaconda distribution or the smaller Miniconda should work fine.
-
-
-#### Create a conda environment
-
-These instructions are for use with conda 4.8.4 or a compatible version.
-
-We will create a conda virtual environment that contains the dependencies for `cfl` from the file `requirements.yml`. This will create a fresh environment that contains no packages aside from those purposefully installed. Using isolated environments can help prevent unintended interactions between packages or versions.
-
-Use the terminal to navigate into the root directory of `cfl` and run the command:
-```
-conda env create -f requirements.yml
-```
-
-This command uses the information in the `requirements.yml` file to generate a new `coonda` environment. It may take a few minutes to execute. You should see progress information output onto the screen as packages are successfully downloaded. At the end, you should see the output:
+With `conda` installed, open a terminal window and run the command: 
 
 ```
-#
-# To activate this environment, use
-#
-#     $ conda activate cfl-env
-#
-# To deactivate an active environment, use
-#
-#     $ conda deactivate
+conda create -n cfl-env python=3.8
 ```
 
-If you see this output, the new environment, named `cfl-env` has been successfully created.
+where `cfl-env` can be replaced with any name of your choice. 
 
+This will create a fresh environment, named `cfl-env`, that contains the version
+of Python we specified (`cfl` was developed with Python 3.8, so we're using that).
 
-To use `cfl-env`, we must activate it:
+Then activate the environment: 
 
 ```
 conda activate cfl-env
@@ -62,49 +45,31 @@ conda activate cfl-env
 If no error messages result from this command, then you have successfully activated the new environment.
 
 
-### Add `cfl` to path
-Before trying to run any code, add the path to the respository to your computer's `PYTHONPATH` variable. This will allow you to easily import the `cfl` package to use in any file, regardless of the location of that file.
+**3. Pip install `cfl`**
 
-To do this, consult the Internet for system-specific instructions on how to [set your `PYTHONPATH` variable](https://bic-berkeley.github.io/psych-214-fall-2016/using_pythonpath.html), and add the path to the repository's root directory to the `PYTHONPATH`.
-
-You must restart your session after modifying the `PYTHONPATH` to see the change take effect.
-
-You should now be ready to run `cfl`.
-
-Check that your installation has been successful by opening a new terminal window. Do _not_ navigate to the `cfl` directory. Make sure that the cfl `conda` environment is active:
+With your cfl virtual environment active, run the command: 
 
 ```
-conda activate cfl-env
+pip install cfl
 ```
 
-and open a Python interpreter (type `python`). Then, from within Python, run the command `import cfl`:
+To check that the installation was successful, open a Python interpreter (type
+`python`). Then, from within Python, run the command `import cfl` and check the version:
 
 ```
 python
 >>> import cfl
->>>
+>>> cfl.__version__
 ```
+The version number of `cfl` should print.
+If this command executes with no errors, then you are now ready to use `cfl`!
 
-If this command executes with no errors, then you are now ready to use `cfl`.
 
-#### Alternative: Temporarily add `cfl` to path 
+**Optional: Add the cfl environment to the Jupyter notebook kernel**
 
-If you have difficulty permanently modifying the `PYTHONPATH` variable, use this workaround:
+For running Jupyter notebooks from within a `conda` virtual environment: 
 
-Add the following block of code to the top of any file where you want to use `cfl`:
-
-```
-import sys
-sys.path.append('/Users/path/to/cfl')
-```
-
-where `path/to/cfl` is the path to the root directory of the repository.
-
-(Copy and paste this )
-
-### Add the cfl environment to the Jupyter notebook kernel
-
-Last step! In order to also be able to run CFL inside of a Jupyter notebook, we need to add `cfl-env` (the `conda` environment which contains the dependencies for `cfl`) to the iPython kernel. This will allow Jupyter notebooks to access the packages we installed for `cfl`. Add `cfl-env` to the Jupyter kernel by running the following command:
+In order to also be able to run CFL inside of a Jupyter notebook, we need to add `cfl-env` (the `conda` environment which contains the dependencies for `cfl`) to the iPython kernel. This will allow Jupyter notebooks to access the packages we installed for `cfl`. Add `cfl-env` to the Jupyter kernel by running the following command:
 
 ```
  ipython kernel install --name cfl-env --user
@@ -116,10 +81,23 @@ If this step is sucessful, it will generate the message
 Installed kernelspec cfl-env in C:/some/directory/
 ```
 
-You can also test the success of this step by `cd`ing into the `examples` folder and starting a Jupyter Notebook server:
+You can also test the success of this step by downloading a notebook from the
+`examples` folder on GitHub, `cd`ing into the folder containing that notebook, and starting a Jupyter Notebook server:
 
 ```
 jupyter notebook
 ```
 
-Open one of the notebooks. Select `cfl-env` as the kernel if prompted. Run the first few code blocks in the notebook. If the import statements in the notebook can be run without errors, then the setup has been successful!
+Open one the notebook. Select `cfl-env` as the kernel if prompted. Run the first
+few code blocks in the notebook. If the import statements in the notebook can be
+run without errors, then setup has been successful!
+
+
+### Troubleshooting 
+
+1. "No matching distribution found for tensorflow>=2.4.0" 
+
+Check that you are using a version of Python that is supported by the current
+version of Tensorflow
+(see https://www.tensorflow.org/install). If not, upgrade/downgrade your Python
+version to fit.
