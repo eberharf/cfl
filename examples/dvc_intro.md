@@ -27,6 +27,7 @@ Note: if a collaborator has set up DVC for your repo, they may have already conf
 While git is great for software version control, git repository hosting services like GitHub often have conservative storage limits, making it a challenge to track/backup data files with git. DVC circumvents this issue by pushing data files to a remote storage device that the user specifies. This can be a lab server, Google Drive, AWS S3 bucket, or other accepted drive listed here: https://dvc.org/doc/command-reference/remote/add#supported-storage-types.
 
 The following instructions are for how to configure a Google Drive directory as your remote storage location.
+
 1. Navigate to drive.google.com and create a new folder where you would like to store your data with DVC for this project. I will call this folder `my_project_data`.
 2. Enter the folder you just created. If you look at the website url, you will see an identification string that looks something like `4cvftbgynmuljmknbvy`. Copy this for the next step.
 3. In your terminal, navigate to your git repository.
