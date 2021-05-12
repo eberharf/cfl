@@ -53,6 +53,7 @@ class CondExpMod(CondExpBase):
                 'show_plot'   : True,
                 'standardize' : False,
                 'best'        : True,
+                'tb_path'     : 'logs',
             }
 
 

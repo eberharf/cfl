@@ -174,7 +174,9 @@ class CondExpBase(Block):
                 save_best_only=True)
             callbacks = [model_checkpoint_callback]
 
-
+        tb_callback = tf.keras.callbacks.TensorBoard(log_dir=self.params['tb_path'])
+        callbacks = [tb_callback] + callbacks
+        
         # train model
         history = self.model.fit(
             Xtr, Ytr,
