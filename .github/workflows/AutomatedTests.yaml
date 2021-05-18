@@ -20,7 +20,7 @@ jobs:
           activate-environment: cfl-env
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
-          condarc-file: requirements.yml
+          environment-file: requirements.yml
           
 
 #     - name: Set up Python 3.8
