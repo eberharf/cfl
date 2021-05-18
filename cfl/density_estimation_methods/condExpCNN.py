@@ -131,6 +131,7 @@ class CondExpCNN(CondExpBase):
                             'show_plot'   : True,
                             'standardize' : False,
                             'best'        : True,
+                            'tb_path'     : None,
                          }
         return default_params
 

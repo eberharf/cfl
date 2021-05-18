@@ -200,13 +200,19 @@ def validate_data_info(data_info):
 
     correct_keys = ['X_dims', 'Y_dims', 'Y_type']
     assert set(correct_keys) == set(data_info.keys()), \
-        'data_info must specify values for the following set of keys exactly: {}'.format(correct_keys)
+        'data_info must specify values for the following set of keys \
+        exactly: {}'.format(correct_keys)
 
-    assert type(data_info['X_dims'])==tuple, 'X_dims should specify a 2-tuple.'
-    assert type(data_info['Y_dims'])==tuple, 'Y_dims should specify a 2-tuple.'
-    # assert len(data_info['X_dims'])==2, 'X_dims should specify a 2-tuple.' #TODO: for CNN, X_dims should be 4-D
-    assert len(data_info['Y_dims'])==2, 'Y_dims should specify a 2-tuple.'
+    assert isinstance(data_info['X_dims'],tuple), 'X_dims should specify a 2-tuple.'
+    assert isinstance(data_info['Y_dims'],tuple), 'Y_dims should specify a 2-tuple.'
+    assert len(data_info['X_dims'])>=2, 'X_dims should specify a 2-tuple.' 
+    assert len(data_info['Y_dims'])>=2, 'Y_dims should specify a 2-tuple.'
+    assert data_info['X_dims'][0]==data_info['Y_dims'][0], \
+        'X and Y should have same number of samples'
+    assert all(data_info['X_dims']) > 0, 'All X_dims should be greater than 0'
+    assert all(data_info['Y_dims']) > 0, 'All Y_dims should be greater than 0'
     correct_Y_types = ['continuous', 'categorical']
-    assert data_info['Y_type'] in correct_Y_types, 'Y_type can take the following values: {}'.format(correct_Y_types)
+    assert data_info['Y_type'] in correct_Y_types, \
+        'Y_type can take the following values: {}'.format(correct_Y_types)
 
     return True

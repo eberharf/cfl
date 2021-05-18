@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 from cfl.density_estimation_methods.cde_interface import Block #base class
+from cfl.dataset import Dataset
 
 # Things that descend from this class should have a self.name attribute but 
 # this class doesn't since CondExpBase objects are not supposed to be created 
@@ -100,6 +101,7 @@ class CondExpBase(Block):
             None
         '''
 
+        assert isinstance(path, str), 'path should be a str of path to block.'
         self.load_model(path)
         self.trained = True
 
@@ -112,7 +114,7 @@ class CondExpBase(Block):
         Returns: 
             None
         '''
-
+        assert isinstance(path, str), 'path should be a str of path to block.'
         self.save_model(path)
 
     def train(self, dataset, prev_results=None):
@@ -135,6 +137,9 @@ class CondExpBase(Block):
         # expected
         #TODO: say what expected vs actual are
 
+        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
+        assert isinstance(prev_results, (type(None), dict)),\
+            'prev_results is not NoneType or dict'
         if self.weights_loaded:
             print('No need to train CDE, specified weights loaded already.')
             return {'pyx' : self.model.predict(dataset.X)}
@@ -174,8 +179,10 @@ class CondExpBase(Block):
                 save_best_only=True)
             callbacks = [model_checkpoint_callback]
 
-        tb_callback = tf.keras.callbacks.TensorBoard(log_dir=self.params['tb_path'])
-        callbacks = [tb_callback] + callbacks
+        if self.params['tb_path'] is not None:
+            tb_callback = tf.keras.callbacks.TensorBoard(
+                            log_dir=self.params['tb_path'])
+            callbacks = [tb_callback] + callbacks
         
         # train model
         history = self.model.fit(
@@ -253,6 +260,10 @@ class CondExpBase(Block):
                 given Dataset. 
         '''
         
+        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
+        assert isinstance(prev_results, (type(None), dict)),\
+            'prev_results is not NoneType or dict'
+
         assert self.trained, "Remember to train the model before prediction."
         pyx = self.model.predict(dataset.X)
 
@@ -270,10 +281,10 @@ class CondExpBase(Block):
         Returns: 
             float : the average loss for this batch
         '''
-
+        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert self.trained, "Remember to train the model before evaluation."
 
-        Y_hat = self.predict(dataset)
+        Y_hat = self.predict(dataset)['pyx']
         loss_fxn = tf.keras.losses.get(self.params['loss'])
         cost = loss_fxn(dataset.Y, Y_hat)
         return tf.reduce_mean(cost)
@@ -293,7 +304,10 @@ class CondExpBase(Block):
 
         if self.params['verbose']>0:
             print("Loading parameters from ", file_path)
-        self.model.load_weights(file_path)
+        try:
+            self.model.load_weights(file_path)
+        except:
+            raise ValueError('path does not exist.')
 
         #TODO: does tensorflow keep track of if model is trained? 
         self.trained = True
@@ -311,7 +325,10 @@ class CondExpBase(Block):
         # setting train to true )
         if self.params['verbose']>0:
             print("Saving parameters to ", file_path)
-        self.model.save_weights(file_path)
+        try:
+            self.model.save_weights(file_path)
+        except:
+            raise ValueError('path does not exist.')
 
     @abstractmethod
     def _build_model(self):
