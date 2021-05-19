@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, mac-latest, windows-latest]
         
     defaults:
       run:
@@ -44,7 +44,5 @@ jobs:
         echo "PYTHONPATH=/home/runner/work/cfl/cfl" >> $GITHUB_ENV
     - name: Test with pytest
       run: |
-        conda env list
-        conda install pytest
         conda env list
         pytest
