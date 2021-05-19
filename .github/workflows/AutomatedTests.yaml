@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
-        os: [macos-latest, windows-latest]
+        os: [windows-latest]
         
     defaults:
       run:
@@ -46,4 +46,4 @@ jobs:
     - name: Test with pytest
       run: |
         conda env list
-        pytest cfl
+        pytest
