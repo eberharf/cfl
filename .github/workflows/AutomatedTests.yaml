@@ -25,16 +25,17 @@ jobs:
     - name: append cfl to pythonpath
       run: |
         echo "PYTHONPATH=\home\runner\work\cfl" >> $GITHUB_ENV
+        
     - name: test import cfl
       run: python import_check.py
       
-#     - uses: conda-incubator/setup-miniconda@v2
-#       with:
-#           activate-environment: cfl-env
-#           python-version: ${{ matrix.python-version }}
-#           channels: conda-forge
-#           environment-file: requirements.yml
-#           auto-activate-base: false
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+          activate-environment: cfl-env
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          environment-file: requirements.yml
+          auto-activate-base: false
           
 
 # #     - name: Set up Python 3.8
@@ -54,8 +55,8 @@ jobs:
 # #         echo "D:\a\cfl\cfl" >> $GITHUB_PATH
 # #         echo "cfl" >> $GITHUB_ENV
 # #         echo "cfl" >> $GITHUB_PATH
-#     - name: Test with pytest
-#       run: |
-#         conda env list
-#         cd $GITHUB_WORKSPACE
-#         pytest
+    - name: Test with pytest
+      run: |
+        conda env list
+        ls
+        pytest
