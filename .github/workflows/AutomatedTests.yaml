@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: what's going on
-      run: $GITHUB_WORKSPACE
+      run: echo $GITHUB_WORKSPACE
       
     - uses: conda-incubator/setup-miniconda@v2
       with:
@@ -44,6 +44,8 @@ jobs:
 
     - name: append cfl to pythonpath
       run: |
+        echo "D:\a\cfl\cfl" >> $GITHUB_ENV
+        echo "D:\a\cfl\cfl" >> $GITHUB_PATH
         echo "cfl" >> $GITHUB_ENV
         echo "cfl" >> $GITHUB_PATH
     - name: Test with pytest
