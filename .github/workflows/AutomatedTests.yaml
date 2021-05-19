@@ -46,4 +46,4 @@ jobs:
     - name: Test with pytest
       run: |
         conda env list
-        pytest
+        pytest cfl
