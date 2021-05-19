@@ -1,5 +1,4 @@
 from shutil import Error
-from cfl.block import validate_data_info
 from cfl.density_estimation_methods import *
 from cfl.dataset import Dataset
 import unittest
@@ -113,7 +112,6 @@ def make_cde_input_tests(cond_exp_class):
         def test_train_correct_input_type(self):
             dataset = Dataset(X=np.ones(self.data_info['X_dims']), 
                               Y=np.zeros(self.data_info['Y_dims']))
-            prev_results = None
 
             # what we expect from train outputs
             tkeys = ['train_loss','val_loss','loss_plot','model_weights','pyx']
@@ -123,6 +121,9 @@ def make_cde_input_tests(cond_exp_class):
                     }
 
             for prev_results in [None, {}]:
+                # reset
+                self.ceb.trained = False
+
                 train_results = self.ceb.train(dataset, prev_results)
 
                 # check state
@@ -135,6 +136,35 @@ def make_cde_input_tests(cond_exp_class):
                     assert tshapes[k]==np.array(train_results[k]).shape, \
                         f'expected {k} to have shape {tshapes[k]} but got \
                         {train_results[k].shape}'
+
+        def test_train_twice(self):
+            dataset = Dataset(X=np.ones(self.data_info['X_dims']), 
+                              Y=np.zeros(self.data_info['Y_dims']))
+            prev_results = None
+
+            # reset
+            self.ceb.trained = False
+
+            # what we expect from train outputs first time
+            tkeys = ['train_loss','val_loss','loss_plot','model_weights','pyx']
+            
+            train_results = self.ceb.train(dataset, prev_results)
+
+            # check state and outputs
+            assert self.ceb.trained, 'CDE should be trained after loading'
+            assert set(train_results.keys())==set(tkeys), \
+                f'train should return dict with keys: {tkeys}'
+
+            # what we expect from train outputs second time
+            tkeys = ['pyx']
+            
+            train_results = self.ceb.train(dataset, prev_results)
+
+            # check state and outputs
+            assert self.ceb.trained, 'CDE should be trained after loading'
+            assert set(train_results.keys())==set(tkeys), \
+                f'train should return dict with keys: {tkeys}'
+
 
         ### PREDICT ##########################################################
         def test_predict_wrong_input_type(self):

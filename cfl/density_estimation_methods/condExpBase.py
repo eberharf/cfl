@@ -82,13 +82,11 @@ class CondExpBase(Block):
         # self.params = self._check_model_params(params)
 
         # set object attributes
-        self.weights_loaded = False
         self.model = self._build_model()
 
         # load model weights if specified
         if self.params['weights_path'] is not None:
             self.load_model(self.params['weights_path'])
-            self.weights_loaded = True
             self.trained = True
 
 
@@ -140,8 +138,9 @@ class CondExpBase(Block):
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
             'prev_results is not NoneType or dict'
-        if self.weights_loaded:
-            print('No need to train CDE, specified weights loaded already.')
+        if self.trained:
+            print('Model has already been trained, will return predictions on \
+                training data.')
             return {'pyx' : self.model.predict(dataset.X)}
 
         # train-test split
