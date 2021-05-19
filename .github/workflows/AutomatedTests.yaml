@@ -39,5 +39,7 @@ jobs:
         echo "PYTHONPATH=/home/runner/work/cfl/cfl" >> $GITHUB_ENV
     - name: Test with pytest
       run: |
+        conda env list
         conda install pytest
+        conda env list
         pytest
