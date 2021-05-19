@@ -21,6 +21,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
           environment-file: requirements.yml
+          auto-activate-base: false
           
 
 #     - name: Set up Python 3.8
