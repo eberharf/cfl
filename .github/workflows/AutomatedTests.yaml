@@ -19,6 +19,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: what's going on
+      run: $GITHUB_WORKSPACE;ls $GITHUB_WORKSPACE;ls $GITHUB_WORKSPACE/cfl
+      
     - uses: conda-incubator/setup-miniconda@v2
       with:
           activate-environment: cfl-env
