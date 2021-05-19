@@ -24,10 +24,10 @@ jobs:
       
     - name: append cfl to pythonpath
       run: |
-        echo "PYTHONPATH=\home\runner\work\cfl" >> $GITHUB_ENV
+        echo "PYTHONPATH=\home\runner\work\cfl\cfl" >> $GITHUB_ENV
         
     - name: test import cfl
-      run: python import_check.py
+      run: python testing\import_check.py
       
     - uses: conda-incubator/setup-miniconda@v2
       with:
