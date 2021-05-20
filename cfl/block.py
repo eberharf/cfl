@@ -1,8 +1,7 @@
-import abc
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 
 
-class Block(metaclass=abc.ABCMeta):
+class Block(metaclass=ABCMeta):
     '''A Block is an object that can:
         1) be trained on a Dataset
         2) predict some target for a Dataset.
