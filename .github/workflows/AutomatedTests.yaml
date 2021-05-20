@@ -30,11 +30,10 @@ jobs:
     - name: append cfl to pythonpath
       run:  |
         %CD%
-        echo "PYTHONPATH=/home/runner/work/cfl" >> $GITHUB_ENV
+        echo "PYTHONPATH=D:\a\cfl\cfl" >> $GITHUB_ENV
 
     - name: test import cfl
       run: |
-        python -c "import sys;sys.path.append('/home/runner/work/cfl/cfl')"
         python testing/import_check.py
       
 #     - uses: conda-incubator/setup-miniconda@v2
