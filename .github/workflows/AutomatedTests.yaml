@@ -32,6 +32,7 @@ jobs:
 
     - name: test import cfl
       run: |
+        python -c "import sys;sys.path.append('/home/runner/work/cfl/cfl')"
         python testing/import_check.py
       
 #     - uses: conda-incubator/setup-miniconda@v2
