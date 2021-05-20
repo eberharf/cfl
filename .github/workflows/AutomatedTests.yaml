@@ -30,7 +30,7 @@ jobs:
     - name: append cfl to pythonpath
       run:  |
         %CD%
-        echo "PYTHONPATH=D:\a\cfl\cfl" >> $GITHUB_ENV
+        echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
     - name: test import cfl
       run: |
