@@ -24,7 +24,7 @@ jobs:
       
     - name: append cfl to pythonpath
       run: |
-        echo "PYTHONPATH::home/runner/work/cfl" >> GITHUB_PATH
+        echo "PYTHONPATH=/home/runner/work/cfl" >> GITHUB_PATH
         # echo "PYTHONPATH=\home\runner\work\cfl\cfl:\home\runner\work\cfl:/home/runner/work/cfl/cfl:/home/runner/work/cfl" >> $GITHUB_ENV
         
     - name: test import cfl
