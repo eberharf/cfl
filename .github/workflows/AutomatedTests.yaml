@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
-        os: [macos-latest]
+        os: [windows-latest]
         
     defaults:
       run:
@@ -28,7 +28,9 @@ jobs:
         python-version: 3.8
 
     - name: append cfl to pythonpath
-      run:  echo "PYTHONPATH=/home/runner/work/cfl" >> $GITHUB_ENV
+      run:  |
+        %CD%
+        echo "PYTHONPATH=/home/runner/work/cfl" >> $GITHUB_ENV
 
     - name: test import cfl
       run: |
