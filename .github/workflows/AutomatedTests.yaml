@@ -22,11 +22,14 @@ jobs:
     - name: what's going on
       run: echo $GITHUB_WORKSPACE
       
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
     - name: append cfl to pythonpath
-      run: |
-        echo "PYTHONPATH=/home/runner/work/cfl/cfl" >> GITHUB_ENV
-        # echo "PYTHONPATH=\home\runner\work\cfl\cfl:\home\runner\work\cfl:/home/runner/work/cfl/cfl:/home/runner/work/cfl" >> $GITHUB_ENV
-        
+      run:  echo "PYTHONPATH=/home/runner/work/cfl/cfl" >> $GITHUB_ENV
+
     - name: test import cfl
       run: |
         python testing/import_check.py
