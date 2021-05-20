@@ -28,7 +28,7 @@ jobs:
         python-version: 3.8
 
     - name: append cfl to pythonpath
-      run:  echo "PYTHONPATH=\home\runner\work\cfl\cfl" >> $GITHUB_ENV
+      run:  echo "PYTHONPATH=/home/runner/work/cfl/cfl" >> $GITHUB_ENV
 
     - name: test import cfl
       run: |
