@@ -1,7 +1,7 @@
 #### A pip install requirements file
 #### contains the packages needed to build the documentation
 recommonmark == 0.7.1
-nbsphinx == 0.8.1
+nbsphinx == 0.8.5 
 
 # for jupyter notebooks
 ipykernel
