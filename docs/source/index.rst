@@ -52,19 +52,21 @@ Contributors
 
 -  Jenna Kahn & Iman Wahle [first authors; name order chosen randomly]
 -  Krzysztof Chalupka
+-  Daniel Israel 
 -  Patrick Burauel
 -  Pietro Perona
 -  Frederick Eberhardt
 
 Jenna Kahn and Iman Wahle designed the software and wrote the code in
-this repository.
+this repository. Daniel Israel wrote the MNIST example notebook and 
+constributed feedback to the code. 
 
 Krzysztof Chalupka, Pietro Perona and Frederick Eberhardt developed the
 original theory for CFL. Krzysztof also wrote the original code upon
 which this software is based.
 
 Code development benefitted from regular discussions with Patrick
-Burauel and Daniel Israel. 
+Burauel. 
 
 License and Citations
 ********************************************
