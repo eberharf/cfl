@@ -1,6 +1,17 @@
 cfl.density\_estimation\_methods package
 ========================================
 
+Submodules
+----------
+
+cfl.density\_estimation\_methods.cde\_interface module
+------------------------------------------------------
+
+.. automodule:: cfl.density_estimation_methods.cde_interface
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cfl.density\_estimation\_methods.condExpBase module
 ---------------------------------------------------
 
@@ -8,11 +19,6 @@ cfl.density\_estimation\_methods.condExpBase module
    :members:
    :undoc-members:
    :show-inheritance:
-
-
-Models 
----------------------------
-
 
 cfl.density\_estimation\_methods.condExpCNN module
 --------------------------------------------------
@@ -54,3 +60,10 @@ cfl.density\_estimation\_methods.condExpVB module
    :undoc-members:
    :show-inheritance:
 
+Module contents
+---------------
+
+.. automodule:: cfl.density_estimation_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:

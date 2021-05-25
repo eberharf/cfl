@@ -5,13 +5,16 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 4
 
-   user_api/cfl.cluster_methods.rst
-   user_api/cfl.density_estimation_methods.rst
-   user_api/cfl.util.rst
-   user_api/cfl.visualization_methods.rst
+   cfl.cluster_methods
+   cfl.density_estimation_methods
+   cfl.interventions
+   cfl.util
+   cfl.visualization_methods
 
+Submodules
+----------
 
 cfl.block module
 ----------------
@@ -21,6 +24,13 @@ cfl.block module
    :undoc-members:
    :show-inheritance:
 
+cfl.cfl\_wrapper module
+-----------------------
+
+.. automodule:: cfl.cfl_wrapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 cfl.dataset module
 ------------------
@@ -38,4 +48,10 @@ cfl.experiment module
    :undoc-members:
    :show-inheritance:
 
+Module contents
+---------------
 
+.. automodule:: cfl
+   :members:
+   :undoc-members:
+   :show-inheritance:
