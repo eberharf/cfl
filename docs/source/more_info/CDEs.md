@@ -6,7 +6,7 @@ A CDE is a machine learning model that, given variables `x` and `y`, learns to e
 
 In the current implementation of CFL, we calculate the conditional _expection_ during the CDE step. Conditional Expectation takes as input the causal data set `X` and the effect data set `Y` and outputs the expectation (mean) of the probability distribution `P(Y | X= x)` for each sample, `x` in the dataset `X`. These expectations are then clustered in the second step of CFL. 
 
-![Sample CFL Workflow](img/SampleCFLworkflow.png "Sample CFL Workflow")
+![Sample CFL Workflow](../img/SampleCFLworkflow.png "Sample CFL Workflow")
 
 
 ## Input Shape for CDEs 

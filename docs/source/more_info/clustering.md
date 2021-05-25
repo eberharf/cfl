@@ -8,8 +8,6 @@
 
 ## Recommendations for Choosing a Clusterer 
 
-(eventually, we will have some tools available to help users automatically select the clustering method/parameters for their dataset, but those do not exist yet)
-
 DBSCAN and KMeans are the two clustering methods we've worked with the most, so unless you have a reason to choose another, maybe stick with one of those.
 
 KMeans
@@ -18,11 +16,14 @@ KMeans
 
 DBSCAN 
     - Advantages: does not force you to pre-define number of clusters, can detect clusters of any shape, you can maybe get away with only tuning one parameter (eps)
-    - Disadvantages: has two  parameters (eps and min_samples) (even though eps is more important to tune than min_samples), can be tricky to tune well, may not correctly distinguish two clusters if there is overlap between the clusters 
+    - Disadvantages: has two  parameters (eps and min_samples) (even though eps
+    is more important to tune than min_samples), can be tricky to tune well, may
+    not correctly distinguish two clusters if there is overlap between the
+    clusters 
+    
+Shared Nearest Neighbor 
+    - a derivative of DBSCAN designed to perform well on high dimensional data
 
----
-**NOTE**
 
-Shared Nearest Neighbor (SNN) clustering is a derivative of DBSCAN designed to perform well on high dimensional data
-
----
+[Optuna](https://optuna.org/) is one of various tools that you can use to select
+clustering hyperparameters. 
