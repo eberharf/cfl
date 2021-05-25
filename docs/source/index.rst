@@ -14,9 +14,9 @@ Causal Feature Learning (CFL) is an unsupervised algorithm designed to construct
    :maxdepth: 1
    :caption: Getting Started
 
-   SETUP
-   cfl_intro.md
-   quick_start.ipynb
+   getting_started/SETUP
+   getting_started/cfl_intro.md
+   getting_started/quick_start.ipynb
 
 .. toctree:: 
    :maxdepth: 1
@@ -30,16 +30,16 @@ Causal Feature Learning (CFL) is an unsupervised algorithm designed to construct
    :maxdepth: 2
    :caption: User API Reference
 
-   cfl.rst
+   user_api/cfl.rst
 
 .. toctree:: 
    :maxdepth: 1
    :caption: More Info 
 
-   Visual_Bars_data
-   CDEs
-   clustering
-   dvc_intro
+   more_info/Visual_Bars_data
+   more_info/CDEs
+   more_info/clustering
+   more_info/dvc_intro
 
 
 
