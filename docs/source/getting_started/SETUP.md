@@ -12,7 +12,7 @@ pip install cfl
 
 
  We recommend installing `cfl` in a virtual environment to prevent unintended
- interactions between different packages. If don't already have a virtual
+ interactions between different packages. If you don't already have a virtual
  environment system, follow steps 1 and 2. Otherwise, skip to step 3. 
 
 **1. Install Anaconda**
@@ -54,7 +54,7 @@ pip install cfl
 ```
 
 To check that the installation was successful, open a Python interpreter (type
-`python`). Then, from within Python, run the command `import cfl` and check the version:
+`python` into the terminal). Then, from within Python, run the command `import cfl` and check the version:
 
 ```
 python
@@ -67,7 +67,7 @@ If this command executes with no errors, then you are now ready to use `cfl`!
 
 **Optional: Add the cfl environment to the Jupyter notebook kernel**
 
-For running Jupyter notebooks from within a `conda` virtual environment: 
+For running Jupyter notebooks from within a `conda` virtual environment. 
 
 In order to also be able to run CFL inside of a Jupyter notebook, we need to add `cfl-env` (the `conda` environment which contains the dependencies for `cfl`) to the iPython kernel. This will allow Jupyter notebooks to access the packages we installed for `cfl`. Add `cfl-env` to the Jupyter kernel by running the following command:
 
@@ -82,22 +82,22 @@ Installed kernelspec cfl-env in C:/some/directory/
 ```
 
 You can also test the success of this step by downloading a notebook from the
-`examples` folder on GitHub, `cd`ing into the folder containing that notebook, and starting a Jupyter Notebook server:
+[`examples`](https://github.com/eberharf/cfl/tree/dev/docs/source/examples) folder on GitHub, `cd`ing into the folder containing that notebook, and starting a Jupyter Notebook server:
 
 ```
 jupyter notebook
 ```
 
-Open one the notebook. Select `cfl-env` as the kernel if prompted. Run the first
+Open the notebook. Select `cfl-env` as the kernel if prompted. Run the first
 few code blocks in the notebook. If the import statements in the notebook can be
-run without errors, then setup has been successful!
+run without errors, then setup has been successful.
 
 
 ### Troubleshooting 
 
-1. "No matching distribution found for tensorflow>=2.4.0" 
+1. "`No matching distribution found for tensorflow>=2.4.0`" 
 
-Check that you are using a version of Python that is supported by the current
+Check that the version of Python you are using is supported by the current
 version of Tensorflow
 (see https://www.tensorflow.org/install). If not, upgrade/downgrade your Python
 version to fit.

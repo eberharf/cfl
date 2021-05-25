@@ -20,4 +20,4 @@ In addition, the 'rules' to predict the macrovariable class of any data point ar
 
 The image below provides a visual overview of the inputs and outputs of each step of CFL.
 
-![Overview of CFL pipeline](img/CFLpipeline.png "overview of CFL pipeline")
+![Overview of CFL pipeline](../img/CFLpipeline.png "overview of CFL pipeline")
