@@ -8,7 +8,7 @@ Go [here](https://cfl.readthedocs.io/en/latest/SETUP.html) for instructions on i
 
 ## Running CFL
 
-Go to the `examples` directory in GitHub for Jupyter Notebooks that demonstrate how to use the CFL code. Check out the [Background](https://cfl.readthedocs.io/en/latest/cfl_intro.html) on CFL for a quick theoretical introduction.
+Go to the [examples](https://cfl.readthedocs.io/en/latest/examples/cfl_code_intro.html) section of our Read The Docs page to see several demonstrations of how to use the CFL code. Check out the [Background](https://cfl.readthedocs.io/en/latest/cfl_intro.html) on CFL for a quick theoretical introduction.
 
 -----------------------------------------
 -------------------------------------------
