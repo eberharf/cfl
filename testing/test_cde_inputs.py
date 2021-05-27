@@ -1,11 +1,13 @@
 from shutil import Error
-from cfl.density_estimation_methods import *
-from cfl.dataset import Dataset
 import unittest
 import numpy as np
 import shutil
 import os
 import tensorflow as tf
+
+from cfl.density_estimation_methods import *
+from cfl.dataset import Dataset
+from all_CDES import get_all_density_estimation_methods
 
 ''' The following code runs all tests in CondExpInputTests on all implemented
     CondExpXxxx classes.
@@ -222,7 +224,7 @@ def make_cde_input_tests(cond_exp_class):
     return CondExpInputTests
 
 
-for cond_exp_class in [CondExpCNN, CondExpMod, CondExpVB]:
+for cond_exp_class in get_all_density_estimation_methods():
     class ConcreteInputTests(make_cde_input_tests(cond_exp_class)):
         pass
 
