@@ -1,12 +1,12 @@
-import cfl.interventions.interventions_prototype as IP
+import cfl.interventions_development.interventions_prototype as IP
 from sklearn.datasets import make_blobs
 from visual_bars.generate_visual_bars_data import VisualBarsData as VB
 import numpy as np
 import matplotlib.pyplot as plt
 
-# X, y = make_blobs(n_samples=1000, centers=3, n_features=2, random_state=0)
-# IP.main(X, y, k_samples=30, eps=0.5, to_plot=True, series='blobs3_100HC')
-# IP.main(X, y, k_samples=100, eps=0.5, to_plot=True, series='blobs3_500HC')
+X, y = make_blobs(n_samples=1000, centers=3, n_features=2, random_state=0)
+IP.main(X, y, k_samples=30, eps=0.5, to_plot=True, series='blobs3_100HC')
+IP.main(X, y, k_samples=100, eps=0.5, to_plot=True, series='blobs3_500HC')
 
 
 # X, y = make_blobs(n_samples=10000, centers=10, n_features=2, random_state=0)

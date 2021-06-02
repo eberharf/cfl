@@ -1,4 +1,4 @@
-from cfl.interventions import interventions_prototype as IP
+from cfl.interventions_development import interventions_prototype as IP
 import numpy as np
 
 

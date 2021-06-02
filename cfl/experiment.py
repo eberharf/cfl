@@ -8,6 +8,7 @@ from cfl.block import Block
 import cfl.density_estimation_methods as cdem
 # import cfl.cluster_methods as ccm
 from cfl.cluster_methods import clusterer
+from cfl import intervention_rec
 
 '''
 Methods in Experiment Class: 
@@ -208,6 +209,7 @@ class Experiment():
                 prev_results = results
             
             self.is_trained = True
+            dataset.set_cfl_results(all_results)
             return all_results
         else: 
             raise Exception('This Experiment has already been trained. ' + \
@@ -251,6 +253,7 @@ class Experiment():
             # pass results on to next block
             prev_results = results    
 
+        dataset.set_cfl_results(all_results)
         return all_results        
 
     def __save_results(self, results, dataset, block):
@@ -516,6 +519,33 @@ class Experiment():
                 modified_params['verbose'] = verbose
                 block_params[pi] = modified_params
         return block_params
+
+    def get_intervention_recs(self, dataset_name, k_samples=100, eps=0.5):
+        ''' For a given dataset, this function selects a subset of samples that
+            serve as optimal interventions to perform when testing for confounding
+            in CFL's observational partition.
+            TODO: complete documentation
+        '''
+        assert self.blocks is not None, 'blocks have not been defined yet.'
+        
+        cfl_results = self.get_dataset(dataset_name).get_cfl_results()
+        assert cfl_results is not None, 'There are no results for this Dataset.'
+
+        # TODO: standardize block names as CDE and Clusterer so those can be
+        # hardcoded here. Right now there's no way to know if blocks[0] is actually
+        # a CDE
+        return intervention_rec.get_recommendations(
+                    pyx=cfl_results[self.blocks[0].get_name()]['pyx'], 
+                    cluster_labels=cfl_results[self.blocks[1].get_name()]['x_lbls'], 
+                    k_samples=k_samples, 
+                    eps=eps,
+                    to_plot=False,
+                    series='series'
+                ) 
+        
+
+
+########### HELPER FUNCTIONS ##################################################
 
 def get_next_dirname(path):
     ''' gets the next subdirectory name in numerical order. i.e. if  'path' 
