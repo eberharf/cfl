@@ -5,9 +5,8 @@ import shutil
 import os
 import tensorflow as tf
 
-from cfl.density_estimation_methods import *
+import cfl.density_estimation_methods
 from cfl.dataset import Dataset
-from all_CDES import get_all_density_estimation_methods
 
 ''' The following code runs all tests in CondExpInputTests on all implemented
     CondExpXxxx classes.
@@ -224,7 +223,7 @@ def make_cde_input_tests(cond_exp_class):
     return CondExpInputTests
 
 
-for cond_exp_class in get_all_density_estimation_methods():
+for cond_exp_class in cfl.density_estimation_methods.__all__:
     class ConcreteInputTests(make_cde_input_tests(cond_exp_class)):
         pass
 
