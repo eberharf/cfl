@@ -3,11 +3,6 @@ import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
 import matplotlib.pyplot as plt
 
-# high-level TODOs
-# TODO: return points by cluster, not by entire dataset, so that if a cluster
-#       is much less dense than others it will still return high-confidence
-#       points.
-
 def main(pyx, cluster_labels, k_samples=100, eps=0.5, to_plot=True, 
          series='series'):
     ''' For a set of data points, compute density for each point, extract
@@ -38,19 +33,9 @@ def main(pyx, cluster_labels, k_samples=100, eps=0.5, to_plot=True,
     
     # plot clusters in pyx with high-confidence points in black
     if to_plot:
-        assert pyx.shape[1]==2, 'pyx must be 2D to plot'
-        names = ['High-density', 'High-density, boundary removal']
-        fig,ax = plt.subplots(1,2,figsize=(10,4))
-        for i,mask in enumerate([hd_mask,final_mask]):
-            ax[i].scatter(pyx[:,0], pyx[:,1], c=cluster_labels, alpha=0.4)
-            ax[i].scatter(pyx[np.where(mask)[0],0], 
-                    pyx[np.where(mask)[0],1], 
-                    c='black')
-            ax[i].set_title(series + f'\n{names[i]}\nNumber of selected points: {np.sum(mask)}')
-        plt.savefig(f'demo_figures/{series}', bbox_inches='tight')
+        plot_results(pyx, hd_mask, final_mask, cluster_labels, series)
 
     return final_mask
-
 
 def compute_density(pyx):
     ''' For each point in pyx, compute density proxy. 
@@ -114,7 +99,6 @@ def get_high_density_samples(density, cluster_labels, k_samples=None):
             k_csamples = n_cluster_samples
         else:
             k_csamples = k_samples
-        print(f'Cluster {ci}: {k_csamples} samples')
         # identify high-density cluster samples
         sorted_cluster_density = np.sort(cluster_density)
         cluster_thresh = sorted_cluster_density[k_csamples-1]
@@ -188,4 +172,15 @@ def discard_boundary_samples(pyx, high_density_mask, cluster_labels, eps=0.5):
 
 
 
-    
+def plot_results(pyx, hd_mask, final_mask, cluster_labels, series):
+    assert pyx.shape[1]==2, 'pyx must be 2D to plot'
+    names = ['High-density', 'High-density, boundary removal']
+    fig,ax = plt.subplots(1,2,figsize=(10,4))
+    for i,mask in enumerate([hd_mask,final_mask]):
+        ax[i].scatter(pyx[:,0], pyx[:,1], c=cluster_labels, alpha=0.4)
+        ax[i].scatter(pyx[np.where(mask)[0],0], 
+                pyx[np.where(mask)[0],1], 
+                c='black')
+        ax[i].set_title(
+            series + f'\n{names[i]}\nNumber of selected points: {np.sum(mask)}')
+    plt.savefig(f'demo_figures/{series}', bbox_inches='tight')
