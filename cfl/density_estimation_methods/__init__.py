@@ -8,8 +8,8 @@ from cfl.density_estimation_methods.condExpVB import CondExpVB
 __all__ = [CondExpCNN, 
            CondExpMod, 
            CondExpCNN3D, 
-           CondExpVB, 
-           CondExpKC
+        #    CondExpVB,  # these are going to be deleted 
+        #    CondExpKC
           ]
 
 
