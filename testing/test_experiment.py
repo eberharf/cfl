@@ -1,4 +1,4 @@
-from testing.test_interventions import RESULTS_PATH
+from testing.test_intervention_rec import RESULTS_PATH
 import pytest
 import numpy as np
 
