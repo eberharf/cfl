@@ -1,3 +1,4 @@
+from testing.test_intervention_rec import RESULTS_PATH
 import pytest
 import numpy as np
 
@@ -11,7 +12,7 @@ import random
 from sklearn.cluster import DBSCAN
 
 # Note: change if you want results somewhere else (folder will be deleted at end of run)
-RESULTS_PATH = 'testing/tmp_test_results'
+# RESULTS_PATH = 'testing/tmp_test_results'
 
 # hypothesis 
 ############### HELPER FUNCTIONS #################
