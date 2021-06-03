@@ -101,7 +101,11 @@ def _get_high_density_samples(density, cluster_labels, k_samples=None):
         # identify high-density cluster samples
         sorted_cluster_density = np.sort(cluster_density)
         cluster_thresh = sorted_cluster_density[k_csamples-1]
-
+        # TODO: since a threshold is used here, more than k_samples can be 
+        #       returned when there are duplicate points. Only return k_samples
+        #       per cluster. (Does this even matter if discard_boundary_samples
+        #       is going to change the number of samples anyways? Probably only
+        #       matters in extreme cases with tons of duplicates.)
         # add to mask
         # note: we want points that have density < cluster_thresh because
         #       smaller distances to neighbors indicate higher densities
