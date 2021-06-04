@@ -3,40 +3,46 @@ import pickle #for saving code
 
 from cfl.block import Block
 import numpy as np
-from cfl.cluster_methods.Y_given_Xmacro import sample_Y_dist #calculate P(Y|Xmacro)
+from cfl.cluster_methods.Y_given_Xmacro import sample_Y_dist # calculate 
+                                                             # P(Y|Xmacro)
 from sklearn.cluster import DBSCAN
 
-#TODO: next step: add very clear documentation about how to add new module. Include:
+#TODO: next step: add very clear documentation about how to add new module. 
+# Include:
 # - demo code?
 # - tests to run with new module to ensure that it works right?
 
 
-""" This class uses  clustering to form the observational partition that CFL
-    is trying to identify. It trains two user-defined clustering models, one to cluster datapoints
-    based on P(Y|X=x), and the other to cluster datapoints based on a proxy
-    for P(Y=y|X) (more information on this proxy can be found in the helper file
-    Y_given_Xmacro.py). Once these two models are trained, they can then
-    be used to assign new datapoints to these clusters.
+""" This class uses  clustering to form the observational partition that CFL is
+    trying to identify. It trains two user-defined clustering models, one to
+    cluster datapoints based on P(Y|X=x), and the other to cluster datapoints
+    based on a proxy for P(Y=y|X) (more information on this proxy can be found
+    in the helper file Y_given_Xmacro.py). Once these two models are trained,
+    they can then be used to assign new datapoints to these clusters.
 
     Attributes:
-        params (dict): two clusterer objects (keys: 'x_model' and 'y_model') that have already been created. 
-            The clusterer objects must follow scikit-learn interface
+        params (dict): two clusterer objects (keys: 'x_model' and 'y_model')
+            that have already been created. The clusterer objects must follow
+            scikit-learn interface
         x_model: clusterer for cause data
         y_model: clusterer for effect data
         data_info (dict) : dictionary with the keys 'X_dims', 'Y_dims', and 
             'Y_type' (whether the y data is categorical or continuous)
-        name : name of the model so that the model type can be recovered from saved parameters (str) #TODO: remove
+        name : name of the model so that the model type can be recovered from
+            saved parameters (str) #TODO: remove
 
     Methods:
         train : fit a model with P(Y|X=x) found by CDE, and a fit second
                 model with proxy for P(Y=y|X).
         predict : assign new datapoints to clusters found in train
-        evaluate_clusters : evaluate the goodness of clustering based on metric specified
-                            in cluster_metric()
-        cluster_metric : a metric to judge the goodness of clustering (not yet implemented).
-        check_model_params : fill in any parameters that weren't provided in params with
-                                    the default value, and discard any unnecessary paramaters
-                                    that were provided.
+        evaluate_clusters : evaluate the goodness of clustering based on metric
+                            specified in cluster_metric()
+        cluster_metric : a metric to judge the goodness of clustering (not yet
+                         implemented). 
+        check_model_params : fill in any parameters that weren't
+                             provided in params with the default value, and 
+                             discard any unnecessary
+                             paramaters that were provided.
     Example: 
         from sklearn.cluster import DBSCAN 
         from cfl.cluster_methods.clusterer import Clusterer
@@ -48,9 +54,12 @@ from sklearn.cluster import DBSCAN
         data = Dataset(X, y)
 
         x_DBSCAN = DBSCAN(eps=0.3, min_samples=10)
-        x_DBSCAN = DBSCAN(eps=0.5, min_samples=15) #TODO: what are appropriate params for y? (values are more consistent)
+        x_DBSCAN = DBSCAN(eps=0.5, min_samples=15) # TODO: what are appropriate 
+                                                   # params for y? (values are 
+                                                   # more consistent)
         c = Clusterer(data_info ={'X_dims': X.shape, 'Y_dims':Y.shape, 
-            'Y_type': 'continuous'}, params={'x_model':x_DBSCAN, 'y_model':y_DBSCAN})
+                                  'Y_type': 'continuous'}, 
+                      params={'x_model':x_DBSCAN, 'y_model':y_DBSCAN})
 
         results = c.train(data, prev_results)
  """
@@ -63,14 +72,17 @@ class Clusterer(Block):
 
         Parameters
             data_info (dict): 
-            params (dict) : a dictionary of relevant hyperparameters for clustering. 
-                For a base clusterer object, these should be two already created clusterers (one
-                for clustering the x data and one for the y. The parameters between the two can be 
-                the same). The clusterer object needs to adhere to the Scikit learn BaseEstimator
-                (https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html) and 
-                ClusterMixin Interfaces (https://scikit-learn.org/stable/modules/generated/sklearn.base.ClusterMixin.html)
-                ^ (this means they need to have the method fit_predict(X, y=None) and assign the results as self.labels_
-                #TODO: make this docstring and the requirements better
+            params (dict) : a dictionary of relevant hyperparameters for
+                clustering. For a base clusterer object, these should be two 
+                already created clusterers (one for clustering the x data and 
+                one for the y. The parameters between the two can be the same). 
+                The clusterer object needs to adhere to the Scikit learn 
+                BaseEstimator (https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html)
+                and ClusterMixin Interfaces (https://scikit-learn.org/stable/modules/generated/sklearn.base.ClusterMixin.html)
+                ^ (this means they need to have the method 
+                fit_predict(X, y=None) and assign the results as 
+                self.labels_ #TODO: make this docstring and the requirements 
+                better.
 
         Return
             None
@@ -80,10 +92,13 @@ class Clusterer(Block):
         self.name = 'Clusterer'
 
         self.Y_type = data_info['Y_type']
-        assert self.Y_type in ["categorical", "continuous"], "Y_type in data_info should be 'categorical' or 'continouous' but is {}".format(self.Y_type)
+        assert self.Y_type in ["categorical", "continuous"], \
+            "Y_type in data_info should be 'categorical' or 'continouous' \
+            but is {}".format(self.Y_type)
 
 
-        super().__init__(data_info=data_info, params=params) #parameter checks and self.params assignment done here 
+        super().__init__(data_info=data_info, params=params) 
+        # parameter checks and self.params assignment done here 
 
         self.xmodel = self.params['x_model']
         self.ymodel = self.params['y_model']
@@ -96,8 +111,8 @@ class Clusterer(Block):
 
     def _get_default_params(self):
         """I made the default clusterer a DBSCAN object with 
-        sklearn's default params cause that seems like a solid all-purpose clusterer. 
-        You should probably not use the default though"""
+        sklearn's default params cause that seems like a solid all-purpose 
+        clusterer. You should probably not use the default though"""
 
         default_params =  {'x_model' : DBSCAN(),
                            'y_model' : DBSCAN(),
@@ -111,12 +126,16 @@ class Clusterer(Block):
         Assign new datapoints to clusters found in training.
 
         Arguments:
-            dataset : Dataset object containing X, Y and pyx data to assign parition labels to (Dataset)
-            prev_results : dictionary that contains a key called 'pyx', whose value is an array of
+            dataset : Dataset object containing X, Y and pyx data to assign 
+                      parition labels to (Dataset)
+            prev_results : dictionary that contains a key called 'pyx', whose 
+                           value is an array of
             probabilities
         Returns:
-            x_lbls : X macrovariable class assignments for this Dataset (np.array)
-            y_lbls : Y macrovariable class assignments for this Dataset (np.array)
+            x_lbls : X macrovariable class assignments for this Dataset 
+                     (np.array)
+            y_lbls : Y macrovariable class assignments for this Dataset 
+                     (np.array)
         """
         
         try:
@@ -146,12 +165,16 @@ class Clusterer(Block):
         Assign new datapoints to clusters found in training.
 
         Arguments:
-            dataset : Dataset object containing X, Y and pyx data to assign parition labels to (Dataset)
-            prev_results : dictionary that contains a key called 'pyx', whose value is an array of
+            dataset : Dataset object containing X, Y and pyx data to assign
+                      partition labels to (Dataset)
+            prev_results : dictionary that contains a key called 'pyx', whose 
+                           value is an array of
             probabilities
         Returns:
-            x_lbls : X macrovariable class assignments for this Dataset (np.array)
-            y_lbls : Y macrovariable class assignments for this Dataset (np.array)
+            x_lbls : X macrovariable class assignments for this Dataset 
+                     (np.array)
+            y_lbls : Y macrovariable class assignments for this Dataset 
+                     (np.array)
         """
 
         assert self.trained, "Remember to train the model before prediction."
@@ -162,8 +185,10 @@ class Clusterer(Block):
             'Generate pyx predictions with CDE before clustering.'
             return
 
-        x_lbls = self.xmodel.fit_predict(pyx)# NOTE: fit_predict is different than predict, so this is wrong 
-                                            # however, kmeans is the only clustering function in sklearn that has a predict function defined so we're doing this for now
+        x_lbls = self.xmodel.fit_predict(pyx)
+        # NOTE: fit_predict is different than predict, so this is wrong 
+        # however, kmeans is the only clustering function in sklearn that has 
+        # a predict function defined so we're doing this for now
         y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
         y_lbls = self.ymodel.fit_predict(y_probs)
 
@@ -172,7 +197,7 @@ class Clusterer(Block):
         return results_dict
 
 
-    #################### SAVE/LOAD FUNCTIONS (required by block.py) ################################
+    ############ SAVE/LOAD FUNCTIONS (required by block.py) ###################
     def save_block(self, file_path):
         ''' save both cluster models to specified path.
             Arguments:
