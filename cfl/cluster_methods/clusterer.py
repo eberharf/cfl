@@ -54,7 +54,7 @@ from sklearn.cluster import DBSCAN
         data = Dataset(X, y)
 
         x_DBSCAN = DBSCAN(eps=0.3, min_samples=10)
-        x_DBSCAN = DBSCAN(eps=0.5, min_samples=15) # TODO: what are appropriate 
+        y_DBSCAN = DBSCAN(eps=0.5, min_samples=15) # TODO: what are appropriate 
                                                    # params for y? (values are 
                                                    # more consistent)
         c = Clusterer(data_info ={'X_dims': X.shape, 'Y_dims':Y.shape, 
@@ -107,12 +107,26 @@ class Clusterer(Block):
 
 
     def get_params(self):
+        ''' Get parameters for this clustering model.
+            Arguments: None
+            Returns: 
+                dict: dictionary of parameter names (keys) and values (values)
+        '''
+
         return self.params
 
     def _get_default_params(self):
-        """I made the default clusterer a DBSCAN object with 
-        sklearn's default params cause that seems like a solid all-purpose 
-        clusterer. You should probably not use the default though"""
+        """ Private method that specifies default clustering method parameters.
+            Note: clustering method currently defaults to DBSCAN. While DBSCAN
+            is a valid starting method, the choice of clustering method is
+            highly dependent on your dataset. Please do not rely on the defaults
+            without considering your use case.
+
+            Arguments: None
+            Returns: 
+                dict: dictionary of parameter names (keys) and values (values)
+
+        """
 
         default_params =  {'x_model' : DBSCAN(),
                            'y_model' : DBSCAN(),
@@ -126,16 +140,15 @@ class Clusterer(Block):
         Assign new datapoints to clusters found in training.
 
         Arguments:
-            dataset : Dataset object containing X, Y and pyx data to assign 
-                      parition labels to (Dataset)
-            prev_results : dictionary that contains a key called 'pyx', whose 
-                           value is an array of
-            probabilities
+            dataset (Dataset): Dataset object containing X, Y and pyx data to 
+                                assign parition labels to
+            prev_results (dict): dictionary that contains a key called 'pyx', 
+                                 whose value is an array of probabilities
         Returns:
-            x_lbls : X macrovariable class assignments for this Dataset 
-                     (np.array)
-            y_lbls : Y macrovariable class assignments for this Dataset 
-                     (np.array)
+            x_lbls (np.ndarray): X macrovariable class assignments for this 
+                                 Dataset 
+            y_lbls (np.ndarray): Y macrovariable class assignments for this 
+                                 Dataset 
         """
         
         try:
@@ -165,16 +178,16 @@ class Clusterer(Block):
         Assign new datapoints to clusters found in training.
 
         Arguments:
-            dataset : Dataset object containing X, Y and pyx data to assign
-                      partition labels to (Dataset)
-            prev_results : dictionary that contains a key called 'pyx', whose 
-                           value is an array of
-            probabilities
+            dataset (Dataset): Dataset object containing X, Y and pyx data to 
+                               assign partition labels to 
+            prev_results (dict): dictionary that contains a key called 'pyx', 
+                                 whose value is an array of probabilities
         Returns:
-            x_lbls : X macrovariable class assignments for this Dataset 
-                     (np.array)
-            y_lbls : Y macrovariable class assignments for this Dataset 
-                     (np.array)
+            x_lbls (np.ndarray): X macrovariable class assignments for this 
+                                 Dataset 
+            y_lbls (np.ndarray) : Y macrovariable class assignments for this 
+                                  Dataset 
+                     
         """
 
         assert self.trained, "Remember to train the model before prediction."
@@ -199,12 +212,11 @@ class Clusterer(Block):
 
     ############ SAVE/LOAD FUNCTIONS (required by block.py) ###################
     def save_block(self, file_path):
-        ''' save both cluster models to specified path.
+        ''' Save both cluster models to specified path.
             Arguments:
                 file_path (str): path to save to
 
-            Returns:
-                None
+            Returns: None
         '''
         model_dict = {}
         model_dict['x_model'] = self.xmodel
@@ -217,7 +229,7 @@ class Clusterer(Block):
         ''' Load both models from path.
 
             Arguments:
-                file_path : path to load saved models from 
+                file_path (str): path to load saved models from 
             Returns: None
         '''
 
