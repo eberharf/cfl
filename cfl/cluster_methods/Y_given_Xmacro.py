@@ -195,55 +195,55 @@ def _continuous_Y(Y_data, x_lbls):
 
     # TODO: this version hasn't been implemented for the categorical case yet
 
-def _avg_nearest_neighbors_dist(y, other_Ys, y_in_otherYs, k_neighbors=4):
-    """
-    Helper function for continuous_Y(). Returns the distance between a point
-    y and its nearest neighbors in the cluster other_Ys
+# def _avg_nearest_neighbors_dist(y, other_Ys, y_in_otherYs, k_neighbors=4):
+#     """
+#     Helper function for continuous_Y(). Returns the distance between a point
+#     y and its nearest neighbors in the cluster other_Ys
 
-    This distance is calculated by finding the euclidean distance (squared)
-    between y and each of the points in other_ys, then averaging the distances
-    of the k (default 4) neighbors closest to y.
+#     This distance is calculated by finding the euclidean distance (squared)
+#     between y and each of the points in other_ys, then averaging the distances
+#     of the k (default 4) neighbors closest to y.
 
-    Parameters:
-        y (np.ndarray): a value from Y_data
-        other_Ys (np.ndarray): all of the y values that correspond to a given 
-            xClass
-        y_in_otherYs (boolean): True when y is a member of other_Ys. In this 
-            case, y is removed from the distance calculation to the nearest 
-            neighbors (so that the distance between y and itself is not a 
-            factored into the calculation)
-        k_neighbors (int): the number of nearest neighbor distances to average
-    Returns:
-        float: average distance between y and other_Ys
+#     Parameters:
+#         y (np.ndarray): a value from Y_data
+#         other_Ys (np.ndarray): all of the y values that correspond to a given 
+#             xClass
+#         y_in_otherYs (boolean): True when y is a member of other_Ys. In this 
+#             case, y is removed from the distance calculation to the nearest 
+#             neighbors (so that the distance between y and itself is not a 
+#             factored into the calculation)
+#         k_neighbors (int): the number of nearest neighbor distances to average
+#     Returns:
+#         float: average distance between y and other_Ys
 
-    Notes:
-        4 neighbors is the default because that is the number of neighbors used
-        when this method was described in Chalupka 2016 (El Nino paper). If
-        there fewer than n neighbors in the class, then however many points
-        there are used to calculate the avg distance
+#     Notes:
+#         4 neighbors is the default because that is the number of neighbors used
+#         when this method was described in Chalupka 2016 (El Nino paper). If
+#         there fewer than n neighbors in the class, then however many points
+#         there are used to calculate the avg distance
 
-        Euclidean/L2 distance metric may be less useful with high-dimensional Ys
-    """
+#         Euclidean/L2 distance metric may be less useful with high-dimensional Ys
+#     """
 
-    # calculates the Euclidean distance (squared) between y and each observation
-    # in other_Ys, then sums across each dimension (per observation) so that
-    # all_distances is an array of single values
-    all_distances = np.sum((y-other_Ys)**2, axis=1)
+#     # calculates the Euclidean distance (squared) between y and each observation
+#     # in other_Ys, then sums across each dimension (per observation) so that
+#     # all_distances is an array of single values
+#     all_distances = np.sum((y-other_Ys)**2, axis=1)
 
-    #find the nearest neighbors by sorting the distances smallest to largest
-    sorted_dists = np.sort(all_distances)
+#     #find the nearest neighbors by sorting the distances smallest to largest
+#     sorted_dists = np.sort(all_distances)
 
-    # if y is a member of other_Ys, we remove y before calculating the nearest
-    # neighbor distance
-    if y_in_otherYs:
-        assert sorted_dists[0] == 0, "The first point in this list should be \
-            the distance between y and itself and have a distance of 0"
-        sorted_dists = sorted_dists[1:]
+#     # if y is a member of other_Ys, we remove y before calculating the nearest
+#     # neighbor distance
+#     if y_in_otherYs:
+#         assert sorted_dists[0] == 0, "The first point in this list should be \
+#             the distance between y and itself and have a distance of 0"
+#         sorted_dists = sorted_dists[1:]
 
-    if len(sorted_dists) < k_neighbors:
-        print("Warning: There are very few members in this class. Calculating \
-            distance anyways.")
+#     if len(sorted_dists) < k_neighbors:
+#         print("Warning: There are very few members in this class. Calculating \
+#             distance anyways.")
 
-    # return the average distance between y and its nearest k neighbors
-    return sorted_dists[:k_neighbors].mean()
+#     # return the average distance between y and its nearest k neighbors
+#     return sorted_dists[:k_neighbors].mean()
 
