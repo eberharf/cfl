@@ -1,11 +1,13 @@
-from shutil import Error
-from cfl.density_estimation_methods import *
-from cfl.dataset import Dataset
-import unittest
-import numpy as np
-import shutil
 import os
+import shutil
+from shutil import Error
+import unittest
+
+import numpy as np
 import tensorflow as tf
+
+from all_cdes import all_cdes 
+from cfl.dataset import Dataset
 
 ''' The following code runs all tests in CondExpInputTests on all implemented
     CondExpXxxx classes.
@@ -213,7 +215,7 @@ def make_cde_io_tests(cond_exp_class):
     return CondExpIOTests
 
 
-for cond_exp_class in [CondExpCNN, CondExpMod, CondExpVB]:
+for cond_exp_class in all_cdes:
     class ConcreteIOTests(make_cde_io_tests(cond_exp_class)):
         pass
 
