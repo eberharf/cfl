@@ -124,7 +124,7 @@ class CondExpCNN3D(CondExpBase):
             AssertionError : if model architecture specified in self.params
                 is invalid. 
         '''
-        assert len(self.params['input_shape'])==4, "Input shape should be of \
+        assert len(self.params['input_shape'])==3, "Input shape should be of \
             the format (im_height, im_width, num_channels) but is {}".format(\
             self.params['input_shape'])
 
