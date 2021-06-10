@@ -214,7 +214,7 @@ def make_cde_io_tests(cond_exp_class):
     return CondExpIOTests
 
 
-for cond_exp_class in cfl.all_cdes:
+for cond_exp_class in all_cdes:
     class ConcreteIOTests(make_cde_io_tests(cond_exp_class)):
         pass
 
