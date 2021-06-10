@@ -1,4 +1,3 @@
-from testing.test_interventions import RESULTS_PATH
 import pytest
 import numpy as np
 
