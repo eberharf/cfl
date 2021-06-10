@@ -53,6 +53,9 @@ With your cfl virtual environment active, run the command:
 pip install cfl
 ```
 
+The installation may take a few minutes, especially if `tensorflow` is not already
+installed. 
+
 To check that the installation was successful, open a Python interpreter (type
 `python` into the terminal). Then, from within Python, run the command `import cfl` and check the version:
 
