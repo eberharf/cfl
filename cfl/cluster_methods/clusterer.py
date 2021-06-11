@@ -89,14 +89,22 @@ class Clusterer(Block):
             None
         """
         
-        # parameter checks and self.params assignment done here 
-        super().__init__(data_info=data_info, params=params) 
-        
         #attributes:
         self.name = 'Clusterer'
+
         self.Y_type = data_info['Y_type']
+        assert self.Y_type in ["categorical", "continuous"], \
+            "Y_type in data_info should be 'categorical' or 'continouous' \
+            but is {}".format(self.Y_type)
+
+
+        super().__init__(data_info=data_info, params=params) 
+        # parameter checks and self.params assignment done here 
+
         self.xmodel = self.params['x_model']
         self.ymodel = self.params['y_model']
+
+        
 
 
     def get_params(self):
