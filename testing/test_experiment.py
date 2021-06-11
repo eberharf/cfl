@@ -12,7 +12,11 @@ import random
 from sklearn.cluster import DBSCAN
 
 # Note: change if you want results somewhere else (folder will be deleted at end of run)
+<<<<<<< HEAD
 RESULTS_PATH = 'testing/tmp_test_results'
+=======
+# RESULTS_PATH = 'testing/tmp_test_results'
+>>>>>>> fix-broken-tests
 
 # hypothesis 
 ############### HELPER FUNCTIONS #################

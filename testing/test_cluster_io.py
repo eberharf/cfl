@@ -195,6 +195,7 @@ cluster_models_to_test = [KMeans(n_clusters=4),
                                min_shared_neighbor_proportion=0.5, 
                                eps=0.1)
                           ]
+                          
 for cluster_model in cluster_models_to_test:
     class ConcreteIOTests(make_cluster_io_tests(cluster_model)):
         pass

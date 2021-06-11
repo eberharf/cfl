@@ -1,8 +1,9 @@
+import os
+import shutil
 from shutil import Error
 import unittest
+
 import numpy as np
-import shutil
-import os
 import tensorflow as tf
 
 from all_cdes import all_cdes 
