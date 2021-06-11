@@ -71,11 +71,6 @@ def generate_vb_data():
     y = one_hot_encode(y, unique_labels=[0,1])
     return x,y
 
-<<<<<<< HEAD
-
-=======
-@pytest.mark.skip #temporarily skip this test because we know it isn't working 
->>>>>>> fix-broken-tests
 def test_intervention_recs():
     ''' check if my_exp.get_intervention_recs('dataset_train') runs without
         failing and if results match prior results.
