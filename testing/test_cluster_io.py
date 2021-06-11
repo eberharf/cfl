@@ -125,7 +125,6 @@ def make_cluster_io_tests(cluster_model):
             self.assertRaises(AssertionError, self.c.predict, dataset, 
                               prev_results)
 
-        @pytest.mark.skip #temporarily skip this test because we know it isn't working 
         def test_predict_correct_input_type(self):
 
             # artifically set clusterer trained = True
