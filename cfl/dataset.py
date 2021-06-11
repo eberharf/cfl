@@ -40,7 +40,6 @@ class Dataset():
 
         self.X = X
         self.Y = Y
-        self.n_samples = X.shape[0]
 
         if Xraw is None:
             self.Xraw = self.X

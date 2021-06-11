@@ -2,7 +2,6 @@ from abc import abstractmethod
 import pickle #for saving code
 
 from cfl.block import Block
-from cfl.dataset import Dataset
 import numpy as np
 from cfl.cluster_methods.Y_given_Xmacro import sample_Y_dist # calculate 
                                                              # P(Y|Xmacro)
@@ -89,22 +88,14 @@ class Clusterer(Block):
             None
         """
         
+        # parameter checks and self.params assignment done here 
+        super().__init__(data_info=data_info, params=params) 
+        
         #attributes:
         self.name = 'Clusterer'
-
         self.Y_type = data_info['Y_type']
-        assert self.Y_type in ["categorical", "continuous"], \
-            "Y_type in data_info should be 'categorical' or 'continouous' \
-            but is {}".format(self.Y_type)
-
-
-        super().__init__(data_info=data_info, params=params) 
-        # parameter checks and self.params assignment done here 
-
         self.xmodel = self.params['x_model']
         self.ymodel = self.params['y_model']
-
-        
 
 
     def get_params(self):
@@ -135,13 +126,14 @@ class Clusterer(Block):
         return default_params
 
 
+
     def train(self, dataset, prev_results):
         """
         Assign new datapoints to clusters found in training.
 
         Arguments:
             dataset (Dataset): Dataset object containing X, Y and pyx data to 
-                               assign parition labels to
+                                assign parition labels to
             prev_results (dict): dictionary that contains a key called 'pyx', 
                                  whose value is an array of probabilities
         Returns:
@@ -151,16 +143,11 @@ class Clusterer(Block):
                                  Dataset 
         """
         
-        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
-        assert isinstance(prev_results, (type(None), dict)),\
-            'prev_results is not NoneType or dict'
-        assert 'pyx' in prev_results.keys(), \
+        try:
+            pyx = prev_results['pyx']
+        except:
             'Generate pyx predictions with CDE before clustering.'
-        # TODO: decide whether to track self.trained status and whether to check
-        #       that here depending on whether we have to refit the clustering
-        #       every time we have new data
-
-        pyx = prev_results['pyx']
+            return
 
         # do x clustering 
         self.xmodel.fit(pyx)
@@ -194,15 +181,14 @@ class Clusterer(Block):
                                   Dataset 
                      
         """
-        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
-        assert isinstance(prev_results, (type(None), dict)),\
-            'prev_results is not NoneType or dict'
-        assert 'pyx' in prev_results.keys(), \
-            'Generate pyx predictions with CDE before clustering.'
 
         assert self.trained, "Remember to train the model before prediction."
 
-        pyx = prev_results['pyx']
+        try:
+            pyx = prev_results['pyx']
+        except:
+            'Generate pyx predictions with CDE before clustering.'
+            return
 
         x_lbls = self.xmodel.fit_predict(pyx)
         # NOTE: fit_predict is different than predict, so this is wrong 
@@ -224,17 +210,12 @@ class Clusterer(Block):
 
             Returns: None
         '''
-        assert isinstance(file_path, str), \
-            'file_path should be a str of path to block.'
         model_dict = {}
         model_dict['x_model'] = self.xmodel
         model_dict['y_model'] = self.ymodel
 
-        try:
-            with open(file_path, 'wb') as f:
-                pickle.dump(model_dict, f)
-        except:
-            raise ValueError('file_path does not exist.')
+        with open(file_path, 'wb') as f:
+            pickle.dump(model_dict, f)
 
     def load_block(self, file_path):
         ''' Load both models from path.
@@ -244,13 +225,9 @@ class Clusterer(Block):
             Returns: None
         '''
 
-        assert isinstance(file_path, str), \
-            'file_path should be a str of path to block.'
-        try:
-            with open(file_path, 'rb') as f:
-                model_dict = pickle.load(f)
-        except:
-            raise ValueError('file_path does not exist.')
+        # TODO: error handling for file not found
+        with open(file_path, 'rb') as f:
+            model_dict = pickle.load(f)
 
         self.xmodel = model_dict['x_model']
         self.ymodel = model_dict['y_model']

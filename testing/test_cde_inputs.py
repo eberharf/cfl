@@ -11,20 +11,27 @@ import tensorflow as tf
     CondExpXxxx classes.
 '''
 
+def check_one_error(error, fxn, *args):
+        try:
+            fxn
+        except error:
+            raise error
+        except:
+            pass
 
-def make_cde_io_tests(cond_exp_class):
+def make_cde_input_tests(cond_exp_class):
 
     # generic test class for any CondExpBase descendant 
     # (passed in as cond_exp_class)
-    class CondExpIOTests(unittest.TestCase):
-        def setUp(self): # overriden unittest.TestCase method that will be
-                         # called in initializaiton
+    class CondExpInputTests(unittest.TestCase):
+        def setUp(self):
             self.data_info = {  'X_dims' : (10,3), 
                                 'Y_dims' : (10,2), 
                                 'Y_type' : 'continuous'}
             self.params = { 'show_plot' : False,
                             'n_epochs' : 2}
             self.ceb = cond_exp_class(self.data_info, self.params)
+            print(self.ceb)
 
         ## INIT ###############################################################
         def test_init_wrong_input_types(self):
@@ -87,9 +94,11 @@ def make_cde_io_tests(cond_exp_class):
             path = 'not/a/real/path'
             self.ceb.save_block(path)
             self.ceb.load_block(path)
-            shutil.rmtree('not')
-            # check and reset state
+
+            # check state
             assert self.ceb.trained, 'CDE should be trained after loading'
+
+            # reset state
             self.ceb.trained = False
 
 
@@ -210,10 +219,10 @@ def make_cde_io_tests(cond_exp_class):
             assert isinstance(self.ceb._build_model(), tf.keras.Sequential)
 
 
-    return CondExpIOTests
+    return CondExpInputTests
 
 
 for cond_exp_class in [CondExpCNN, CondExpMod, CondExpVB]:
-    class ConcreteIOTests(make_cde_io_tests(cond_exp_class)):
+    class ConcreteInputTests(make_cde_input_tests(cond_exp_class)):
         pass
 

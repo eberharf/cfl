@@ -89,14 +89,6 @@ class CondExpBase(Block):
             self.load_model(self.params['weights_path'])
             self.trained = True
 
-    def get_params(self):
-        ''' Get parameters for this CDE model.
-            Arguments: None
-            Returns: 
-                dict: dictionary of parameter names (keys) and values (values)
-        '''
-
-        return self.params
 
     def load_block(self, path):
         ''' 
