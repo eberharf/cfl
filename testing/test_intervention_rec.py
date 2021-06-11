@@ -1,23 +1,13 @@
 import os
 import pytest
-<<<<<<< HEAD
-import numpy as np
-import shutil
-import os
-=======
 import shutil
 
 import numpy as np
 from sklearn.cluster import KMeans
->>>>>>> fix-broken-tests
 
 from cfl.experiment import Experiment
 from visual_bars import generate_visual_bars_data as vbd
 from cfl.util.data_processing import one_hot_encode
-<<<<<<< HEAD
-from sklearn.cluster import KMeans
-=======
->>>>>>> fix-broken-tests
 from cfl import intervention_rec as IR
 
 # Note: change if you want results somewhere else (folder will be deleted at 
@@ -42,11 +32,7 @@ CDE_PARAMS = {'batch_size': 128,
                 'best': True}
 
 CLUSTER_PARAMS = {'x_model' : KMeans(n_clusters=4),
-<<<<<<< HEAD
                     'y_model' : KMeans(n_clusters=4)}
-=======
-                    'y_model' : KMeans(n_clusters=2)}
->>>>>>> fix-broken-tests
 
 def generate_vb_data():
     # create a visual bars data set 
@@ -99,8 +85,6 @@ def test_intervention_recs():
     #         my_exp.get_intervention_recs('dataset_train'))
     recs = my_exp.get_intervention_recs('dataset_train')
     old_recs = np.load(os.path.join(RESOURCE_PATH, 'recs.npy'))
-<<<<<<< HEAD
-=======
     # print(recs)
     # print(np.unique(recs))
     # print(recs.shape)
@@ -110,7 +94,6 @@ def test_intervention_recs():
     # print(old_recs.shape)
     # print(np.sum(old_recs)) #TODO: the sum of the two is not the same currently
 
->>>>>>> fix-broken-tests
     assert np.array_equal(recs, old_recs), f'{recs[0]}, {old_recs[0]}'
 
     # clear any saved data
