@@ -2,6 +2,7 @@ from abc import abstractmethod
 import pickle #for saving code
 
 from cfl.block import Block
+from cfl.dataset import Dataset
 import numpy as np
 from cfl.cluster_methods.Y_given_Xmacro import sample_Y_dist # calculate 
                                                              # P(Y|Xmacro)
@@ -126,14 +127,13 @@ class Clusterer(Block):
         return default_params
 
 
-
     def train(self, dataset, prev_results):
         """
         Assign new datapoints to clusters found in training.
 
         Arguments:
             dataset (Dataset): Dataset object containing X, Y and pyx data to 
-                                assign parition labels to
+                               assign parition labels to
             prev_results (dict): dictionary that contains a key called 'pyx', 
                                  whose value is an array of probabilities
         Returns:
@@ -143,11 +143,16 @@ class Clusterer(Block):
                                  Dataset 
         """
         
-        try:
-            pyx = prev_results['pyx']
-        except:
+        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
+        assert isinstance(prev_results, (type(None), dict)),\
+            'prev_results is not NoneType or dict'
+        assert 'pyx' in prev_results.keys(), \
             'Generate pyx predictions with CDE before clustering.'
-            return
+        # TODO: decide whether to track self.trained status and whether to check
+        #       that here depending on whether we have to refit the clustering
+        #       every time we have new data
+
+        pyx = prev_results['pyx']
 
         # do x clustering 
         self.xmodel.fit(pyx)
@@ -181,14 +186,15 @@ class Clusterer(Block):
                                   Dataset 
                      
         """
+        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
+        assert isinstance(prev_results, (type(None), dict)),\
+            'prev_results is not NoneType or dict'
+        assert 'pyx' in prev_results.keys(), \
+            'Generate pyx predictions with CDE before clustering.'
 
         assert self.trained, "Remember to train the model before prediction."
 
-        try:
-            pyx = prev_results['pyx']
-        except:
-            'Generate pyx predictions with CDE before clustering.'
-            return
+        pyx = prev_results['pyx']
 
         x_lbls = self.xmodel.fit_predict(pyx)
         # NOTE: fit_predict is different than predict, so this is wrong 
@@ -210,12 +216,17 @@ class Clusterer(Block):
 
             Returns: None
         '''
+        assert isinstance(file_path, str), \
+            'file_path should be a str of path to block.'
         model_dict = {}
         model_dict['x_model'] = self.xmodel
         model_dict['y_model'] = self.ymodel
 
-        with open(file_path, 'wb') as f:
-            pickle.dump(model_dict, f)
+        try:
+            with open(file_path, 'wb') as f:
+                pickle.dump(model_dict, f)
+        except:
+            raise ValueError('file_path does not exist.')
 
     def load_block(self, file_path):
         ''' Load both models from path.
@@ -225,9 +236,13 @@ class Clusterer(Block):
             Returns: None
         '''
 
-        # TODO: error handling for file not found
-        with open(file_path, 'rb') as f:
-            model_dict = pickle.load(f)
+        assert isinstance(file_path, str), \
+            'file_path should be a str of path to block.'
+        try:
+            with open(file_path, 'rb') as f:
+                model_dict = pickle.load(f)
+        except:
+            raise ValueError('file_path does not exist.')
 
         self.xmodel = model_dict['x_model']
         self.ymodel = model_dict['y_model']
