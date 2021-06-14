@@ -6,7 +6,7 @@ import unittest
 import numpy as np
 import tensorflow as tf
 
-from all_cdes import all_cdes 
+from cdes_for_testing import all_cdes 
 from cfl.dataset import Dataset
 
 ''' The following code runs all tests in CondExpInputTests on all implemented
