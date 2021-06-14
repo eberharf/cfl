@@ -28,6 +28,10 @@ def get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5,
     print('PYX', np.sum(pyx))
     density = _compute_density(pyx)
     print('DENSITY', np.sum(density))
+    # np.save('testing/resources/test_intervention_rec/density.npy', density)
+    density = np.load('testing/resources/test_intervention_rec/density.npy')
+    print('DENSITY', np.sum(density))
+
     hd_mask = _get_high_density_samples(density, cluster_labels, 
                                        k_samples=k_samples)
     print('HD_MASK', np.sum(hd_mask))
