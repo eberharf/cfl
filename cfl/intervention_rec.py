@@ -25,7 +25,7 @@ def get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5,
                     b) a point doesn't lie close to a cluster boundary. 
                     0 otherwise.
     '''
-
+    print('PYX', np.sum(pyx))
     density = _compute_density(pyx)
     print('DENSITY', np.sum(density))
     hd_mask = _get_high_density_samples(density, cluster_labels, 
