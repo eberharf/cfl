@@ -64,6 +64,8 @@ def test_intervention_recs():
 
     # generate data
     x,y = generate_vb_data()
+    print('X', np.sum(x))
+    print('Y', np.sum(y))
 
     # set CFL params
     data_info = {'X_dims': x.shape, 
@@ -95,7 +97,7 @@ def test_intervention_recs():
     print(np.sum(old_recs)) #TODO: the sum of the two is not the same currently
     print(np.sum(old_recs==recs))
     print(len(recs))
-    
+
     assert np.array_equal(recs, old_recs), f'{recs[0]}, {old_recs[0]}'
 
     # clear any saved data
