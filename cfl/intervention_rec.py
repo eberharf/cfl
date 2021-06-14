@@ -58,9 +58,11 @@ def _compute_density(pyx):
     
     # precompute pairwise distances between all points
     distance_matrix = euclidean_distances(pyx, pyx)
+    print(distance_matrix.shape)
     # np.save('testing/resources/test_intervention_rec/distance_matrix.npy', distance_matrix)
     distance_matrix = np.load('testing/resources/test_intervention_rec/distance_matrix.npy')
-
+    print(distance_matrix.shape)
+    
     # sort distances
     distance_matrix = np.sort(distance_matrix, axis=1)
 
