@@ -85,14 +85,14 @@ def test_intervention_recs():
     #         my_exp.get_intervention_recs('dataset_train'))
     recs = my_exp.get_intervention_recs('dataset_train')
     old_recs = np.load(os.path.join(RESOURCE_PATH, 'recs.npy'))
-    # print(recs)
-    # print(np.unique(recs))
-    # print(recs.shape)
-    # print(np.sum(recs))
-    # print(old_recs)
-    # print(np.unique(old_recs))
-    # print(old_recs.shape)
-    # print(np.sum(old_recs)) #TODO: the sum of the two is not the same currently
+    print(recs)
+    print(np.unique(recs))
+    print(recs.shape)
+    print(np.sum(recs))
+    print(old_recs)
+    print(np.unique(old_recs))
+    print(old_recs.shape)
+    print(np.sum(old_recs)) #TODO: the sum of the two is not the same currently
 
     assert np.array_equal(recs, old_recs), f'{recs[0]}, {old_recs[0]}'
 
