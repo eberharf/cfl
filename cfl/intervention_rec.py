@@ -27,10 +27,13 @@ def get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5,
     '''
 
     density = _compute_density(pyx)
+    print('DENSITY', np.sum(density))
     hd_mask = _get_high_density_samples(density, cluster_labels, 
                                        k_samples=k_samples)
+    print('HD_MASK', np.sum(hd_mask))
     final_mask = _discard_boundary_samples(pyx, hd_mask, cluster_labels, eps=eps)
-    
+    print('FINAL_MASK', np.sum(final_mask))
+
     # plot clusters in pyx with high-confidence points in black
     if to_plot:
         _plot_results(pyx, hd_mask, final_mask, cluster_labels, series)
