@@ -93,7 +93,9 @@ def test_intervention_recs():
     print(np.unique(old_recs))
     print(old_recs.shape)
     print(np.sum(old_recs)) #TODO: the sum of the two is not the same currently
-
+    print(np.sum(old_recs==recs))
+    print(len(recs))
+    
     assert np.array_equal(recs, old_recs), f'{recs[0]}, {old_recs[0]}'
 
     # clear any saved data
@@ -143,7 +145,7 @@ def test_discard_boundary_samples():
 
 
 
-# TODO: these tests only cover hte main use case. Edge cases left to test:
+# TODO: these tests only cover the main use case. Edge cases left to test:
 # - varying epsilon in _discard_boundary_samples
 # - points falling between two clusters
 # - duplicate points
