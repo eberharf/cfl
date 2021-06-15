@@ -25,19 +25,19 @@ def get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5,
                     b) a point doesn't lie close to a cluster boundary. 
                     0 otherwise.
     '''
-    # print('PYX', np.sum(pyx))
-    # print('PYX.SHAPE', pyx.shape)
+    print('PYX', np.sum(pyx))
+    print('PYX.SHAPE', pyx.shape)
     density = _compute_density(pyx)
-    # print('DENSITY', np.sum(density))
-    # # np.save('testing/resources/test_intervention_rec/density.npy', density)
+    print('DENSITY', np.sum(density))
+    # np.save('testing/resources/test_intervention_rec/density.npy', density)
     # density = np.load('testing/resources/test_intervention_rec/density.npy')
     # print('DENSITY', np.sum(density))
 
     hd_mask = _get_high_density_samples(density, cluster_labels, 
                                        k_samples=k_samples)
-    # print('HD_MASK', np.sum(hd_mask))
+    print('HD_MASK', np.sum(hd_mask))
     final_mask = _discard_boundary_samples(pyx, hd_mask, cluster_labels, eps=eps)
-    # print('FINAL_MASK', np.sum(final_mask))
+    print('FINAL_MASK', np.sum(final_mask))
 
     # plot clusters in pyx with high-confidence points in black
     if to_plot:
@@ -58,9 +58,9 @@ def _compute_density(pyx):
     '''
     
     # precompute pairwise distances between all points
-    # print('pyx.shape', pyx.shape)
+    print('pyx.shape', pyx.shape)
     distance_matrix = euclidean_distances(pyx, pyx)
-    # print('dm.shape1', distance_matrix.shape)
+    print('dm.shape1', distance_matrix.shape)
     # np.save('testing/resources/test_intervention_rec/distance_matrix.npy', distance_matrix)
     # distance_matrix = np.load('testing/resources/test_intervention_rec/distance_matrix.npy')
     # print('dm.shape2', distance_matrix.shape)

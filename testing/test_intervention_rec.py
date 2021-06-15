@@ -36,7 +36,7 @@ CLUSTER_PARAMS = {'x_model' : KMeans(n_clusters=4),
 
 def generate_vb_data():
     # create a visual bars data set 
-    n_samples = 5000
+    n_samples = 3000
     noise_lvl = 0.03
     im_shape = (10, 10)
     random_seed = 143
@@ -83,20 +83,20 @@ def test_intervention_recs():
     train_results = my_exp.train()
     
     # check if recommended interventions match prior results
-    # np.save(os.path.join(RESOURCE_PATH, 'recs'), 
-    #         my_exp.get_intervention_recs('dataset_train'))
+    np.save(os.path.join(RESOURCE_PATH, 'recs'), 
+            my_exp.get_intervention_recs('dataset_train'))
     recs = my_exp.get_intervention_recs('dataset_train')
     old_recs = np.load(os.path.join(RESOURCE_PATH, 'recs.npy'))
-    # print(recs)
-    # print(np.unique(recs))
-    # print(recs.shape)
-    # print(np.sum(recs))
-    # print(old_recs)
-    # print(np.unique(old_recs))
-    # print(old_recs.shape)
-    # print(np.sum(old_recs)) #TODO: the sum of the two is not the same currently
-    # print(np.sum(old_recs==recs))
-    # print(len(recs))
+    print(recs)
+    print(np.unique(recs))
+    print(recs.shape)
+    print(np.sum(recs))
+    print(old_recs)
+    print(np.unique(old_recs))
+    print(old_recs.shape)
+    print(np.sum(old_recs)) #TODO: the sum of the two is not the same currently
+    print(np.sum(old_recs==recs))
+    print(len(recs))
 
     assert np.array_equal(recs, old_recs), f'{recs[0]}, {old_recs[0]}'
 
