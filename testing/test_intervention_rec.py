@@ -36,7 +36,7 @@ CLUSTER_PARAMS = {'x_model' : KMeans(n_clusters=4),
 
 def generate_vb_data():
     # create a visual bars data set 
-    n_samples = 3000
+    n_samples = 500
     noise_lvl = 0.03
     im_shape = (10, 10)
     random_seed = 143
