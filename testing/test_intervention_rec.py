@@ -83,8 +83,8 @@ def test_intervention_recs():
     train_results = my_exp.train()
     
     # check if recommended interventions match prior results
-    np.save(os.path.join(RESOURCE_PATH, 'recs'), 
-            my_exp.get_intervention_recs('dataset_train'))
+    # np.save(os.path.join(RESOURCE_PATH, 'recs'), 
+    #         my_exp.get_intervention_recs('dataset_train'))
     recs = my_exp.get_intervention_recs('dataset_train')
     old_recs = np.load(os.path.join(RESOURCE_PATH, 'recs.npy'))
     print(recs)
