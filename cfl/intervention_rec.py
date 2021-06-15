@@ -26,6 +26,7 @@ def get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5,
                     0 otherwise.
     '''
     print('PYX', np.sum(pyx))
+    print('PYX.SHAPE', pyx.shape)
     density = _compute_density(pyx)
     # print('DENSITY', np.sum(density))
     # # np.save('testing/resources/test_intervention_rec/density.npy', density)
@@ -57,12 +58,13 @@ def _compute_density(pyx):
     '''
     
     # precompute pairwise distances between all points
+    print('pyx.shape', pyx.shape)
     distance_matrix = euclidean_distances(pyx, pyx)
-    print(distance_matrix.shape)
+    print('dm.shape1', distance_matrix.shape)
     # np.save('testing/resources/test_intervention_rec/distance_matrix.npy', distance_matrix)
     distance_matrix = np.load('testing/resources/test_intervention_rec/distance_matrix.npy')
-    print(distance_matrix.shape)
-    
+    print('dm.shape2', distance_matrix.shape)
+
     # sort distances
     distance_matrix = np.sort(distance_matrix, axis=1)
 
