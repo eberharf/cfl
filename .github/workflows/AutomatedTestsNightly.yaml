@@ -1,4 +1,4 @@
-name: AutomatedTests
+name: AutomatedTestsNightly
 
 on:
   schedule:
