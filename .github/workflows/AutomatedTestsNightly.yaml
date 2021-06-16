@@ -2,7 +2,7 @@ name: AutomatedTestsNightly
 
 on:
   schedule:
-    - cron: @midnight
+    - cron: '0 0 * * *'
     branches:
       - dev
 
