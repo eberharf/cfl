@@ -26,26 +26,21 @@ macrovariable")
 CFL is designed to take two micro-level data sets as input: a 'causal' data set
 (`X`) and an 'effect' data set (`Y`). CFL then assigns each data point in `X`
 and `Y` to a macrovariable state: the causal data is partitioned into a set of
-**macro-causes** (e.g. the temperature of the room) and effect data into a set
-of **macro-effects** (e.g. whether or not the air conditioner turns on). 
+macro-causes (e.g. the temperature of the room) and effect data into a set
+of macro-effects (e.g. whether or not the air conditioner turns on). 
 
 
----
-CFL attempts to preserve the causal relationships between microvariables at the
-macrovariable level while abstracting away causally irrelevant
-features of the micro-level data. 
-In other words, any data point in `X` assigned to macro-cause state `a` should
-be similarly likely to produce a certain `Y` distribution as any another data point assigned to `a`. 
+As discussed above, when constructing a macrovariable, a choice must be made
+about what information to preserve and what details to abstract away. In the
+case of CFL, we attempt to preserve the causal
+relationships between microvariables in the cause and effect data sets. 
 
 
---- 
-When constructing the cause and effect macrovariables, CFL attempts to preserve the original causal
-relationships between the microvariables. In other words, CFL attempts to create
-macrovariables such that, every microvariable configuration in `X` assigned to a given
-cause macro-state produces the same effect on `Y`. Similarly, each
+In other words, every microvariable configuration assigned to a given
+cause macro-state should produce the same effect on `Y` as any other member of
+that same macro-state. Similarly, each
 microvariable configuration in `Y` that is assigned to the same effect
-macro-state should be expected to respond similarly to any cause data.  **TODO: Help**
---- 
+macro-state should be expected to respond similarly to any cause data.  
 
 
 CFL works in two steps to create these macrovariables: first, CFL estimates a
