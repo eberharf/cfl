@@ -41,7 +41,7 @@ import matplotlib.pyplot as plt
 
 class VisualBarsData():
 
-    def __init__(self, n_samples=1000, im_shape=(10,10), noise_lvl=0, set_random_seed=None):
+    def __init__(self, n_samples=1000, im_shape=(10,10), noise_lvl=0, set_random_seed=None, hBarFreq=0.5, vBarFreq=0.5):
         '''the constructor generates n_samples binary vertical bars images,
         generates the ground labels for each image, and generates the target behavior associated
         with each image in separate, aligned np arrays
