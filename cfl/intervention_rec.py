@@ -26,6 +26,7 @@ def get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5,
                     0 otherwise.
     '''
     print('PYX', np.sum(pyx))
+    print('CLUSTER-LABELS', np.sum(cluster_labels))
     print('PYX.SHAPE', pyx.shape)
     density = _compute_density(pyx)
     print('DENSITY', np.sum(density))
@@ -58,9 +59,9 @@ def _compute_density(pyx):
     '''
     
     # precompute pairwise distances between all points
-    print('pyx.shape', pyx.shape)
+    # print('pyx.shape', pyx.shape)
     distance_matrix = euclidean_distances(pyx, pyx)
-    print('dm.shape1', distance_matrix.shape)
+    # print('dm.shape1', distance_matrix.shape)
     # np.save('testing/resources/test_intervention_rec/distance_matrix.npy', distance_matrix)
     # distance_matrix = np.load('testing/resources/test_intervention_rec/distance_matrix.npy')
     # print('dm.shape2', distance_matrix.shape)
@@ -175,10 +176,18 @@ def _discard_boundary_samples(pyx, high_density_mask, cluster_labels, eps=0.5):
         # similar to distance to other-cluster) --> point is near boundary
         # TODO: the first check here will accidentally exclude any points that
         # lie exactly between two cluster centers, fix this
-        if any((center_dists_ratio[i,:] != 1) & 
-           (abs(center_dists_ratio[i,:] - 1) < eps)):
-           # discard point
-           non_boundary_mask[i] = 0
+        own_cluster = hd_cluster_labels[i]
+        for j in range(center_dists_ratio.shape[1]):
+            if j==own_cluster:
+                pass
+            else:
+                if center_dists_ratio[i,j] > 1-eps:
+                    non_boundary_mask[i] = 0
+
+        # if any((center_dists_ratio[i,:] != 1) & 
+        #    (abs(center_dists_ratio[i,:] - 1) < eps)):
+        #    # discard point
+        #    non_boundary_mask[i] = 0
         
     # map non_boundary_mask (of shape (n_hd_samples,)) back to index across
     # all samples of shape (n_samples,)

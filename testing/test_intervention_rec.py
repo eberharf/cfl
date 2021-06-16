@@ -31,12 +31,12 @@ CDE_PARAMS = {'batch_size': 128,
                 'standardize': False,
                 'best': True}
 
-CLUSTER_PARAMS = {'x_model' : KMeans(n_clusters=4),
-                    'y_model' : KMeans(n_clusters=4)}
+CLUSTER_PARAMS = {'x_model' : KMeans(n_clusters=4, random_state=42),
+                    'y_model' : KMeans(n_clusters=4, random_state=42)}
 
 def generate_vb_data():
     # create a visual bars data set 
-    n_samples = 500
+    n_samples = 10000
     noise_lvl = 0.03
     im_shape = (10, 10)
     random_seed = 143
