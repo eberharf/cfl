@@ -13,7 +13,7 @@ CDE_key = { 'CondExpVB'     : cdem.condExpVB.CondExpVB,
             'CondExpCNN'  : cdem.condExpCNN.CondExpCNN,
             'CondExpMod'  : cdem.condExpMod.CondExpMod }
 
-cluster_key = { 'Kmeans' : ccm.kmeans.KMeans }
+cluster_key = { 'Clusterer' : ccm.clusterer.Clusterer }
 
 def make_CFL(data_info, CDE_type, cluster_type, CDE_params, cluster_params, experiment_saver=None):
     

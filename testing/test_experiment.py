@@ -1,3 +1,4 @@
+from testing.test_intervention_rec import RESULTS_PATH
 import pytest
 import numpy as np
 
@@ -11,7 +12,7 @@ import random
 from sklearn.cluster import DBSCAN
 
 # Note: change if you want results somewhere else (folder will be deleted at end of run)
-save_path = 'testing/tmp_test_results'
+# RESULTS_PATH = 'testing/tmp_test_results'
 
 # hypothesis 
 ############### HELPER FUNCTIONS #################
@@ -65,7 +66,7 @@ def test_cde_experiment():
     # make new CFL Experiment with CDE only
     my_exp_cde = Experiment(X_train=x, Y_train=y, data_info=data_info, 
                 block_names=block_names, block_params=block_params, blocks=None, 
-                results_path=save_path)
+                results_path=RESULTS_PATH)
 
     dataset_train_cde = Dataset(x,y,name='dataset_train_cde')
     train_results_cde = my_exp_cde.train(dataset=dataset_train_cde, prev_results=None)
@@ -100,7 +101,7 @@ def test_cde_experiment():
 
     my_exp_clust = Experiment(X_train=x, Y_train=y, data_info=data_info, 
                 block_names=block_names, block_params=block_params, blocks=None, 
-                results_path=save_path)
+                results_path=RESULTS_PATH)
     
     dataset_train_clust = Dataset(x,y, name='dataset_train_clust')
 
@@ -121,7 +122,7 @@ def test_cde_experiment():
             prev_results=train_results_cde)
 
     # clear any saved data
-    shutil.rmtree(save_path)
+    shutil.rmtree(RESULTS_PATH)
     
 
 def test_clusterer_experiment():
@@ -146,7 +147,7 @@ def test_clusterer_experiment():
     # make new CFL Experiment with clusterer only
     my_exp_cluster = Experiment(X_train=x, Y_train=y, data_info=data_info, 
                 block_names=block_names, block_params=block_params, blocks=None, 
-                results_path=save_path)
+                results_path=RESULTS_PATH)
     
     # make artificial pyx
     rng = np.random.default_rng(12345) # create a Random Number Gen to set reproducible random seed
@@ -176,7 +177,7 @@ def test_clusterer_experiment():
     # try to train with no pyx (bad)
     my_exp_cluster2 = Experiment(X_train=x, Y_train=y, data_info=data_info, 
             block_names=block_names, block_params=block_params, blocks=None, 
-            results_path=save_path)
+            results_path=RESULTS_PATH)
     with pytest.raises(Exception): 
         cluster_bad = my_exp_cluster2.train(dataset=dataset_train_cluster, prev_results=None)
 

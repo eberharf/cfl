@@ -1,24 +1,3 @@
-''' Experiment class
- 
-- Pipeline to pass data through the different blocks of CFL 
-- Save parameters, models, results for reuse 
-
-
-Methods: 
-
-train()
-predict()
-_save_results()
-_save_params()
-_load_params()
-add_dataset()
-get_dataset()
-load_dataset_results()
-_build_block()
-_make_exp_dir()
-_propagate_verbosity()
-
-'''
 
 import pickle
 import json
@@ -29,18 +8,40 @@ from cfl.block import Block
 import cfl.density_estimation_methods as cdem
 # import cfl.cluster_methods as ccm
 from cfl.cluster_methods import clusterer
+from cfl import intervention_rec
 
+'''
+Methods in Experiment Class: 
+    train()
+    predict()
+    __save_results()
+    __save_params()
+    __load_params()
+    add_dataset()
+    get_dataset()
+    load_dataset_results()
+    __build_block()
+    __make_exp_dir()
+    __propagate_verbosity()
+
+'''
 # TODO: this is a placeholder until we have a block registration system.
 # NOTE: the name in the registry has to match the self.name in each block's __init__ 
-BLOCK_KEY = {   'CondExpVB'     : cdem.condExpVB.CondExpVB, 
-                'CondExpKC'     :   cdem.condExpKC.CondExpKC,
-                'CondExpCNN'    : cdem.condExpCNN.CondExpCNN,
-                'CondExpCNN3D'  : cdem.condExpCNN3D.CondExpCNN3D,
-                'CondExpMod'    : cdem.condExpMod.CondExpMod,
+BLOCK_KEY = {   'CondExpVB'     : cdem.CondExpVB, 
+                'CondExpKC'     : cdem.CondExpKC,
+                'CondExpCNN'    : cdem.CondExpCNN,
+                'CondExpCNN3D'  : cdem.CondExpCNN3D,
+                'CondExpMod'    : cdem.CondExpMod,
                 'Clusterer'     : clusterer.Clusterer } #TODO: maybe change this so that instead of 
                                                             # calling clusterer, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods  
 
 class Experiment():
+    '''The Experiment class: 
+ 
+    - Creates a pipeline to pass data through the different Blocks of CFL 
+    - Save parameters, models, results of the pipeline for reuse 
+    '''
+
 
     def __init__(self, data_info, X_train, Y_train, X_train_raw=None, 
                  Y_train_raw=None, past_exp_path=None, block_names=None, 
@@ -49,31 +50,31 @@ class Experiment():
         Sets up and trains an Experiment.
 
         Arguments:
-            X_train : an (n_samples, n_x_features) 2D array. (np.array)
-            Y_train : an (n_samples, n_y_features) 2D array. (np.array)
-            data_info : a dictionary of information about this Experiment's
+            X_train (np.array) : an (n_samples, n_x_features) 2D array. 
+            Y_train (np.array) : an (n_samples, n_y_features) 2D array. 
+            data_info (dict) : a dictionary of information about this Experiment's
                         associated data. Refer to 
                         cfl.block.validate_data_info() for 
-                        more information. (dict)
-            past_exp_path : path to directory associated with a previously
-                            trained Experiment. (str)
-            block_names : list of block names to use (i.e. ['CondExpVB', 'KMeans']). 
-                          Full list of names can be found here: <TODO>. (str list)
-            block_params : list of dicts specifying parameters for each block specified
-                           in block_names. Default is None. (dict list)
-            blocks : list of block objects. Default is None. (Block list)
-            results_path : path to directory to save this experiment to. Default is ''. (str)
+                        more information. 
+            past_exp_path (str) : path to directory associated with a previously
+                            trained Experiment. 
+            block_names (list of strs) : list of block names to use (i.e. `['CondExpVB', 'KMeans']`). 
+                          Full list of names can be found here: <TODO>. 
+            block_params (list of dicts) : list of dicts specifying parameters for each block specified
+                           in block_names. Default is None. 
+            blocks (list of Blocks): list of block objects. Default is None.
+            results_path (str) : path to directory to save this experiment to. Default is `''`. 
 
-        Note: There are three ways to specify blocks: 
-                1) specify past_exp_path
-                2) specify both block_names and block_params
-                3) specify blocks. 
+        Note: There are three ways to specify Blocks: 
+                1) specify `past_exp_path`
+                2) specify both `block_names` and `block_params`
+                3) specify `blocks`. 
               Do not specify all four of these parameters. 
         '''
 
-        # check data input types
-        assert isinstance(X_train, np.ndarray), 'X should be of type np.ndarray'
-        assert isinstance(Y_train, np.ndarray), 'Y should be of type np.ndarray'
+        # # check data input types
+        # assert isinstance(X_train, np.ndarray), 'X should be of type np.ndarray'
+        # assert isinstance(Y_train, np.ndarray), 'Y should be of type np.ndarray' #TODO: remove (duplicate of work done by Dataset class)
 
         # if loading from past experiment, make sure no other block
         # specifications are provided ...
@@ -107,28 +108,28 @@ class Experiment():
         self.data_info = data_info
         self.datasets = {}
         self.dataset_train = self.add_dataset(X=X_train, Y=Y_train, \
+                                              dataset_name='dataset_train', \
                                               Xraw=X_train_raw, \
-                                              Yraw=Y_train_raw, \
-                                              dataset_name='dataset_train')
+                                              Yraw=Y_train_raw)
         self.datasets[self.dataset_train.get_name()] = self.dataset_train
 
         # add verbosity to params that don't specify
         self.verbose = verbose
         if block_params is not None:
-            block_params = self._propagate_verbosity(self.verbose, block_params)
+            block_params = self.__propagate_verbosity(self.verbose, block_params)
         
         # build experiment directory
-        self.save_path = self._make_exp_dir(results_path)
+        self.save_path = self.__make_exp_dir(results_path)
 
         # load in params from past experiment if provided
         if past_exp_path is not None:
-            block_names, block_params = self._load_params(os.path.join(past_exp_path, 'params'))
+            block_names, block_params = self.__load_params(os.path.join(past_exp_path, 'params'))
 
         # build blocks from names and params if blocks not provided
         if blocks is None:
             blocks = []
             for bn,bp in zip(block_names, block_params): # data_info
-                blocks.append(self._build_block(bn,bp))
+                blocks.append(self.__build_block(bn,bp))
         
         # load in trained block info if past experiment provided
         if past_exp_path is not None:
@@ -148,7 +149,7 @@ class Experiment():
         # assert self.check_blocks_compatibility(), 'Specified blocks are incompatible'
         
         # save configuration parameters for each block
-        self._save_params()
+        self.__save_params()
 
     def train(self, dataset=None, prev_results=None):
         ''' Train the CFL pipeline. 
@@ -198,7 +199,7 @@ class Experiment():
                 all_results[block.get_name()] = results
 
                 # save results
-                self._save_results(results, dataset, block)
+                self.__save_results(results, dataset, block)
 
                 # save trained block
                 fn = os.path.join(self.save_path, 'trained_blocks', block.get_name())
@@ -208,6 +209,7 @@ class Experiment():
                 prev_results = results
             
             self.is_trained = True
+            dataset.set_cfl_results(all_results)
             return all_results
         else: 
             raise Exception('This Experiment has already been trained. ' + \
@@ -218,12 +220,12 @@ class Experiment():
         ''' Predict using the trained CFL pipeline. 
 
             Arguments:
-                dataset : dataset name or object. (str or Dataset)
-                prev_results : dict of results to pass to first Block to
-                               predict with, if needed. (dict)
+                dataset (str or Dataset) : dataset name or object.
+                prev_results (dict) : dict of results to pass to first Block to
+                               predict with, if needed.
 
             Returns: 
-                all_results : dict of results dicts from all Blocks. (dict dict)
+                 (dict of dicts) : dict of results dictionaries from all Blocks.
         '''
 
         # check inputs
@@ -246,22 +248,24 @@ class Experiment():
             all_results[block.get_name()] = results
 
             # save results
-            self._save_results(results, dataset, block)
+            self.__save_results(results, dataset, block)
 
             # pass results on to next block
             prev_results = results    
 
+        dataset.set_cfl_results(all_results)
         return all_results        
 
-    def _save_results(self, results, dataset, block):
+    def __save_results(self, results, dataset, block):
         ''' Save results for a given dataset and block. 
-            Arguments: 
-                results : dictionary of results from running block on dataset. 
-                          (dict)
-                dataset : dataset object to run block on. (Dataset)
-                block : block to run on dataset. (Block)
 
-            Returns: None
+            Arguments: 
+                results (dict) : dictionary of results from running block on dataset. 
+                dataset (Dataset) : dataset object to run block on. 
+                block (Block) : block to run on dataset. 
+
+            Returns: 
+                None
         '''
 
         # check inputs
@@ -281,11 +285,9 @@ class Experiment():
                 # TODO: eventually, we have to be careful about what pickle 
                 # protocol we use for compatibility across python versions
 
-    def _save_params(self):
+    def __save_params(self):
         ''' Helper function to save params associated with each block in 
             self.blocks. Primarily used in Experiment initialization. 
-            Arguments: None
-            Returns: None
         '''
 
         if self.save_path is not None:
@@ -305,22 +307,22 @@ class Experiment():
                 pickle.dump(block_graph, f) 
     
 
-    def _load_params(self, params_path):
+    def __load_params(self, params_path):
         ''' Helper function to load params from a specified previous
             experiment to be used in this experiment. Primarily used in 
             Experiment initialization. 
             
             Arguments: 
-                params_path : path to where params are saved in previous 
-                              Experiment. (str)
+                params_path (str) : path to where params are saved in previous 
+                              Experiment. 
             
             Returns: 
-                block_graph : ordered list of blocks used in previous
+                list of strs : ordered list of blocks used in previous
                               Experiment. Blocks identified by name (should be
                               the same name that block.get_name() returns). 
-                              (str list)
-                block_params : ordered list of params dictionaries associated 
-                               with each block. (dict list)
+                              
+                list of dicts : ordered list of params dictionaries associated 
+                               with each block. 
         '''
         assert isinstance(params_path, str), 'params_path should be a str.'
         assert os.path.exists(params_path), \
@@ -335,18 +337,20 @@ class Experiment():
         return block_graph, block_params
 
 
-    def add_dataset(self, X, Y, Xraw=None, Yraw=None, dataset_name='dataset'):
+    def add_dataset(self, X, Y, dataset_name, Xraw=None, Yraw=None):
         ''' Add a new dataset to be tracked by this Experiment. 
             
             Arguments: 
-                X : X data of shape (n_samples, n_x_features) associated with 
-                    this Dataset. (np.array)
-                Y : Y data of shape (n_samples, n_y_features) associated with
-                    this Dataset. (np.array)
-                dataset_name : name associated with this Dataset. This will be
+                X (np.array) : X data of shape (n_samples, n_x_features) associated with 
+                    this Dataset. 
+                Y (np.array) : Y data of shape (n_samples, n_y_features) associated with
+                    this Dataset. 
+                dataset_name (str) : name associated with this Dataset. This will be
                                the name used to retrieve a dataset using the
-                               Experiment.get_dataset method. (str)
-            
+                               `Experiment.get_dataset()` method. 
+                Xraw (np.ndarray) : (Optional) raw form of X before preprocessing to remain associated with X for visualization. Defaults to None.
+                Yraw (np.ndarray) : (Optional) raw form of Y before preprocessing to remain associated with Y for visualization. Defaults to None. 
+
             Returns:
                 dataset : the newly constructed Dataset object. (Dataset)
         '''
@@ -397,14 +401,14 @@ class Experiment():
             through the Experiment pipeline.
 
             Arguments: 
-                dataset_name : name of Dataset to load results for. Defaults
+                dataset_name (str) : name of Dataset to load results for. Defaults
                                to the dataset used to train the pipeline, 
-                               'dataset_train'. (str)
+                               'dataset_train'. 
 
             Returns:
-                results : dictionary of results-dictionaries. The first key
-                          specifies which block the results come from. The
-                          second key specifies the result name. (dict dict)
+                dict of dicts : dictionary of results-dictionaries. The first key
+                          specifies which Block the results come from. The
+                          second key specifies the specific result.
         '''
 
         # check inputs
@@ -427,7 +431,7 @@ class Experiment():
         return results
 
     
-    def _build_block(self, block_name, block_param):
+    def __build_block(self, block_name, block_param):
         ''' Given a Block's name and associated params, instantiate a Block 
             object. 
 
@@ -474,18 +478,18 @@ class Experiment():
     #     return True
 
     
-    def _make_exp_dir(self, results_path):
+    def __make_exp_dir(self, results_path):
         ''' Build directory to which to save this Experiment. 
             
             Arguments: 
-                results_path : where to build this Experiment's directory. For
-                               example, if results_path='path/to/dir', the
-                               direcotry 'path/to/dir/experiment000x' will
-                               be built.(str)
+                results_path (str): where to build this Experiment's directory. For
+                               example, if `results_path='path/to/dir'`, the
+                               direcotry `'path/to/dir/experiment000x'` will
+                               be built.
             Returns: 
-                save_path : path to experiment directory 
-                            ('path/to/dir/experiment000x' in the example above).
-                            (str)
+                save_path (str): path to experiment directory 
+                            (`'path/to/dir/experiment000x'` in the example above).
+                            
         '''
 
         # check inputs
@@ -508,13 +512,40 @@ class Experiment():
         os.mkdir(os.path.join(save_path, 'trained_blocks'))
         return save_path
 
-    def _propagate_verbosity(self, verbose, block_params):
+    def __propagate_verbosity(self, verbose, block_params):
         for pi in range(len(block_params)):
             if 'verbose' not in block_params[pi].keys():
                 modified_params = block_params[pi]
                 modified_params['verbose'] = verbose
                 block_params[pi] = modified_params
         return block_params
+
+    def get_intervention_recs(self, dataset_name, k_samples=100, eps=0.5):
+        ''' For a given dataset, this function selects a subset of samples that
+            serve as optimal interventions to perform when testing for confounding
+            in CFL's observational partition.
+            TODO: complete documentation
+        '''
+        assert self.blocks is not None, 'blocks have not been defined yet.'
+        
+        cfl_results = self.get_dataset(dataset_name).get_cfl_results()
+        assert cfl_results is not None, 'There are no results for this Dataset.'
+
+        # TODO: standardize block names as CDE and Clusterer so those can be
+        # hardcoded here. Right now there's no way to know if blocks[0] is actually
+        # a CDE
+        return intervention_rec.get_recommendations(
+                    pyx=cfl_results[self.blocks[0].get_name()]['pyx'], 
+                    cluster_labels=cfl_results[self.blocks[1].get_name()]['x_lbls'], 
+                    k_samples=k_samples, 
+                    eps=eps,
+                    to_plot=False,
+                    series='series'
+                ) 
+        
+
+
+########### HELPER FUNCTIONS ##################################################
 
 def get_next_dirname(path):
     ''' gets the next subdirectory name in numerical order. i.e. if  'path' 

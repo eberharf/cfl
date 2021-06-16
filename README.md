@@ -1,6 +1,7 @@
 # Welcome to CFL 
 
 ![Build Status](https://github.com/eberharf/cfl/workflows/dev_regression_tests/badge.svg)
+[![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360/)
 
 ## Set-up 
 
