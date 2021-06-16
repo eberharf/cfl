@@ -69,21 +69,22 @@ class Clusterer(Block):
 
     def __init__(self, data_info, params):
         """
-        initialize Clusterer object
+        Initialize Clusterer object
 
         Parameters
             data_info (dict): 
             params (dict) : a dictionary of relevant hyperparameters for
-                clustering. For a base clusterer object, these should be two 
-                already created clusterers (one for clustering the x data and 
-                one for the y. The parameters between the two can be the same). 
-                The clusterer object needs to adhere to the Scikit learn 
-                BaseEstimator (https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html)
-                and ClusterMixin Interfaces (https://scikit-learn.org/stable/modules/generated/sklearn.base.ClusterMixin.html)
-                ^ (this means they need to have the method 
-                fit_predict(X, y=None) and assign the results as 
-                self.labels_ #TODO: make this docstring and the requirements 
-                better.
+                clustering. This dictionary should contain the keys `x_model` and
+                `y_model`. The value of each of these should be an already created
+                clustering object (the first for clustering the `X` data and the
+                second for clustering the `Y` data). `None` can be passed as the
+                value of `y_model` to indicate only clustering on the cause data. 
+
+                The clusterer objects need to adhere to the Scikit learn 
+                `BaseEstimator` (https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html)
+                and `ClusterMixin` interfaces (https://scikit-learn.org/stable/modules/generated/sklearn.base.ClusterMixin.html)
+                This means they need to have the method `fit_predict(X, y=None)` and assign the results as 
+                `self.labels_`.
 
         Return
             None
@@ -158,16 +159,21 @@ class Clusterer(Block):
         self.xmodel.fit(pyx)
         x_lbls = self.xmodel.labels_
 
-        # sample P(Y|Xclass)
-        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
+        # if we are also clustering effect data 
+        if self.ymodel is not None: 
+            # sample P(Y|Xclass)
+            y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
 
-        # do y clustering
-        self.ymodel.fit(y_probs)
-        y_lbls = self.ymodel.labels_
+            # do y clustering
+            self.ymodel.fit(y_probs)
+            y_lbls = self.ymodel.labels_
 
-        self.trained = True
-        results_dict = {'x_lbls' : x_lbls,
-                        'y_lbls' : y_lbls}
+            self.trained = True
+            results_dict = {'x_lbls' : x_lbls,
+                            'y_lbls' : y_lbls}
+        else: 
+            results_dict = {'x_lbls' : x_lbls}
+
         return results_dict
 
     def predict(self, dataset, prev_results):
