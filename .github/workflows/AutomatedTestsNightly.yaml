@@ -1,7 +1,8 @@
 name: AutomatedTests
 
 on:
-  push:
+  schedule:
+    - cron: @midnight
     branches:
       - dev
 
@@ -10,8 +11,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.8]
-        os: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
+        os: [macos-latest, ubuntu-latest, windows-latest]
         
     defaults:
       run:
