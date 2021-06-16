@@ -24,23 +24,36 @@ macrovariable")
 ### How does CFL work? 
 
 CFL is designed to take two micro-level data sets as input: a 'causal' data set
-(`X`) and an 'effect' data set (`Y`). CFL partitions each data set into a set of
-macrovariable states: the causal data into a set of **macro-causes** (e.g. the temperature
-of the room) and effect data into a set of **macro-effects** (e.g. whether or not
-the air conditioner turns on). 
+(`X`) and an 'effect' data set (`Y`). CFL then assigns each data point in `X`
+and `Y` to a macrovariable state: the causal data is partitioned into a set of
+**macro-causes** (e.g. the temperature of the room) and effect data into a set
+of **macro-effects** (e.g. whether or not the air conditioner turns on). 
 
-CFL constructs macrovariables while attempting to preserve the original causal
+
+---
+CFL attempts to preserve the causal relationships between microvariables at the
+macrovariable level while abstracting away causally irrelevant
+features of the micro-level data. 
+In other words, any data point in `X` assigned to macro-cause state `a` should
+be similarly likely to produce a certain `Y` distribution as any another data point assigned to `a`. 
+
+
+--- 
+When constructing the cause and effect macrovariables, CFL attempts to preserve the original causal
 relationships between the microvariables. In other words, CFL attempts to create
-macrovariables such that, TODO: **all configurations of variables in the causal data set
-that affect the 'effect' data in a certain way are assigned to the same causal
-macrovariable class, and vice versa for the effect macrovariables.**
+macrovariables such that, every microvariable configuration in `X` assigned to a given
+cause macro-state produces the same effect on `Y`. Similarly, each
+microvariable configuration in `Y` that is assigned to the same effect
+macro-state should be expected to respond similarly to any cause data.  **TODO: Help**
+--- 
 
-CFL works in two steps to create its macrovariables: first, it estimates a
-conditional probability distribution _P(Y|X)_; and second, it clusters the cause
+
+CFL works in two steps to create these macrovariables: first, CFL estimates a
+conditional probability distribution _P(Y|X)_; second, it clusters the cause
 and effect data based on that distribution. The cluster labels that CFL outputs
 correspond to the macrovariable state of each data point. 
 
-In addition to these labels, the 'rules' to predict the macrovariable class of any data point are stored in the parameters of the trained CFL pipeline. New data can be passed through the trained pipeline and given macrovaraible assignments as well. 
-
-The image below provides a visual overview of the inputs and outputs of each step of CFL.
-
+In addition to these labels, the underlying rules to predict the macrovariable
+state of any new data point are implicitly stored in the parameters of the trained CFL
+pipeline. New data can be passed through the trained pipeline and given
+macrovariable assignments as well. 
