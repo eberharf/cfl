@@ -24,13 +24,9 @@ class CondExpCNN(CondExpBase):
                 data that will be passed in. Should contain 'X_dims',
                 'Y_dims', and 'Y_type' as keys.
             params (dict) : dictionary containing parameters for the model.
-            model (str) : name of the model so that the model type can be
-                recovered from saved parameters.
         Returns: 
             None
         '''
-
-        self.name='CondExpCNN'
         super().__init__(data_info, params) #Main init stuff happens in block.py
 
 

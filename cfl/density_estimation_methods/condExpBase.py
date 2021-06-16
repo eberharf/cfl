@@ -76,7 +76,7 @@ class CondExpBase(Block):
         Returns: 
             None
         '''
-
+        self.name = 'CDE'
         super().__init__(data_info=data_info, params=params)
 
         # self.params = self._check_model_params(params)

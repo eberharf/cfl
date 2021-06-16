@@ -26,13 +26,10 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
                 data that will be passed in. Should contain 'X_dims',
                 'Y_dims', and 'Y_type' as keys.
             params (dict) : dictionary containing parameters for the model.
-            model (str) : name of the model so that the model type can be
-                recovered from saved parameters.
         Returns: 
             None
         '''
 
-        self.name = 'CondExpVB'
         super().__init__(data_info, params)
 
     def _get_default_params(self):
