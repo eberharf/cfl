@@ -3,8 +3,6 @@ name: AutomatedTestsNightly
 on:
   schedule:
     - cron: '0 0 * * *'
-    branches:
-      - dev
 
 jobs:
   build:
