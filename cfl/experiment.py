@@ -26,7 +26,9 @@ Methods in Experiment Class:
 
 '''
 # TODO: this is a placeholder until we have a block registration system.
-# NOTE: the name in the registry has to match the self.name in each block's __init__ 
+# NOTE: the keys of this dictionary are passed as part of the 'block_names'
+# list. They are different than the names of the attributes in each block's
+# self.name attribute
 BLOCK_KEY = {   'CondExpVB'     : cdem.CondExpVB, 
                 'CondExpKC'     : cdem.CondExpKC,
                 'CondExpCNN'    : cdem.CondExpCNN,
