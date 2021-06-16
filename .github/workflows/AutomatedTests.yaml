@@ -66,4 +66,4 @@ jobs:
       run: |
         conda env list
         ls
-        pytest
+        pytest -s
