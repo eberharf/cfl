@@ -73,10 +73,10 @@ def test_cde_experiment():
     print('HERE:::::: ', train_results_cde.keys())
     
     # check output of CDE block
-    assert 'pyx' in train_results_cde['CondExpMod'].keys(), \
+    assert 'pyx' in train_results_cde['CDE'].keys(), \
         'CDE train fxn should specify pyx in training results. ' + \
         'Actual keys: {}'.format(train_results_cde.keys())
-    assert 'model_weights' in train_results_cde['CondExpMod'].keys(), \
+    assert 'model_weights' in train_results_cde['CDE'].keys(), \
         'CDE train fxn should specify model_weights in training results. ' + \
         'Actual keys: {}'.format(train_results_cde.keys())
 
@@ -87,10 +87,10 @@ def test_cde_experiment():
     ## predict 
     # check that results are the same as with training 
     predict_results_cde = my_exp_cde.predict(dataset_train_cde)
-    assert 'pyx' in predict_results_cde['CondExpMod'].keys(), \
+    assert 'pyx' in predict_results_cde['CDE'].keys(), \
         'CDE predict fxn should specify pyx in prediction results'
-    assert np.array_equal(train_results_cde['CondExpMod']['pyx'], \
-        predict_results_cde['CondExpMod']['pyx'])
+    assert np.array_equal(train_results_cde['CDE']['pyx'], \
+        predict_results_cde['CDE']['pyx'])
 
 
     ## CDE and cluster experiment 
