@@ -34,8 +34,6 @@ As discussed above, when constructing a macrovariable, a choice must be made
 about what information to preserve and what details to abstract away. In the
 case of CFL, we attempt to preserve the causal
 relationships between microvariables in the cause and effect data sets. 
-
-
 In other words, every microvariable configuration assigned to a given
 cause macro-state should produce the same effect on `Y` as any other member of
 that same macro-state. Similarly, each
