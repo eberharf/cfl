@@ -1,18 +1,15 @@
 '''
-This module contains a function that assists in converting a list containing the
-default output of CFL clustering (an array called `x_lbls`) into a format useful
-for creating a Sankey Diagram. 
+Iman Wahle and Jenna Kahn
+1/8/20
+Sankey diagram code
 
-The Sankey Diagram can be used during cluster tuning to understand how different
-samples 'flow' between clusters as their parameters change. 
+Usage of this function:
 
-Usage of this module:
 
-```
 import plotly.graph_objects as go
 from cfl.visualization_methods import clustering_to_sankey as sk
 
-#x_lbls_L = list of x_lbls from several different rounds of clustering on the same data
+#x_lbls_L = list of x labels from several different rounds of clustering on the same data
 
 link, label = sk.convert_lbls_to_sankey_nodes(x_lbls_L)
 # plot
@@ -22,7 +19,6 @@ fig = go.Figure(data=
 
 fig.update_layout(title_text="Sample Sankey", font_size=10)
 fig.show()
-```
 '''
 
 import numpy as np

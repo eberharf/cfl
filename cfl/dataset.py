@@ -40,6 +40,7 @@ class Dataset():
 
         self.X = X
         self.Y = Y
+        self.n_samples = X.shape[0]
 
         if Xraw is None:
             self.Xraw = self.X
@@ -51,6 +52,7 @@ class Dataset():
             self.Yraw = Yraw
 
         self.name = name
+        self.cfl_results = None
 
     def get_name(self):
         ''' Return the name of this Dataset.
@@ -69,3 +71,9 @@ class Dataset():
     def get_Y(self):
         ''' Return Y array associated with this Dataset'''
         return self.Y
+    
+    def get_cfl_results(self):
+        return self.cfl_results
+    
+    def set_cfl_results(self, cfl_results):
+        self.cfl_results = cfl_results

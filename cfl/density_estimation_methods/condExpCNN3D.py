@@ -24,12 +24,9 @@ class CondExpCNN3D(CondExpBase):
                 data that will be passed in. Should contain 'X_dims',
                 'Y_dims', and 'Y_type' as keys.
             params (dict) : dictionary containing parameters for the model.
-            model (str) : name of the model so that the model type can be
-                recovered from saved parameters.
         Returns: 
             None
         '''
-        self.name='CondExpCNN3D'
         super().__init__(data_info, params) #Main init stuff happens in block.py
 
 
@@ -124,7 +121,7 @@ class CondExpCNN3D(CondExpBase):
             AssertionError : if model architecture specified in self.params
                 is invalid. 
         '''
-        assert len(self.params['input_shape'])==4, "Input shape should be of \
+        assert len(self.params['input_shape'])==3, "Input shape should be of \
             the format (im_height, im_width, num_channels) but is {}".format(\
             self.params['input_shape'])
 

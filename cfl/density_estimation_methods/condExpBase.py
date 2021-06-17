@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 from cfl.density_estimation_methods.cde_interface import Block #base class
+from cfl.dataset import Dataset
 
 # Things that descend from this class should have a self.name attribute but 
 # this class doesn't since CondExpBase objects are not supposed to be created 
@@ -75,21 +76,27 @@ class CondExpBase(Block):
         Returns: 
             None
         '''
-
+        self.name = 'CDE'
         super().__init__(data_info=data_info, params=params)
 
         # self.params = self._check_model_params(params)
 
         # set object attributes
-        self.weights_loaded = False
         self.model = self._build_model()
 
         # load model weights if specified
         if self.params['weights_path'] is not None:
             self.load_model(self.params['weights_path'])
-            self.weights_loaded = True
             self.trained = True
 
+    def get_params(self):
+        ''' Get parameters for this CDE model.
+            Arguments: None
+            Returns: 
+                dict: dictionary of parameter names (keys) and values (values)
+        '''
+
+        return self.params
 
     def load_block(self, path):
         ''' 
@@ -100,6 +107,7 @@ class CondExpBase(Block):
             None
         '''
 
+        assert isinstance(path, str), 'path should be a str of path to block.'
         self.load_model(path)
         self.trained = True
 
@@ -112,7 +120,7 @@ class CondExpBase(Block):
         Returns: 
             None
         '''
-
+        assert isinstance(path, str), 'path should be a str of path to block.'
         self.save_model(path)
 
     def train(self, dataset, prev_results=None):
@@ -135,8 +143,12 @@ class CondExpBase(Block):
         # expected
         #TODO: say what expected vs actual are
 
-        if self.weights_loaded:
-            print('No need to train CDE, specified weights loaded already.')
+        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
+        assert isinstance(prev_results, (type(None), dict)),\
+            'prev_results is not NoneType or dict'
+        if self.trained:
+            print('Model has already been trained, will return predictions on \
+                training data.')
             return {'pyx' : self.model.predict(dataset.X)}
 
         # train-test split
@@ -174,7 +186,11 @@ class CondExpBase(Block):
                 save_best_only=True)
             callbacks = [model_checkpoint_callback]
 
-
+        if self.params['tb_path'] is not None:
+            tb_callback = tf.keras.callbacks.TensorBoard(
+                            log_dir=self.params['tb_path'])
+            callbacks = [tb_callback] + callbacks
+        
         # train model
         history = self.model.fit(
             Xtr, Ytr,
@@ -251,6 +267,10 @@ class CondExpBase(Block):
                 given Dataset. 
         '''
         
+        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
+        assert isinstance(prev_results, (type(None), dict)),\
+            'prev_results is not NoneType or dict'
+
         assert self.trained, "Remember to train the model before prediction."
         pyx = self.model.predict(dataset.X)
 
@@ -268,10 +288,10 @@ class CondExpBase(Block):
         Returns: 
             float : the average loss for this batch
         '''
-
+        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert self.trained, "Remember to train the model before evaluation."
 
-        Y_hat = self.predict(dataset)
+        Y_hat = self.predict(dataset)['pyx']
         loss_fxn = tf.keras.losses.get(self.params['loss'])
         cost = loss_fxn(dataset.Y, Y_hat)
         return tf.reduce_mean(cost)
@@ -291,7 +311,10 @@ class CondExpBase(Block):
 
         if self.params['verbose']>0:
             print("Loading parameters from ", file_path)
-        self.model.load_weights(file_path)
+        try:
+            self.model.load_weights(file_path)
+        except:
+            raise ValueError('path does not exist.')
 
         #TODO: does tensorflow keep track of if model is trained? 
         self.trained = True
@@ -309,7 +332,10 @@ class CondExpBase(Block):
         # setting train to true )
         if self.params['verbose']>0:
             print("Saving parameters to ", file_path)
-        self.model.save_weights(file_path)
+        try:
+            self.model.save_weights(file_path)
+        except:
+            raise ValueError('path does not exist.')
 
     @abstractmethod
     def _build_model(self):
