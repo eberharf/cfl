@@ -203,14 +203,23 @@ class Clusterer(Block):
         pyx = prev_results['pyx']
 
         x_lbls = self.xmodel.fit_predict(pyx)
-        # NOTE: fit_predict is different than predict, so this is wrong 
+
+        # NOTE: TODO: fit_predict is different than predict, so this code is WRONG  
         # however, kmeans is the only clustering function in sklearn that has 
         # a predict function defined so we're doing this for now
-        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
-        y_lbls = self.ymodel.fit_predict(y_probs)
 
-        results_dict = {'x_lbls' : x_lbls,
-                        'y_lbls' : y_lbls}
+        # if we are also clustering effect data 
+        if self.ymodel is not None: 
+            # sample P(Y|Xclass)
+            y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
+
+            # do y clustering
+            y_lbls = self.ymodel.fit_predict(y_probs)
+
+            results_dict = {'x_lbls' : x_lbls,
+                            'y_lbls' : y_lbls}
+        else: 
+            results_dict = {'x_lbls' : x_lbls}
         return results_dict
 
 
