@@ -1,15 +1,22 @@
 import matplotlib.pyplot as plt
 
 def cde_diagnostic(cfL_experiment): 
-    '''histogram with the distribution of the given effecvariable in 
+    '''Creates a figure to help diagnose whether the CDE is predicting the
+target variable(s) effectively or should be tuned further 
 
-    histogram if Y has type 'continuous', bar chart if Y has type 'categorical'.
-    This function may not work for 
-    First column: actual distribution of th 
+
+    Creates a figure with three subplots
+    First: actual distribution of the Y variable(s), according to the data 
+    Second: predicted distribution of the Y variable(s), as output by the CDE 
+    Third: difference between subplots 1 and 2
+
+    This function may not work for higher dimensional continuous Ys. 
 
     # these should ideally look fairly similar if the CDE is doing well 
-
-
+    creates a histogram if Y has type 'continuous', bar chart if Y has type
+    'categorical'.
+    Params: 
+        cfl_experiment (cfl.experiment.Experiment) - a trained CFL pipeline 
     Returns 
         (Fig) - A `matplotlib.pyplot Figure` object that contains the diagnostic plot
         (Axes) - An array of `matplotlib.pyplot Axes` objects that are the
@@ -27,13 +34,13 @@ def cde_diagnostic(cfL_experiment):
 
 
     if Y_type == 'continuous': 
-        __for_continuous_Y(Y, pyx, axes)
+        axes = __for_continuous_Y(Y, pyx, axes)
     if Y_type == 'categorical': 
-        __for_categorical_Y(Y, pyx, axes)
+        axes = __for_categorical_Y(Y, pyx, axes)
 
     axes[2].set_title("Difference between actual and expected values")
 
-    return fig, axes 
+    return fig, axes  
 
 def __for_continuous_Y(Y, pyx, axes): 
     """ 
