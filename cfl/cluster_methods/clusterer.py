@@ -171,10 +171,11 @@ class Clusterer(Block):
             y_lbls = self.ymodel.labels_
 
             self.trained = True
-            results_dict = {'x_lbls' : x_lbls,
-                            'y_lbls' : y_lbls}
+            results_dict = {'x_lbls'  : x_lbls,
+                            'y_lbls'  : y_lbls,
+                            'y_probs' : y_probs}
         else: 
-            results_dict = {'x_lbls' : x_lbls}
+            results_dict = {'x_lbls'  : x_lbls}
 
         return results_dict
 
