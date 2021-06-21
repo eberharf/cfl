@@ -18,7 +18,7 @@ def cde_diagnostic(cfL_experiment):
     '''
 
     Y = cfL_experiment.get_training_data().get_Y()
-    pyx = cfL_experiment.get_training_results()['CDE']['pyx'] #TODO: there isn't a specific CDE necessarily (this line doesn't work )
+    pyx = cfL_experiment.get_training_results()['CDE']['pyx'] )
     Y_type = cfL_experiment.get_data_info().get_Y()
     assert Y_type in ['categorical', 'continuous'], \
         'There is not a graphing method defined for the Y type of this training dataset'
