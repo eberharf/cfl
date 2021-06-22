@@ -124,6 +124,7 @@ class Clusterer(Block):
 
         default_params =  {'x_model' : DBSCAN(),
                            'y_model' : DBSCAN(),
+                           'precompute_distances' : True,
                           }
         return default_params
 
@@ -162,17 +163,19 @@ class Clusterer(Block):
         # if we are also clustering effect data 
         if self.ymodel is not None: 
             # sample P(Y|Xclass)
-            y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
+            y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls, 
+                precompute_distances=self.params['precompute_distances'])
 
             # do y clustering
             self.ymodel.fit(y_probs)
             y_lbls = self.ymodel.labels_
 
             self.trained = True
-            results_dict = {'x_lbls' : x_lbls,
-                            'y_lbls' : y_lbls}
+            results_dict = {'x_lbls'  : x_lbls,
+                            'y_lbls'  : y_lbls,
+                            'y_probs' : y_probs}
         else: 
-            results_dict = {'x_lbls' : x_lbls}
+            results_dict = {'x_lbls'  : x_lbls}
 
         return results_dict
 

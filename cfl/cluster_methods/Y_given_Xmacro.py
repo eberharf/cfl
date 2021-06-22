@@ -13,7 +13,7 @@ from sklearn.metrics.pairwise import euclidean_distances
 
 
 
-def sample_Y_dist(Y_type, dataset, x_lbls):
+def sample_Y_dist(Y_type, dataset, x_lbls, precompute_distances=True):
     #TODO: is name good? I think it's decent
     """
     Finds (a proxy of) P(Y=y | Xclass) for all Y=y
@@ -34,15 +34,16 @@ def sample_Y_dist(Y_type, dataset, x_lbls):
     """
     Y = dataset.get_Y()
     if Y_type == 'continuous':
-        y_probs = _continuous_Y(Y, x_lbls)
+        y_probs = _continuous_Y(Y, x_lbls, precompute_distances)
     elif Y_type == 'categorical':
-        y_probs = _categorical_Y(Y, x_lbls)
+        y_probs = _categorical_Y(Y, x_lbls, precompute_distances)
     else: 
         raise TypeError('Invalid Y-type')
     return y_probs
 
 
-def _categorical_Y(Y_data, x_lbls):
+def _categorical_Y(Y_data, x_lbls, precompute_distances=True):
+    # TODO: use precompute_distances
     """
     Estimates the conditional probability density P(Y=y|X=xClass) for
     categorical data, where 'y' is an observation in Y_data and xClass is a
@@ -55,6 +56,9 @@ def _categorical_Y(Y_data, x_lbls):
         x_lbls (np.ndarray): a 1D array (same
             length/aligned with Y_data) of the CFL labels predicted for the x
             (cause) data
+        precompute_distances (boolean): when True, distances between all 
+            samples will be precomputed. This will significantly speed up
+            this function, but uses considerable space for larger datasets.
 
     Returns: 
         np.ndarray: an array with a row for each observation
@@ -99,7 +103,7 @@ def _categorical_Y(Y_data, x_lbls):
     return cond_Y_prob
 
 
-def _continuous_Y(Y_data, x_lbls):
+def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
     """
     Estimates the conditional probability density `P(Y=y|X=xClass)` for every y
     (observation in Y_data) and xClass (macrovariable constructed from X_data,
@@ -128,6 +132,9 @@ def _continuous_Y(Y_data, x_lbls):
         x_lbls (np.ndarray): a 1D array (same
             length/aligned with `Y_data`) of the CFL labels predicted for the 
             `X` (cause) data
+        precompute_distances (boolean): when True, distances between all 
+            samples will be precomputed. This will significantly speed up
+            this function, but uses considerable space for larger datasets.
 
     Returns: 
         np.ndarray: a 2D array with a row for each observation in Y_data
@@ -155,43 +162,69 @@ def _continuous_Y(Y_data, x_lbls):
     # format x_lbls that come in as shape (n_samples,1) to be of shape 
     # (n_samples,)
     x_lbls = np.squeeze(x_lbls)
-
-    # precompute distance matrices
-    dist_matrix = euclidean_distances(Y_data, Y_data)
-
-    # separate distances by X class
-    # xclass_dist_matrix is a 3D array of distances where:
-    #   - axis 0 corresponds to X classes
-    #   - axis 1 corresponds to Y_data samples
-    #   - axis 2 corresponds to nearest neighbors, sorted
     k_neighbors = 4
     n_x_classes = len(np.unique(x_lbls))
-    xclass_dist_matrix = -1 * np.ones((n_x_classes, Y_data.shape[0], 
-                                       k_neighbors))
-    for xi in np.unique(x_lbls):
-        # take first through fifth closest distances (offset by one to 
-        # leave out distance to self)
-        nn = np.sort(dist_matrix[:,x_lbls==xi],axis=1)[:,1:k_neighbors+1]
-        # if we have less than k_neighbors neighbors, pad with -1
-        padded_nn = np.pad(nn, ((0,0),(0,k_neighbors-nn.shape[1])), 'constant', 
-                           constant_values=-1) 
-        xclass_dist_matrix[xi,:,:] = padded_nn
+
+    # precompute distance matrices
+    if precompute_distances:
+        dist_matrix = euclidean_distances(Y_data, Y_data)
+
+        # separate distances by X class
+        # xclass_dist_matrix is a 3D array of distances where:
+        #   - axis 0 corresponds to X classes
+        #   - axis 1 corresponds to Y_data samples
+        #   - axis 2 corresponds to nearest neighbors, sorted
+        xclass_dist_matrix = -1 * np.ones((n_x_classes, Y_data.shape[0], 
+                                        k_neighbors))
+        for xi in range(n_x_classes):
+            # take first through fifth closest distances (offset by one to 
+            # leave out distance to self)
+            nn = np.sort(dist_matrix[:,x_lbls==xi],axis=1)[:,1:k_neighbors+1]
+            # if we have less than k_neighbors neighbors, pad with -1
+            padded_nn = np.pad(nn, ((0,0),(0,k_neighbors-nn.shape[1])), 
+                'constant', constant_values=-1) 
+            xclass_dist_matrix[xi,:,:] = padded_nn
 
     # now we can compute nearest neighbors averages for each 
     # Y_data point and X class combination
     cond_Y_prob = np.zeros((Y_data.shape[0], n_x_classes))
-    # vectorize this
+    # TODO: vectorize this
     for y_id in tqdm(range(Y_data.shape[0])):
         # compute average distance to nearest neighbors per class
-        for xi in range(xclass_dist_matrix.shape[0]):
-            # do not include -1 entries in mean
-            valid = xclass_dist_matrix[xi,y_id,:] >= 0
-            cond_Y_prob[y_id,xi] = np.mean(xclass_dist_matrix[xi,y_id,valid])
+        for xi in range(n_x_classes):
 
+            if precompute_distances:
+                # do not include -1 entries in mean
+                valid = xclass_dist_matrix[xi,y_id,:] >= 0
+                cond_Y_prob[y_id,xi] = \
+                    np.mean(xclass_dist_matrix[xi,y_id,valid])
+            
+            else:
+                # compute distances from sample y_id to all other samples in 
+                # class xi
+                y_id_dists = np.squeeze(euclidean_distances(np.expand_dims(
+                    Y_data[y_id,:],0), Y_data[x_lbls==xi,:]))
+                
+                # take average of closest neighbors in class xi
+                cond_Y_prob[y_id,xi] = \
+                    np.mean(np.sort(y_id_dists)[1:k_neighbors+1])
+                
         # normalize so that sum of distances is 1
-        cond_Y_prob[y_id,:] /=np.sum(cond_Y_prob[y_id,:])
+        # note: not only is it unecessary to normalize when we only have once
+        # class (as the only element in the row equals the sum of the row), 
+        # but it can also cause an error when we have duplicate points. For
+        # example, if we have five duplicate points and they are all in the
+        # same (and only) class, the four nearest neighbors to one of these
+        # points will all have distance 0, so the sum of the row will be 0 -->
+        # divide by zero error. We will avoid dividing in the case all together
+        # since it's not needed anyways.
+        if n_x_classes > 1:
+            cond_Y_prob[y_id,:] /= np.sum(cond_Y_prob[y_id,:])
 
     return cond_Y_prob
+
+
+
 
     # TODO: this version hasn't been implemented for the categorical case yet
 
