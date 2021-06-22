@@ -183,7 +183,6 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
             # if we have less than k_neighbors neighbors, pad with -1
             padded_nn = np.pad(nn, ((0,0),(0,k_neighbors-nn.shape[1])), 
                 'constant', constant_values=-1) 
-            print(xi)
             xclass_dist_matrix[xi,:,:] = padded_nn
 
     # now we can compute nearest neighbors averages for each 
