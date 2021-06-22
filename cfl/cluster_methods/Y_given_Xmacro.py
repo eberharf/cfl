@@ -176,13 +176,14 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
         #   - axis 2 corresponds to nearest neighbors, sorted
         xclass_dist_matrix = -1 * np.ones((n_x_classes, Y_data.shape[0], 
                                         k_neighbors))
-        for xi in np.unique(x_lbls):
+        for xi in range(n_x_classes):
             # take first through fifth closest distances (offset by one to 
             # leave out distance to self)
             nn = np.sort(dist_matrix[:,x_lbls==xi],axis=1)[:,1:k_neighbors+1]
             # if we have less than k_neighbors neighbors, pad with -1
             padded_nn = np.pad(nn, ((0,0),(0,k_neighbors-nn.shape[1])), 
                 'constant', constant_values=-1) 
+            print(xi)
             xclass_dist_matrix[xi,:,:] = padded_nn
 
     # now we can compute nearest neighbors averages for each 
@@ -196,14 +197,18 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
             if precompute_distances:
                 # do not include -1 entries in mean
                 valid = xclass_dist_matrix[xi,y_id,:] >= 0
-                cond_Y_prob[y_id,xi] = np.mean(xclass_dist_matrix[xi,y_id,valid])
+                cond_Y_prob[y_id,xi] = \
+                    np.mean(xclass_dist_matrix[xi,y_id,valid])
             
             else:
-                # compute distances from sample y_id to all other samples in class xi
-                y_id_dists = np.squeeze(euclidean_distances(np.expand_dims(Y_data[y_id,:],0), Y_data[x_lbls==xi,:]))
+                # compute distances from sample y_id to all other samples in 
+                # class xi
+                y_id_dists = np.squeeze(euclidean_distances(np.expand_dims(
+                    Y_data[y_id,:],0), Y_data[x_lbls==xi,:]))
                 
                 # take average of closest neighbors in class xi
-                cond_Y_prob[y_id,xi] = np.mean(np.sort(y_id_dists)[1:k_neighbors+1])
+                cond_Y_prob[y_id,xi] = \
+                    np.mean(np.sort(y_id_dists)[1:k_neighbors+1])
                 
         # normalize so that sum of distances is 1
         cond_Y_prob[y_id,:] /=np.sum(cond_Y_prob[y_id,:])
