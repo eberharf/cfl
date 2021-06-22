@@ -164,6 +164,7 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
     x_lbls = np.squeeze(x_lbls)
     k_neighbors = 4
     n_x_classes = len(np.unique(x_lbls))
+    print('N_X_CLASSES', n_x_classes)
 
     # precompute distance matrices
     if precompute_distances:
@@ -210,7 +211,16 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
                     np.mean(np.sort(y_id_dists)[1:k_neighbors+1])
                 
         # normalize so that sum of distances is 1
-        cond_Y_prob[y_id,:] /=np.sum(cond_Y_prob[y_id,:])
+        # note: not only is it unecessary to normalize when we only have once
+        # class (as the only element in the row equals the sum of the row), 
+        # but it can also cause an error when we have duplicate points. For
+        # example, if we have five duplicate points and they are all in the
+        # same (and only) class, the four nearest neighbors to one of these
+        # points will all have distance 0, so the sum of the row will be 0 -->
+        # divide by zero error. We will avoid dividing in the case all together
+        # since it's not needed anyways.
+        if n_x_classes > 1:
+            cond_Y_prob[y_id,:] /= np.sum(cond_Y_prob[y_id,:])
 
     return cond_Y_prob
 

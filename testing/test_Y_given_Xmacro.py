@@ -38,3 +38,16 @@ def test__continuous_Y_one_xcluster():
     # make sure doesn't fail
     result1 = YGX._continuous_Y(Y_data, x_lbls, precompute_distances=True)
     result2 = YGX._continuous_Y(Y_data, x_lbls, precompute_distances=False)
+
+def test__continuous_Y_one_xcluster_duplicate_points():
+    
+    # make fake data
+    rng = np.random.default_rng(12345)
+    Y_data = rng.random(size=DATA_INFO['Y_dims'])
+    Y_data[0:10,:] = Y_data[0,:] # add duplicate points
+    x_lbls = np.zeros((DATA_INFO['Y_dims'][0],)) # all in one cluster
+
+    # make sure doesn't fail
+    result1 = YGX._continuous_Y(Y_data, x_lbls, precompute_distances=True)
+    result2 = YGX._continuous_Y(Y_data, x_lbls, precompute_distances=False)
+
