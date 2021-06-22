@@ -381,6 +381,7 @@ class Experiment():
         return dataset
 
     def get_dataset(self, dataset_name):
+
         ''' Retrieve a Dataset that has been registered with this Experiment.
 
             Arguments:
@@ -398,6 +399,8 @@ class Experiment():
 
         return self.datasets[dataset_name]
 
+    def get_data_info(self): 
+        return self.data_info
     # TODO: this function doesn't work right now
     def load_results_from_file(self, dataset_name='dataset_train'):
         ''' Load and return saved results from running a given dataset
