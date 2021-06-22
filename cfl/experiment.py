@@ -398,9 +398,11 @@ class Experiment():
 
         return self.datasets[dataset_name]
 
-    def load_dataset_results(self, dataset_name='dataset_train'):
-        ''' Load and return all saved results from running a given dataset
-            through the Experiment pipeline.
+    # TODO: this function doesn't work right now
+    def load_results_from_file(self, dataset_name='dataset_train'):
+        ''' Load and return saved results from running a given dataset
+            through the Experiment pipeline. Different from get_results because
+            this loads the saved results from their save directory
 
             Arguments: 
                 dataset_name (str) : name of Dataset to load results for. Defaults
@@ -432,7 +434,23 @@ class Experiment():
         
         return results
 
-    
+    def retrieve_results(self, dataset_name='dataset_train'): 
+        '''Returns the results from running a given dataset
+            through the Experiment pipeline. Default is the training dataset
+
+        Arguments: 
+            dataset_name (str) : name of Dataset to load results for. Defaults
+                            to the dataset used to train the pipeline, 
+                            'dataset_train'. 
+        Returns:
+            dict of dicts : dictionary of results-dictionaries. The first key
+                        specifies which Block the results come from. The
+                        second key specifies the specific result.
+        '''
+        dataset = self.datasets['dataset_train']
+        return dataset.cfl_results
+
+
     def __build_block(self, block_name, block_param):
         ''' Given a Block's name and associated params, instantiate a Block 
             object. 
