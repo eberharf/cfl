@@ -64,9 +64,9 @@ target variable(s) effectively or should be tuned further
 
     '''
 
-    Y = cfL_experiment.get_training_data().get_Y()
+    Y = cfL_experiment.get_dataset('dataset_train').get_Y()
     pyx = cfl_experiment.retrieve_results('dataset_train')['CDE']['pyx'] # get training results 
-    Y_type = cfL_experiment.get_data_info().get_Y()
+    Y_type = cfL_experiment.get_data_info()['Y_type']
     assert Y_type in ['categorical', 'continuous'], \
         'There is not a graphing method defined for the Y type of this training dataset'
 
