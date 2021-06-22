@@ -1,4 +1,51 @@
 import matplotlib.pyplot as plt
+import numpy as np 
+
+
+def pyx_scatter(cfl_experiment, ground_truth=None): 
+    '''creates a scatter plot with a sample of points from the CDE output,
+    colored by ground truth (if given). 
+    and also returns the average predictions for each
+    CFL macro cause class
+    
+    Only good for 1D effect data 
+
+    Example Usage: 
+
+    ```
+        fig, means = pyx_scatter(cfl_experiment)
+        plt.show()
+        for i, value in enumerate(means):
+            print('Average prediction for x-class {}: {:.2f}'.format(i, value))
+    ```
+
+    Params: 
+        cfl_experiment (cfl.experiment.Experiment): a trained CFL pipeline 
+        ground_truth (np array): an array, aligned with the CFL training data 
+            that contains the ground truth macrovariable labels for the cause data 
+''' 
+
+    fig  = plt.figure()
+    pyx = cfl_experiment.get_training_results()['CDE']['pyx']
+
+    #choose a thousand (or the maximum possible) random samples from the pyx results
+    n_samples = np.min(1000, pyx.shape[0])
+    plot_idx = np.random.choice(pyx.shape[0], n_samples, replace=False)
+
+    # scatter plot 
+    if ground_truth is not None: 
+        plt.scatter(n_samples, pyx[plot_idx,0], c=ground_truth[plot_idx]) # color by ground truth
+    else: 
+        plt.scatter(n_samples, pyx[plot_idx,0], c='m') # color magenta
+
+    plt.ylabel("Expectation of Target")
+    plt.xlabel("Sample")
+
+    means = []
+    x_lbls = np.unique(cfl_experiment.get_training_results()['Clusterer']['x_lbls'])
+    for macrovar in x_lbls:
+        means.append((pyx[ground_truth==macrovar,0]))
+    return fig, means
 
 def cde_diagnostic(cfL_experiment): 
     '''Creates a figure to help diagnose whether the CDE is predicting the
@@ -25,7 +72,7 @@ target variable(s) effectively or should be tuned further
     '''
 
     Y = cfL_experiment.get_training_data().get_Y()
-    pyx = cfL_experiment.get_training_results()['CDE']['pyx'] )
+    pyx = cfL_experiment.get_training_results()['CDE']['pyx']
     Y_type = cfL_experiment.get_data_info().get_Y()
     assert Y_type in ['categorical', 'continuous'], \
         'There is not a graphing method defined for the Y type of this training dataset'
