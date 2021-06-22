@@ -164,7 +164,6 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
     x_lbls = np.squeeze(x_lbls)
     k_neighbors = 4
     n_x_classes = len(np.unique(x_lbls))
-    print('N_X_CLASSES', n_x_classes)
 
     # precompute distance matrices
     if precompute_distances:
