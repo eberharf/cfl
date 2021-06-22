@@ -40,7 +40,7 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
     plt.xlabel("Sample")
     return fig
 
-def cde_diagnostic(cfL_experiment): 
+def cde_diagnostic(cfl_experiment): 
     '''Creates a figure to help diagnose whether the CDE is predicting the
 target variable(s) effectively or should be tuned further 
 
@@ -64,9 +64,9 @@ target variable(s) effectively or should be tuned further
 
     '''
 
-    Y = cfL_experiment.get_dataset('dataset_train').get_Y()
+    Y = cfl_experiment.get_dataset('dataset_train').get_Y()
     pyx = cfl_experiment.retrieve_results('dataset_train')['CDE']['pyx'] # get training results 
-    Y_type = cfL_experiment.get_data_info()['Y_type']
+    Y_type = cfl_experiment.get_data_info()['Y_type']
     assert Y_type in ['categorical', 'continuous'], \
         'There is not a graphing method defined for the Y type of this training dataset'
 
