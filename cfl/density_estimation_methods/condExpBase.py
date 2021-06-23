@@ -191,6 +191,13 @@ class CondExpBase(Block):
                             log_dir=self.params['tb_path'])
             callbacks = [tb_callback] + callbacks
         
+        # log GPU device if available
+        device_name = tf.test.gpu_device_name()
+        if device_name is not '':
+            print('Using GPU device: ', device_name)
+        else:
+            print('No GPU device detected.')
+            
         # train model
         history = self.model.fit(
             Xtr, Ytr,
