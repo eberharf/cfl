@@ -8,9 +8,10 @@
 
 import numpy as np
 import cfl.cluster_methods.Y_given_Xmacro as YGX
+from time import time
 
-DATA_INFO = {  'X_dims' : (1000,3), 
-               'Y_dims' : (1000,2), 
+DATA_INFO = {  'X_dims' : (10000,3), 
+               'Y_dims' : (10000,2), 
                'Y_type' : 'continuous' }
 
 def test_precompute_distances_true_vs_false():
@@ -20,8 +21,12 @@ def test_precompute_distances_true_vs_false():
     Y_data = rng.random(size=DATA_INFO['Y_dims'])
     x_lbls = rng.choice(4, size=(DATA_INFO['Y_dims'][0],))
 
+    st = time()
     result1 = YGX._continuous_Y(Y_data, x_lbls, precompute_distances=True)
+    print('Precompute time: ', time()-st)
+    st = time()
     result2 = YGX._continuous_Y(Y_data, x_lbls, precompute_distances=False)
+    print('Parallelized no-precompute time: ', time()-st)
 
     np.testing.assert_array_almost_equal(result1, result2, decimal=12, \
         err_msg=f'Results should be the same whether or not distances \
@@ -50,4 +55,3 @@ def test__continuous_Y_one_xcluster_duplicate_points():
     # make sure doesn't fail
     result1 = YGX._continuous_Y(Y_data, x_lbls, precompute_distances=True)
     result2 = YGX._continuous_Y(Y_data, x_lbls, precompute_distances=False)
-

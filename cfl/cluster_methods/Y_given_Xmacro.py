@@ -10,7 +10,7 @@ from tqdm import tqdm
 from cfl.util.find_xlbl_locations import rows_where_each_x_class_occurs
 from cfl.util.data_processing import one_hot_decode
 from sklearn.metrics.pairwise import euclidean_distances
-
+from joblib import Parallel, delayed
 
 
 def sample_Y_dist(Y_type, dataset, x_lbls, precompute_distances=True):
@@ -165,6 +165,10 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
     k_neighbors = 4
     n_x_classes = len(np.unique(x_lbls))
 
+    # now we can compute nearest neighbors averages for each 
+    # Y_data point and X class combination
+    cond_Y_prob = np.zeros((Y_data.shape[0], n_x_classes))
+
     # precompute distance matrices
     if precompute_distances:
         dist_matrix = euclidean_distances(Y_data, Y_data)
@@ -184,45 +188,82 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
             padded_nn = np.pad(nn, ((0,0),(0,k_neighbors-nn.shape[1])), 
                 'constant', constant_values=-1) 
             xclass_dist_matrix[xi,:,:] = padded_nn
+    
+        for y_id in tqdm(range(Y_data.shape[0])):
+            # compute average distance to nearest neighbors per class
+            for xi in range(n_x_classes):
 
-    # now we can compute nearest neighbors averages for each 
-    # Y_data point and X class combination
-    cond_Y_prob = np.zeros((Y_data.shape[0], n_x_classes))
-    # TODO: vectorize this
-    for y_id in tqdm(range(Y_data.shape[0])):
-        # compute average distance to nearest neighbors per class
-        for xi in range(n_x_classes):
-
-            if precompute_distances:
                 # do not include -1 entries in mean
                 valid = xclass_dist_matrix[xi,y_id,:] >= 0
                 cond_Y_prob[y_id,xi] = \
                     np.mean(xclass_dist_matrix[xi,y_id,valid])
+
+            # normalize so that sum of distances is 1
+            # note: not only is it unecessary to normalize when we only have once
+            # class (as the only element in the row equals the sum of the row), 
+            # but it can also cause an error when we have duplicate points. For
+            # example, if we have five duplicate points and they are all in the
+            # same (and only) class, the four nearest neighbors to one of these
+            # points will all have distance 0, so the sum of the row will be 0 -->
+            # divide by zero error. We will avoid dividing in the case all together
+            # since it's not needed anyways.
+            if n_x_classes > 1:
+                cond_Y_prob[y_id,:] /= np.sum(cond_Y_prob[y_id,:])
+    
+    else:
+        def parallel_job1(y_id, xi):
+            # compute distances from sample y_id to all other samples in 
+            # class xi
+            y_id_dists = np.squeeze(euclidean_distances(np.expand_dims(Y_data[y_id,:],0), Y_data[x_lbls==xi,:]))
             
-            else:
-                # compute distances from sample y_id to all other samples in 
-                # class xi
-                y_id_dists = np.squeeze(euclidean_distances(np.expand_dims(
-                    Y_data[y_id,:],0), Y_data[x_lbls==xi,:]))
-                
-                # take average of closest neighbors in class xi
-                cond_Y_prob[y_id,xi] = \
-                    np.mean(np.sort(y_id_dists)[1:k_neighbors+1])
-                
-        # normalize so that sum of distances is 1
-        # note: not only is it unecessary to normalize when we only have once
-        # class (as the only element in the row equals the sum of the row), 
-        # but it can also cause an error when we have duplicate points. For
-        # example, if we have five duplicate points and they are all in the
-        # same (and only) class, the four nearest neighbors to one of these
-        # points will all have distance 0, so the sum of the row will be 0 -->
-        # divide by zero error. We will avoid dividing in the case all together
-        # since it's not needed anyways.
+            # take average of closest neighbors in class xi
+            cond_Y_prob[y_id,xi] = \
+                np.mean(np.sort(y_id_dists)[1:k_neighbors+1])
+            
+        loop1 = [delayed(parallel_job1)(y_id, xi) for xi in range(n_x_classes) for y_id in tqdm(range(Y_data.shape[0]))]
+        Parallel(n_jobs=-1, prefer='threads')(loop1)
+
+        # normalize so that sum of distances is 1 (see note above)
         if n_x_classes > 1:
-            cond_Y_prob[y_id,:] /= np.sum(cond_Y_prob[y_id,:])
+            def parallel_job2(y_id):
+                cond_Y_prob[y_id,:] /= np.sum(cond_Y_prob[y_id,:])
+            loop2 = [delayed(parallel_job2)(y_id) for y_id in range(Y_data.shape[0])]
+            Parallel(n_jobs=-1, prefer='threads')(loop2)
+
+
 
     return cond_Y_prob
 
+
+
+# def _continuous_Y_parallelized(Y_data, x_lbls, precompute_distances=True):
+
+#     assert Y_data.shape[0] == x_lbls.shape[0], "The Y data and x_lbls arrays \
+#         passed through continuous_Y should have the same length. Actual \
+#         shapes: {},{}".format(Y_data.shape[0],x_lbls.shape[0])
+
+#     # format x_lbls that come in as shape (n_samples,1) to be of shape 
+#     # (n_samples,)
+#     x_lbls = np.squeeze(x_lbls)
+#     k_neighbors = 4
+#     n_x_classes = len(np.unique(x_lbls))
+
+#     # now we can compute nearest neighbors averages for each 
+#     # Y_data point and X class combination
+#     cond_Y_prob = np.zeros((Y_data.shape[0], n_x_classes))
+
+#     def what_to_parallelize(y_id, xi):
+#         # compute distances from sample y_id to all other samples in 
+#         # class xi
+#         y_id_dists = np.squeeze(euclidean_distances(np.expand_dims(Y_data[y_id,:],0), Y_data[x_lbls==xi,:]))
+        
+#         # take average of closest neighbors in class xi
+#         cond_Y_prob[y_id,xi] = \
+#             np.mean(np.sort(y_id_dists)[1:k_neighbors+1])
+        
+#     loop = [delayed(what_to_parallelize)(0, xi) for xi in range(n_x_classes) for y_id in range(Y_data.shape[0])]
+#     Parallel(n_jobs=-1, prefer='threads')(loop)
+#     return cond_Y_prob
 
 
 
