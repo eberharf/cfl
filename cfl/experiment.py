@@ -579,7 +579,7 @@ def get_next_dirname(path):
         next subdirectory name. 
     '''
     i = 0
-    while os.path.exists(os.path.join(path, 'experiment{}'.format(str(i).zfill(4)))):
+    while os.path.exists(os.path.join(path, 'experiment{}'.format(str(i).zfill(4)))): #zfill(4) creates a 4 digit number
         i += 1  
     return 'experiment{}'.format(str(i).zfill(4))
 

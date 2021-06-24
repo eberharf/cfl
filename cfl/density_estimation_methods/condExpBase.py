@@ -3,6 +3,8 @@ import os
 import shutil
 # TODO: add GPU support
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
+import datetime #for creating ID 
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -182,15 +184,27 @@ class CondExpBase(Block):
             # if we want to return the best weights (rather than the weights at the
             # end of training)
             if self.params['best']:
-                checkpoint_path = 'tmp_checkpoints'#TODO: do we need to specify an abs rather than relative path? 
 
-                #if the folder already exists, create a folder with a unique name (eg if multiple CFl runs are happening
-                #in parallel)
-                i = 0 
-                while os.path.exists(os.path.join(checkpoint_path+str(i).zfill(4))): #zfill(4) creates a 4 digit number
-                    i += 1  
-                checkpoint_path = checkpoint_path + str(i).zfill(4)
-                os.mkdir(checkpoint_path)
+
+                # absolute_dirpath = os.path.abspath(os.path.dirname(__file__))
+                # checkpoint_path = os.path.join(absolute_dirpath, 'tmp_checkpoints') #specifying the abs path rather than relative bc sometimes tensorflow has issues with the relative path (discovered on Jenna's windows machine when running Optuna)
+                #^Jenna's note: this doesn't actually fix any issues
+
+                # #if the folder already exists, create a folder with a unique name (eg if multiple CFl runs are happening
+                # #in parallel)
+                # i = 0 
+                # while os.path.exists(os.path.join(checkpoint_path+str(i).zfill(4))): #zfill(4) creates a 4 digit number
+                #     i += 1  
+                # checkpoint_path = checkpoint_path + str(i).zfill(4)
+                # os.mkdir(checkpoint_path)
+
+                # give the checkpoints path a unique ID (so that it doesn't get
+                # confused with other CFL runs)
+                now = datetime.datetime.now()
+                dt_id = now.strftime("%d%m%Y%H%M%S") #this creates a string based on the current date and time up to the second (NOTE: if you create a bunch of CFLs all at once maybe you'd need a more precise ID)
+                checkpoint_path = 'tmp_checkpoints'+dt_id
+
+
 
                 # ModelCheckpoint saves model checkpoints to specified path during training 
                 best_path = os.path.join(checkpoint_path, 'best_weights')
@@ -236,10 +250,6 @@ class CondExpBase(Block):
 
 
             self.trained = True
-
-        except: 
-            # do something
-            pass  
 
         finally:  # want to delete the checkpoints directory even if things messed up during training
             if self.params['best']:
