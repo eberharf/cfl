@@ -185,26 +185,11 @@ class CondExpBase(Block):
             # end of training)
             if self.params['best']:
 
-
-                # absolute_dirpath = os.path.abspath(os.path.dirname(__file__))
-                # checkpoint_path = os.path.join(absolute_dirpath, 'tmp_checkpoints') #specifying the abs path rather than relative bc sometimes tensorflow has issues with the relative path (discovered on Jenna's windows machine when running Optuna)
-                #^Jenna's note: this doesn't actually fix any issues
-
-                # #if the folder already exists, create a folder with a unique name (eg if multiple CFl runs are happening
-                # #in parallel)
-                # i = 0 
-                # while os.path.exists(os.path.join(checkpoint_path+str(i).zfill(4))): #zfill(4) creates a 4 digit number
-                #     i += 1  
-                # checkpoint_path = checkpoint_path + str(i).zfill(4)
-                # os.mkdir(checkpoint_path)
-
                 # give the checkpoints path a unique ID (so that it doesn't get
                 # confused with other CFL runs)
                 now = datetime.datetime.now()
                 dt_id = now.strftime("%d%m%Y%H%M%S") #this creates a string based on the current date and time up to the second (NOTE: if you create a bunch of CFLs all at once maybe you'd need a more precise ID)
                 checkpoint_path = 'tmp_checkpoints'+dt_id
-
-
 
                 # ModelCheckpoint saves model checkpoints to specified path during training 
                 best_path = os.path.join(checkpoint_path, 'best_weights')
@@ -251,10 +236,10 @@ class CondExpBase(Block):
 
             self.trained = True
 
-        finally:  # want to delete the checkpoints directory even if things messed up during training
+        # we want to delete the checkpoints directory at the end, even if something messed up during training
+        finally:
             if self.params['best']:
                 shutil.rmtree(checkpoint_path)
-
         return results_dict
 
 
