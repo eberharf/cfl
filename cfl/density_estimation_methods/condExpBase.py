@@ -3,6 +3,8 @@ import os
 import shutil
 # TODO: add GPU support
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
+import datetime #for creating ID 
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -167,29 +169,6 @@ class CondExpBase(Block):
             loss=self.params['loss'],
             optimizer=optimizer,
         )
-
-        # specify checkpoint save callback
-        callbacks = []
-        if self.params['best']:
-            # handle case where user interrupted previous training session
-            # before tmp_checkpoints clean-up code was executed.
-            if os.path.exists('tmp_checkpoints'):
-                if self.params['verbose']>0:
-                    print('Warning: deleting tmp_checkpoints directory.')
-                shutil.rmtree('tmp_checkpoints')
-            os.mkdir('tmp_checkpoints')
-            model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-                filepath='tmp_checkpoints/best_weights',
-                save_weights_only=True,
-                monitor='val_loss',
-                mode='min',
-                save_best_only=True)
-            callbacks = [model_checkpoint_callback]
-
-        if self.params['tb_path'] is not None:
-            tb_callback = tf.keras.callbacks.TensorBoard(
-                            log_dir=self.params['tb_path'])
-            callbacks = [tb_callback] + callbacks
         
         # log GPU device if available
         device_name = tf.test.gpu_device_name()
@@ -198,37 +177,69 @@ class CondExpBase(Block):
         else:
             print('No GPU device detected.')
             
-        # train model
-        history = self.model.fit(
-            Xtr, Ytr,
-            batch_size=self.params['batch_size'],
-            epochs=self.params['n_epochs'],
-            validation_data=(Xts,Yts),
-            callbacks=callbacks,
-            verbose=self.params['verbose']
-        )
+        try: 
+            # specify checkpoint save callback
+            callbacks = []
 
-        # handle results
-        train_loss = history.history['loss']
-        val_loss = history.history['val_loss']
-        fig = self._graph_results(train_loss, val_loss, 
-            show=self.params['show_plot'])
-        pyx = self.model.predict(dataset.X)
+            # if we want to return the best weights (rather than the weights at the
+            # end of training)
+            if self.params['best']:
 
-        # load in best weights if specified
-        if self.params['best']:
-            self.load_model('tmp_checkpoints/best_weights')
-            shutil.rmtree('tmp_checkpoints')
+                # give the checkpoints path a unique ID (so that it doesn't get
+                # confused with other CFL runs)
+                now = datetime.datetime.now()
+                dt_id = now.strftime("%d%m%Y%H%M%S") #this creates a string based on the current date and time up to the second (NOTE: if you create a bunch of CFLs all at once maybe you'd need a more precise ID)
+                checkpoint_path = 'tmp_checkpoints'+dt_id
+
+                # ModelCheckpoint saves model checkpoints to specified path during training 
+                best_path = os.path.join(checkpoint_path, 'best_weights')
+                model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+                    filepath= best_path,  
+                    save_weights_only=True,
+                    monitor='val_loss',
+                    mode='min',
+                    save_best_only=True)
+                callbacks = [model_checkpoint_callback]
+
+            if self.params['tb_path'] is not None:
+                tb_callback = tf.keras.callbacks.TensorBoard(
+                                log_dir=self.params['tb_path'])
+                callbacks = [tb_callback] + callbacks
+            
+            # train model
+            history = self.model.fit(
+                Xtr, Ytr,
+                batch_size=self.params['batch_size'],
+                epochs=self.params['n_epochs'],
+                validation_data=(Xts,Yts),
+                callbacks=callbacks,
+                verbose=self.params['verbose']
+            )
+
+            # handle results
+            train_loss = history.history['loss']
+            val_loss = history.history['val_loss']
+            fig = self._graph_results(train_loss, val_loss, 
+                show=self.params['show_plot'])
+            pyx = self.model.predict(dataset.X)
+
+            # load in best weights if specified
+            if self.params['best']:
+                self.load_model(best_path) #TODO: this is where the error is jenna
+
+            results_dict = {'train_loss' : train_loss,
+                            'val_loss' : val_loss,
+                            'loss_plot' : fig,
+                            'model_weights' : self.model.get_weights(),
+                            'pyx' : pyx}
 
 
-        results_dict = {'train_loss' : train_loss,
-                        'val_loss' : val_loss,
-                        'loss_plot' : fig,
-                        'model_weights' : self.model.get_weights(),
-                        'pyx' : pyx}
+            self.trained = True
 
-
-        self.trained = True
+        # we want to delete the checkpoints directory at the end, even if something messed up during training
+        finally:
+            if self.params['best']:
+                shutil.rmtree(checkpoint_path)
         return results_dict
 
 
@@ -319,7 +330,7 @@ class CondExpBase(Block):
         if self.params['verbose']>0:
             print("Loading parameters from ", file_path)
         try:
-            self.model.load_weights(file_path)
+            self.model.load_weights(file_path) #TODO: this is where an error is happening 
         except:
             raise ValueError('path does not exist.')
 
