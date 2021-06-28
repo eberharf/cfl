@@ -567,6 +567,14 @@ class Experiment():
                 ) 
         
 
+    def get_save_path(self):
+        ''' Return the path at which experiment results are saved.
+            Arguments: None
+            Returns:
+                str : path to experiment
+        '''
+        return self.save_path
+
 
 ########### HELPER FUNCTIONS ##################################################
 
