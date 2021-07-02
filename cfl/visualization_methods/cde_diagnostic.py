@@ -13,32 +13,63 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
     Example Usage: 
 
     ```
-        fig = pyx_scatter(cfl_experiment, ground_truth)
+        fig, ax = pyx_scatter(cfl_experiment, ground_truth)
         plt.show()
     ```
 
     Params: 
         cfl_experiment (cfl.experiment.Experiment): a trained CFL pipeline 
-        ground_truth (np array): an array, aligned with the CFL training data 
-            that contains the ground truth macrovariable labels for the cause data 
+        ground_truth (np array): (Optional) an array, aligned with the CFL training data 
+            that contains the ground truth macrovariable labels for the cause data.
+            If provided, the points in the plot will be colored according to their
+            ground truth state 
 ''' 
 
-    fig  = plt.figure()
-    pyx = cfl_experiment.retrieve_results('dataset_train')['CDE']['pyx'] # get training results 
+    pyx = my_exp.retrieve_results('dataset_train')['CDE']['pyx'] # get training results 
 
-    #choose a thousand (or the maximum possible) random samples from the pyx results
+    #choose indices for a thousand (or the maximum possible) random samples from the pyx results
     n_samples = min(1000, pyx.shape[0])
     plot_idx = np.random.choice(pyx.shape[0], n_samples, replace=False)
 
-    # scatter plot 
+    # make scatter plot 
+    fig, ax = plt.subplots(
     if ground_truth is not None: 
-        plt.scatter(range(n_samples), pyx[plot_idx,0], c=ground_truth[plot_idx]) # color by ground truth
+        pyx_subset = pyx[plot_idx]
+        gt_subset = ground_truth[plot_idx]
+        ax = __pyx_scatter_gt_legend(ax, pyx_subset, gt_subset)
     else: 
-        plt.scatter(range(n_samples), pyx[plot_idx,0], c='m') # color magenta
+        ax = plt.scatter(range(n_samples), pyx[plot_idx,0], c='m') # color magenta
 
-    plt.ylabel("Expectation of Target")
-    plt.xlabel("Sample")
-    return fig
+    ax.set_ylabel("Expectation of Target")
+    ax.set_xlabel("Sample")
+    fig.suptitle("Sample of predicted P(Y|X) values after CDE training\nColored by ground truth")
+
+    return fig, ax
+
+def __pyx_scatter_gt_legend(ax, pyx, ground_truth_labels): 
+    '''plots data from each ground_truth_class as a separate series in the
+    scatter plot. 
+    Does this so that each label can be associated with a legend''' 
+    # construct a list of all indices in the data 
+    all_indices = list(range(len(pyx)))
+
+    # for each macrovariable class... 
+    for macrovar in np.unique(ground_truth_labels): 
+
+        # select the data points in pyx that belong to that class 
+        current_series = pyx[ground_truth_labels == macrovar]
+
+        # select random values along the x-axis to plot those data against 
+        # (we do the selecting in this slightly convoluted way so that no x-value is chosen twice)
+        current_indices = np.random.choice(all_indices, len(current_series), replace=False)
+        indices = np.nonzero(np.in1d(all_indices,current_indices))[0]
+        all_indices = np.delete(all_indices, indices)
+
+        # scatter plot 
+        ax.scatter(current_indices, current_series, label=macrovar)
+        ax.legend(bbox_to_anchor=(1,1)) #place legend outside of figure 
+    return ax 
+
 
 def cde_diagnostic(cfl_experiment): 
     '''Creates a figure to help diagnose whether the CDE is predicting the
