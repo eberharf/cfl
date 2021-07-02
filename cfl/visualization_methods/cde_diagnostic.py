@@ -32,7 +32,7 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
     plot_idx = np.random.choice(pyx.shape[0], n_samples, replace=False)
 
     # make scatter plot 
-    fig, ax = plt.subplots(
+    fig, ax = plt.subplots(nrows=1, ncols=1)
     if ground_truth is not None: 
         pyx_subset = pyx[plot_idx]
         gt_subset = ground_truth[plot_idx]
@@ -137,7 +137,7 @@ def __for_categorical_Y(Y, pyx):
 
     return axes
 
-def __for_continuous_Y(Y, pyx, axes):     
+def __for_continuous_Y(Y, pyx):     
     """ 
     This method is for a Y that consists of continuous variable(s). 
     If Y contains a single variable, its distribution will be plotted as a
@@ -156,10 +156,10 @@ def __for_continuous_Y(Y, pyx, axes):
     upper_bound = np.max(np.vstack((Y, pyx)))
 
     # plot the actual distribution of the effect variable(s)
-    axes[0].hist(Y, range=(lower_bound, upper_bound)) # the default # of bins is 10
+    axes[0].hist(Y, range=(lower_bound, upper_bound), histtype='barstacked') # the default # of bins is 10
 
     # plot the CDE's predicted distribution of the effect given the input 
-    axes[1].hist(pyx, range=(lower_bound, upper_bound))
+    axes[1].hist(pyx, range=(lower_bound, upper_bound), histtype='barstacked')
 
     axes[1].set_title("Distribution of Predicted Effect Variable\n(output from CDE)")
     axes[0].set_title("Distribution of Actual Effect Variable\n(from data)")
