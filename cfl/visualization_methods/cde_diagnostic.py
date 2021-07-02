@@ -101,30 +101,18 @@ target variable(s) effectively or should be tuned further
     assert Y_type in ['categorical', 'continuous'], \
         'There is not a graphing method defined for the Y type of this training dataset'
 
-    fig, axes = plt.subplots(nrows= 1, ncols=3, figsize=(16, 5), sharex=True, sharey=True) #figsize selected bc it worked well for one example plot
-
-
     if Y_type == 'continuous': 
-        axes = __for_continuous_Y(Y, pyx, axes)
+        fig, axes = __for_continuous_Y(Y, pyx)
     if Y_type == 'categorical': 
-        axes = __for_categorical_Y(Y, pyx, axes)
-
-    axes[2].set_title("Difference between actual and expected values")
+        fig, axes = __for_categorical_Y(Y, pyx)
 
     return fig, axes  
 
-def __for_continuous_Y(Y, pyx, axes): 
-    """ 
-    This method is for a Y that consists of continuous variable(s). 
-    If Y contains a single variable, its distribution will be plotted as a
-    single histogram. 
 
+def __for_categorical_Y(Y, pyx): 
 
-    If Y contains multiple variables, they will be plotted together as a
-    side-by-side histogram (note: this is not be the best way to display the
-    data for viewing)
-    """         
-    
+    fig, axes = plt.subplots(nrows= 1, ncols=3, figsize=(16, 5), sharex=True, sharey=True) #figsize selected bc it worked well for one example plot
+
     # for both the actual (Y) and predicted (pyx) values....
     for ax, values in zip(axes, (Y, pyx)):
 
@@ -141,28 +129,39 @@ def __for_continuous_Y(Y, pyx, axes):
 
     # then add the values to a bar chart 
     axes[2].bar(range(len(actual_mean_values)), expected_mean_values - actual_mean_values) 
-    
     axes[2].set_xlabel("Questions")
 
     axes[0].set_title("Mean values of actual effect variables\n(from data)")
     axes[1].set_title("Mean values of predicted effect variables\n(output from CDE)")
+    axes[2].set_title("Difference between actual and expected values")
 
     return axes
 
+def __for_continuous_Y(Y, pyx, axes):     
+    """ 
+    This method is for a Y that consists of continuous variable(s). 
+    If Y contains a single variable, its distribution will be plotted as a
+    single histogram. 
 
+    If Y contains multiple variables, they will be plotted together as a
+    side-by-side histogram (note: this is not be the best way to display the
+    data for viewing)
+    """         
 
-def __for_categorical_Y(Y, pyx, axes): 
+    fig, axes = plt.subplots(nrows= 1, ncols=2, figsize=(16, 5), sharex=True, sharey=True) #figsize selected bc it worked well for one example plot
+
+    #find the min and max values of both data sets (so that both histograms have
+    #consistent bin boundaries)
+    lower_bound = np.min(np.vstack((Y, pyx)))
+    upper_bound = np.max(np.vstack((Y, pyx)))
 
     # plot the actual distribution of the effect variable(s)
-    axes[0].hist(Y)
+    axes[0].hist(Y, range=(lower_bound, upper_bound)) # the default # of bins is 10
 
-    # plot the CDE's predicted distribution of the effect (HoNOSCA) given the input 
-    axes[1].hist(pyx)
-
-    # difference between plots 0 and 1 
-    axes[2].hist(Y - pyx) #I think Y and pyx should have the same shape
+    # plot the CDE's predicted distribution of the effect given the input 
+    axes[1].hist(pyx, range=(lower_bound, upper_bound))
 
     axes[1].set_title("Distribution of Predicted Effect Variable\n(output from CDE)")
     axes[0].set_title("Distribution of Actual Effect Variable\n(from data)")
-
-    return axes
+    return fig, axes
+    
