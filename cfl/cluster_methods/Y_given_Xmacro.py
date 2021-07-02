@@ -163,7 +163,9 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
     # (n_samples,)
     x_lbls = np.squeeze(x_lbls)
     k_neighbors = 4
-    n_x_classes = len(np.unique(x_lbls))
+    class_labels = np.unique(x_lbls)
+    n_x_classes = len(class_labels)
+    
 
     # now we can compute nearest neighbors averages for each 
     # Y_data point and X class combination
@@ -180,10 +182,10 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
         #   - axis 2 corresponds to nearest neighbors, sorted
         xclass_dist_matrix = -1 * np.ones((n_x_classes, Y_data.shape[0], 
                                         k_neighbors))
-        for xi in range(n_x_classes):
+        for xi,xlbl in enumerate(class_labels):
             # take first through fifth closest distances (offset by one to 
             # leave out distance to self)
-            nn = np.sort(dist_matrix[:,x_lbls==xi],axis=1)[:,1:k_neighbors+1]
+            nn = np.sort(dist_matrix[:,x_lbls==xlbl],axis=1)[:,1:k_neighbors+1]
             # if we have less than k_neighbors neighbors, pad with -1
             padded_nn = np.pad(nn, ((0,0),(0,k_neighbors-nn.shape[1])), 
                 'constant', constant_values=-1) 
@@ -191,7 +193,7 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
     
         for y_id in tqdm(range(Y_data.shape[0])):
             # compute average distance to nearest neighbors per class
-            for xi in range(n_x_classes):
+            for xi,xlbl in enumerate(class_labels):
 
                 # do not include -1 entries in mean
                 valid = xclass_dist_matrix[xi,y_id,:] >= 0
@@ -211,16 +213,16 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
                 cond_Y_prob[y_id,:] /= np.sum(cond_Y_prob[y_id,:])
     
     else:
-        def parallel_job1(y_id, xi):
+        def parallel_job1(y_id, xi, xlbl):
             # compute distances from sample y_id to all other samples in 
             # class xi
-            y_id_dists = np.squeeze(euclidean_distances(np.expand_dims(Y_data[y_id,:],0), Y_data[x_lbls==xi,:]))
+            y_id_dists = np.squeeze(euclidean_distances(np.expand_dims(Y_data[y_id,:],0), Y_data[x_lbls==xlbl,:]))
             
             # take average of closest neighbors in class xi
             cond_Y_prob[y_id,xi] = \
                 np.mean(np.sort(y_id_dists)[1:k_neighbors+1])
             
-        loop1 = [delayed(parallel_job1)(y_id, xi) for xi in range(n_x_classes) for y_id in tqdm(range(Y_data.shape[0]))]
+        loop1 = [delayed(parallel_job1)(y_id, xi, xlbl) for xi,xlbl in enumerate(class_labels) for y_id in tqdm(range(Y_data.shape[0]))]
         Parallel(n_jobs=-1, prefer='threads')(loop1)
 
         # normalize so that sum of distances is 1 (see note above)
@@ -229,7 +231,6 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
                 cond_Y_prob[y_id,:] /= np.sum(cond_Y_prob[y_id,:])
             loop2 = [delayed(parallel_job2)(y_id) for y_id in range(Y_data.shape[0])]
             Parallel(n_jobs=-1, prefer='threads')(loop2)
-
 
 
     return cond_Y_prob

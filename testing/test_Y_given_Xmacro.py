@@ -1,11 +1,3 @@
-''' TODO cases to test:
-    - categorical, continuous
-    - sample_Y_dist when x classes have < 4 members
-    - regression tests on each method
-    - sample_Y_dist when only 1 xclass
-    - compare slow vs fast version
-'''
-
 import numpy as np
 import cfl.cluster_methods.Y_given_Xmacro as YGX
 from time import time
@@ -55,3 +47,12 @@ def test__continuous_Y_one_xcluster_duplicate_points():
     # make sure doesn't fail
     result1 = YGX._continuous_Y(Y_data, x_lbls, precompute_distances=True)
     result2 = YGX._continuous_Y(Y_data, x_lbls, precompute_distances=False)
+
+
+''' TODO: cases to test:
+    - categorical, continuous
+    - sample_Y_dist when x classes have < 4 members
+    - regression tests on each method
+    - sample_Y_dist when only 1 xclass
+    - compare slow vs fast version
+'''
