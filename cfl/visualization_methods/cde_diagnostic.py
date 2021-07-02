@@ -155,11 +155,11 @@ def __for_continuous_Y(Y, pyx):
     lower_bound = np.min(np.vstack((Y, pyx)))
     upper_bound = np.max(np.vstack((Y, pyx)))
 
-    # plot the actual distribution of the effect variable(s)
-    axes[0].hist(Y, range=(lower_bound, upper_bound), histtype='barstacked') # the default # of bins is 10
-
-    # plot the CDE's predicted distribution of the effect given the input 
-    axes[1].hist(pyx, range=(lower_bound, upper_bound), histtype='barstacked')
+    for ax, data in zip(axes, (Y, pyx)): 
+        # plot the actual distribution of the effect variable(s)
+        ax.hist(data, range=(lower_bound, upper_bound), histtype='barstacked') # (the default # of bins is 10) 
+        ax.set_xlabel("Value")
+        ax.set_ylabel("Frequency")
 
     axes[1].set_title("Distribution of Predicted Effect Variable\n(output from CDE)")
     axes[0].set_title("Distribution of Actual Effect Variable\n(from data)")
