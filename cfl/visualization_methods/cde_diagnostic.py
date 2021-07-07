@@ -135,7 +135,7 @@ def __for_categorical_Y(Y, pyx):
     axes[1].set_title("Mean values of predicted effect variables\n(output from CDE)")
     axes[2].set_title("Difference between actual and expected values")
 
-    return axes
+    return fig, axes
 
 def __for_continuous_Y(Y, pyx):     
     """ 
