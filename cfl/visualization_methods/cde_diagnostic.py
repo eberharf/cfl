@@ -25,7 +25,7 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
             ground truth state 
 ''' 
 
-    pyx = my_exp.retrieve_results('dataset_train')['CDE']['pyx'] # get training results 
+    pyx = cfl_experiment.retrieve_results('dataset_train')['CDE']['pyx'] # get training results 
 
     #choose indices for a thousand (or the maximum possible) random samples from the pyx results
     n_samples = min(1000, pyx.shape[0])
@@ -38,7 +38,7 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
         gt_subset = ground_truth[plot_idx]
         ax = __pyx_scatter_gt_legend(ax, pyx_subset, gt_subset)
     else: 
-        ax = plt.scatter(range(n_samples), pyx[plot_idx,0], c='m') # color magenta
+        ax.scatter(range(n_samples), pyx[plot_idx,0], c='m') # color magenta
 
     ax.set_ylabel("Expectation of Target")
     ax.set_xlabel("Sample")
