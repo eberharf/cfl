@@ -68,34 +68,6 @@ The version number of `cfl` should print.
 If this command executes with no errors, then you are now ready to use `cfl`!
 
 
-**Optional: Add the cfl environment to the Jupyter notebook kernel**
-
-For running Jupyter notebooks from within a `conda` virtual environment. 
-
-In order to also be able to run CFL inside of a Jupyter notebook, we need to add `cfl-env` (the `conda` environment which contains the dependencies for `cfl`) to the iPython kernel. This will allow Jupyter notebooks to access the packages we installed for `cfl`. Add `cfl-env` to the Jupyter kernel by running the following command:
-
-```
- ipython kernel install --name cfl-env --user
-```
-
-If this step is sucessful, it will generate the message
-
-```
-Installed kernelspec cfl-env in C:/some/directory/
-```
-
-You can also test the success of this step by downloading a notebook from the
-[`examples`](https://github.com/eberharf/cfl/tree/dev/docs/source/examples) folder on GitHub, `cd`ing into the folder containing that notebook, and starting a Jupyter Notebook server:
-
-```
-jupyter notebook
-```
-
-Open the notebook. Select `cfl-env` as the kernel if prompted. Run the first
-few code blocks in the notebook. If the import statements in the notebook can be
-run without errors, then setup has been successful.
-
-
 ### Troubleshooting 
 
 1. "`No matching distribution found for tensorflow>=2.4.0`" 
