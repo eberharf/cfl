@@ -125,6 +125,7 @@ class Experiment():
 
         # load in params from past experiment if provided
         if past_exp_path is not None:
+            print(f'Loading in Experiment from {past_exp_path}')
             block_names, block_params = self.__load_params(os.path.join(past_exp_path, 'params'))
 
         # build blocks from names and params if blocks not provided
@@ -140,7 +141,7 @@ class Experiment():
                 block.load_block(fn)
             self.is_trained = True
 
-        self.blocks = blocks
+        self.blocks = blocks # TODO: need to populate block_names and block_params
         for block in self.blocks:
             assert isinstance(block, Block), \
                 'A specified block is not of type Block.'
@@ -151,6 +152,8 @@ class Experiment():
         # assert self.check_blocks_compatibility(), 'Specified blocks are incompatible'
         
         # save configuration parameters for each block
+        self.block_names = block_names
+        self.block_params = block_params
         self.__save_params()
 
     def train(self, dataset=None, prev_results=None):
@@ -297,16 +300,14 @@ class Experiment():
             assert not os.path.exists(os.path.join(self.save_path, 'params')), 'Params already saved.'
             os.mkdir(os.path.join(self.save_path, 'params'))
             
-            block_graph = []
-            for block in self.blocks:
-                block_graph.append(block.get_name())
-                fn = os.path.join(self.save_path, 'params', block.get_name())
+            for block,block_name in zip(self.blocks, self.block_names):
+                fn = os.path.join(self.save_path, 'params', block_name)
                 with open(fn, 'wb') as f:
                     pickle.dump(block.get_params(), f)
 
             fn = os.path.join(self.save_path, 'params', 'block_graph')
             with open(fn, 'wb') as f:
-                pickle.dump(block_graph, f) 
+                pickle.dump(self.block_names, f) 
     
 
     def __load_params(self, params_path):
@@ -328,7 +329,7 @@ class Experiment():
         '''
         assert isinstance(params_path, str), 'params_path should be a str.'
         assert os.path.exists(params_path), \
-            'The params_path specified does not exist.'
+            f'The params_path specified does not exist: {params_path}.'
 
         with open(os.path.join(params_path, 'block_graph'), 'rb') as f:
             block_graph = pickle.load(f)
@@ -590,5 +591,3 @@ def get_next_dirname(path):
     while os.path.exists(os.path.join(path, 'experiment{}'.format(str(i).zfill(4)))): #zfill(4) creates a 4 digit number
         i += 1  
     return 'experiment{}'.format(str(i).zfill(4))
-
-

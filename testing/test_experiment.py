@@ -1,6 +1,7 @@
 from testing.test_intervention_rec import RESULTS_PATH
 import pytest
 import numpy as np
+import os
 
 from cfl.experiment import Experiment
 from visual_bars import generate_visual_bars_data as vbd
@@ -184,7 +185,54 @@ def test_clusterer_experiment():
 
 
 
+def test_load_past_experiment():
 
+    # make old experiment
+
+    # generate data
+    x,y = generate_vb_data()
+
+    # set CFL params
+    data_info = {'X_dims': x.shape, 
+                'Y_dims': y.shape, 
+                'Y_type': 'categorical'}
+
+    # parameters for CDE 
+    condExp_params = {'batch_size': 128,
+                    'optimizer': 'adam',
+                    'n_epochs': 2,
+                    'opt_config': {'lr': 0.001},
+                    'verbose': 1,
+                    'show_plot': False,
+                    'dense_units': [100, 50, 10, 2],
+                    'activations': ['relu', 'relu', 'relu', 'softmax'],
+                    'dropouts': [0.2, 0.5, 0.5, 0],
+                    'weights_path': None,
+                    'loss': 'mean_squared_error',
+                    'standardize': False,
+                    'best': True}
+
+    cluster_params = {'x_model' : DBSCAN(),
+                      'y_model' : DBSCAN()}
+
+    block_names = ['CondExpMod', 'Clusterer']
+    block_params = [condExp_params, cluster_params]
+
+    # make CFL Experiment
+    old_exp = Experiment(X_train=x, Y_train=y, data_info=data_info, 
+                block_names=block_names, block_params=block_params, blocks=None, 
+                results_path=RESULTS_PATH)
+
+    results = old_exp.train()
+
+    # make new CFL Experiment based on old one
+    new_exp = Experiment(X_train=x, Y_train=y, data_info=data_info, 
+                past_exp_path=old_exp.get_save_path(),
+                results_path=RESULTS_PATH)
+
+    # clear any saved data
+    shutil.rmtree(RESULTS_PATH)
+    
 # ------- 
 
 # add a new data set 
