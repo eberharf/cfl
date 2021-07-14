@@ -25,20 +25,20 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
             ground truth state 
 ''' 
 
-    pyx = my_exp.retrieve_results('dataset_train')['CDE']['pyx'] # get training results 
+    pyx = cfl_experiment.retrieve_results('dataset_train')['CDE']['pyx'] # get training results 
 
     #choose indices for a thousand (or the maximum possible) random samples from the pyx results
     n_samples = min(1000, pyx.shape[0])
     plot_idx = np.random.choice(pyx.shape[0], n_samples, replace=False)
 
     # make scatter plot 
-    fig, ax = plt.subplots(
+    fig, ax = plt.subplots(nrows=1, ncols=1)
     if ground_truth is not None: 
         pyx_subset = pyx[plot_idx]
         gt_subset = ground_truth[plot_idx]
         ax = __pyx_scatter_gt_legend(ax, pyx_subset, gt_subset)
     else: 
-        ax = plt.scatter(range(n_samples), pyx[plot_idx,0], c='m') # color magenta
+        ax.scatter(range(n_samples), pyx[plot_idx,0], c='m') # color magenta
 
     ax.set_ylabel("Expectation of Target")
     ax.set_xlabel("Sample")
@@ -101,30 +101,18 @@ target variable(s) effectively or should be tuned further
     assert Y_type in ['categorical', 'continuous'], \
         'There is not a graphing method defined for the Y type of this training dataset'
 
-    fig, axes = plt.subplots(nrows= 1, ncols=3, figsize=(16, 5), sharex=True, sharey=True) #figsize selected bc it worked well for one example plot
-
-
     if Y_type == 'continuous': 
-        axes = __for_continuous_Y(Y, pyx, axes)
+        fig, axes = __for_continuous_Y(Y, pyx)
     if Y_type == 'categorical': 
-        axes = __for_categorical_Y(Y, pyx, axes)
-
-    axes[2].set_title("Difference between actual and expected values")
+        fig, axes = __for_categorical_Y(Y, pyx)
 
     return fig, axes  
 
-def __for_continuous_Y(Y, pyx, axes): 
-    """ 
-    This method is for a Y that consists of continuous variable(s). 
-    If Y contains a single variable, its distribution will be plotted as a
-    single histogram. 
 
+def __for_categorical_Y(Y, pyx): 
 
-    If Y contains multiple variables, they will be plotted together as a
-    side-by-side histogram (note: this is not be the best way to display the
-    data for viewing)
-    """         
-    
+    fig, axes = plt.subplots(nrows= 1, ncols=3, figsize=(16, 5), sharex=True, sharey=True) #figsize selected bc it worked well for one example plot
+
     # for both the actual (Y) and predicted (pyx) values....
     for ax, values in zip(axes, (Y, pyx)):
 
@@ -141,28 +129,39 @@ def __for_continuous_Y(Y, pyx, axes):
 
     # then add the values to a bar chart 
     axes[2].bar(range(len(actual_mean_values)), expected_mean_values - actual_mean_values) 
-    
     axes[2].set_xlabel("Questions")
 
     axes[0].set_title("Mean values of actual effect variables\n(from data)")
     axes[1].set_title("Mean values of predicted effect variables\n(output from CDE)")
+    axes[2].set_title("Difference between actual and expected values")
 
-    return axes
+    return fig, axes
 
+def __for_continuous_Y(Y, pyx):     
+    """ 
+    This method is for a Y that consists of continuous variable(s). 
+    If Y contains a single variable, its distribution will be plotted as a
+    single histogram. 
 
+    If Y contains multiple variables, they will be plotted together as a
+    side-by-side histogram (note: this is not be the best way to display the
+    data for viewing)
+    """         
 
-def __for_categorical_Y(Y, pyx, axes): 
+    fig, axes = plt.subplots(nrows= 1, ncols=2, figsize=(16, 5), sharex=True, sharey=True) #figsize selected bc it worked well for one example plot
 
-    # plot the actual distribution of the effect variable(s)
-    axes[0].hist(Y)
+    #find the min and max values of both data sets (so that both histograms have
+    #consistent bin boundaries)
+    lower_bound = np.min(np.vstack((Y, pyx)))
+    upper_bound = np.max(np.vstack((Y, pyx)))
 
-    # plot the CDE's predicted distribution of the effect (HoNOSCA) given the input 
-    axes[1].hist(pyx)
-
-    # difference between plots 0 and 1 
-    axes[2].hist(Y - pyx) #I think Y and pyx should have the same shape
+    for ax, data in zip(axes, (Y, pyx)): 
+        # plot the actual distribution of the effect variable(s)
+        ax.hist(data, range=(lower_bound, upper_bound), histtype='barstacked') # (the default # of bins is 10) 
+        ax.set_xlabel("Value")
+        ax.set_ylabel("Frequency")
 
     axes[1].set_title("Distribution of Predicted Effect Variable\n(output from CDE)")
     axes[0].set_title("Distribution of Actual Effect Variable\n(from data)")
-
-    return axes
+    return fig, axes
+    
