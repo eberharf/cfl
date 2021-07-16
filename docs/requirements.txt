@@ -8,7 +8,6 @@ ipykernel
 
 # needed for autodoc stuff 
 tensorflow 
-nibabel
 
 tqdm # progress bar
 matplotlib  # creates plots (used for visualization)
