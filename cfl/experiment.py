@@ -150,14 +150,7 @@ class Experiment():
                 blocks.append(self.__build_block(bn,bp))
         
 
-<<<<<<< HEAD
-        self.blocks = blocks # TODO: need to populate block_names and block_params
-        for block in self.blocks:
-            assert isinstance(block, Block), \
-                'A specified block is not of type Block.'
-=======
         self.blocks = blocks
->>>>>>> 077e100 (rearrange functions in experiment.py and rearrange control flow in experiment __init__())
 
         # TODO: check that interfaces match
         # TODO: assert in the function itself so we can give more info
@@ -274,88 +267,6 @@ class Experiment():
         dataset.set_cfl_results(all_results)
         return all_results        
 
-<<<<<<< HEAD
-    def __save_results(self, results, dataset, block):
-        ''' Save results for a given dataset and block. 
-
-            Arguments: 
-                results (dict) : dictionary of results from running block on dataset. 
-                dataset (Dataset) : dataset object to run block on. 
-                block (Block) : block to run on dataset. 
-
-            Returns: 
-                None
-        '''
-
-        # check inputs
-        assert isinstance(results, dict), 'results should be a dict.'
-        assert isinstance(dataset, Dataset), 'dataset should be of type Dataset.'
-        assert isinstance(block, Block), \
-            'block should be of a type that inherits Block.'
-
-        if self.save_path is not None:
-            dir_name = os.path.join(self.save_path, dataset.get_name())
-            if not os.path.exists(dir_name):
-                os.mkdir(dir_name)
-
-            file_name = os.path.join(dir_name, block.get_name() + '_results.pickle')
-            with open(file_name, 'wb') as f:
-                pickle.dump(results, f) 
-                # TODO: eventually, we have to be careful about what pickle 
-                # protocol we use for compatibility across python versions
-
-    def __save_params(self):
-        ''' Helper function to save params associated with each block in 
-            self.blocks. Primarily used in Experiment initialization. 
-        '''
-
-        if self.save_path is not None:
-            assert self.blocks is not None, 'self.blocks does not exist yet.'
-            assert not os.path.exists(os.path.join(self.save_path, 'params')), 'Params already saved.'
-            os.mkdir(os.path.join(self.save_path, 'params'))
-            
-            for block,block_name in zip(self.blocks, self.block_names):
-                fn = os.path.join(self.save_path, 'params', block_name)
-                with open(fn, 'wb') as f:
-                    pickle.dump(block.get_params(), f)
-
-            fn = os.path.join(self.save_path, 'params', 'block_graph')
-            with open(fn, 'wb') as f:
-                pickle.dump(self.block_names, f) 
-    
-
-    def __load_params(self, params_path):
-        ''' Helper function to load params from a specified previous
-            experiment to be used in this experiment. Primarily used in 
-            Experiment initialization. 
-            
-            Arguments: 
-                params_path (str) : path to where params are saved in previous 
-                              Experiment. 
-            
-            Returns: 
-                list of strs : ordered list of blocks used in previous
-                              Experiment. Blocks identified by name (should be
-                              the same name that block.get_name() returns). 
-                              
-                list of dicts : ordered list of params dictionaries associated 
-                               with each block. 
-        '''
-        assert isinstance(params_path, str), 'params_path should be a str.'
-        assert os.path.exists(params_path), \
-            f'The params_path specified does not exist: {params_path}.'
-
-        with open(os.path.join(params_path, 'block_graph'), 'rb') as f:
-            block_graph = pickle.load(f)
-        block_params = []
-        for bn in block_graph:
-            with open(os.path.join(params_path, bn), 'rb') as f:
-                block_params.append(pickle.load(f))
-        return block_graph, block_params
-
-
-=======
->>>>>>> 077e100 (rearrange functions in experiment.py and rearrange control flow in experiment __init__())
     def add_dataset(self, X, Y, dataset_name, Xraw=None, Yraw=None):
         ''' Add a new dataset to be tracked by this Experiment. 
             
