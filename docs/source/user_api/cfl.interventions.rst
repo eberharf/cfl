@@ -1,4 +1,4 @@
-cfl.interventions package
+Interventions package
 =========================
 
 Submodules

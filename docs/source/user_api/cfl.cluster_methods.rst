@@ -1,4 +1,4 @@
-cfl.cluster\_methods package
+Clustering
 ============================
 
 Submodules

@@ -1,4 +1,4 @@
-cfl.density\_estimation\_methods package
+Density Estimation Methods
 ========================================
 
 Submodules
