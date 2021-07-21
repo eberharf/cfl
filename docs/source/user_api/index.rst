@@ -1,12 +1,14 @@
-User API Documentation 
+.. _api-index:
+
+User API 
 ============================
 
 .. toctree:: 
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: User API Reference 
    
-   user_api/cfl.rst
-   user_api/cfl.cluster_methods
-   user_api/cfl.density_estimation_methods 
-   user_api/cfl.visualization_methods
-   user_api/cfl.util
+   cfl.rst
+   cfl.cluster_methods
+   cfl.density_estimation_methods 
+   cfl.visualization_methods
+   cfl.util
