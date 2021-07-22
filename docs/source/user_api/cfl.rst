@@ -1,6 +1,34 @@
 cfl package
 ===========
 
+Basic Objects 
+----------
+
+Block 
+----------------
+
+.. automodule:: cfl.block
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Dataset
+------------------
+
+.. automodule:: cfl.dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Experiment
+---------------------
+
+.. automodule:: cfl.experiment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 Subpackages
 -----------
 
@@ -12,46 +40,3 @@ Subpackages
    cfl.interventions
    cfl.util
    cfl.visualization_methods
-
-Submodules
-----------
-
-cfl.block module
-----------------
-
-.. automodule:: cfl.block
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-cfl.cfl\_wrapper module
------------------------
-
-.. automodule:: cfl.cfl_wrapper
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-cfl.dataset module
-------------------
-
-.. automodule:: cfl.dataset
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-cfl.experiment module
----------------------
-
-.. automodule:: cfl.experiment
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: cfl
-   :members:
-   :undoc-members:
-   :show-inheritance:
