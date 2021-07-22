@@ -5,13 +5,15 @@ the conditional probability of each y value, given each X-macrovariable.
 Contains functions for clustering categorical and continuous 1-D Ys
 (not tested on higher dimensional Y)
 """
+
 import numpy as np
 from tqdm import tqdm
-from cfl.util.find_xlbl_locations import rows_where_each_x_class_occurs
-from cfl.util.data_processing import one_hot_decode
 from sklearn.metrics.pairwise import euclidean_distances
 from joblib import Parallel, delayed
 
+
+from cfl.util.find_xlbl_locations import rows_where_each_x_class_occurs
+from cfl.util.data_processing import one_hot_decode
 
 def sample_Y_dist(Y_type, dataset, x_lbls, precompute_distances=True):
     #TODO: is name good? I think it's decent
@@ -143,7 +145,8 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
             y value, given that the x is a member of the corresponding class of 
             that column.
 
-    Note: Why is `P(y|x_Class)` calculated, instead of `P(y|x)` for each
+    Note: 
+        Why is `P(y|x_Class)` calculated, instead of `P(y|x)` for each
         individual `x`? The clusters of `x` created immediately prior to this
         step are observational classes of `X` (see "Causal Feature Learning: An
         Overview" by Eberhardt, Chalupka, Pierona 2017). Observational classes
@@ -162,7 +165,7 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
     # format x_lbls that come in as shape (n_samples,1) to be of shape 
     # (n_samples,)
     x_lbls = np.squeeze(x_lbls)
-    k_neighbors = 4
+    k_neighbors = 4 #4 nearest neighbors is hard-coded in because that is what the El Nino paper, which introduced this method, used
     class_labels = np.unique(x_lbls)
     n_x_classes = len(class_labels)
     
@@ -182,6 +185,7 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
         #   - axis 2 corresponds to nearest neighbors, sorted
         xclass_dist_matrix = -1 * np.ones((n_x_classes, Y_data.shape[0], 
                                         k_neighbors))
+                                        
         for xi,xlbl in enumerate(class_labels):
             # take first through fifth closest distances (offset by one to 
             # leave out distance to self)

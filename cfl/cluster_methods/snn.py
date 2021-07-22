@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
 # TODO: add a bit of information about the point of SNN and when you would want to use it
+# the point of SNN clustering is that it's DBSCAN 
 
 import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
@@ -51,9 +52,9 @@ def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     """
     n_samples = X.shape[0]
 
-    # the knn_graph is a sparse matrix showing the connectivity of the nearest neighbors
+    # the knn_graph is a sparse binary matrix showing the connectivity of the nearest neighbors
     # knn_graph has the shape (n_samples, n_samples), where knn_graph[i][j] = 1 if j is
-    # a k-nearest neighbor of i and = 0 otherwise
+    # a k-nearest neighbor of i and 0 otherwise
     knn_graph = kneighbors_graph(X, n_neighbors=neighbor_num, include_self=False)
     knn_array = knn_graph.toarray()
 
@@ -66,7 +67,7 @@ def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     # SNN distance metric, which is defined for two points in X as
     # dist(x0, x1) = 1 - len(kNN(x0).intersect(knn(x1))) / k
 
-    normalization_factor = np.sum(knn_array, axis=1) #NOTE: as far as I can tell, this normalization should be equal to k in all
+    normalization_factor = np.sum(knn_array, axis=1) #NOTE: as far as I can tell, normalization_factor should be equal to k in all
     # cases, but the original code had the normalization as a function of the SNN
     # similarity, and I'm scared to change it in case my understanding is wrong
 

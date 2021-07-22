@@ -1,3 +1,5 @@
+# if you add a new CDE to the density_estimation_methods subpackage, also import
+# it here 
 from cfl.density_estimation_methods.condExpCNN import CondExpCNN
 from cfl.density_estimation_methods.condExpCNN3D import CondExpCNN3D
 from cfl.density_estimation_methods.condExpKC import CondExpKC

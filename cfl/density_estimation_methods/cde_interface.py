@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from cfl.block import Block
 import json
 import os
+
+from cfl.block import Block
 
 class CDE(Block):
 

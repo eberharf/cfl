@@ -34,9 +34,9 @@ class CondExpCNN(CondExpBase):
         '''         
         Define the neural network based on specifications in self.params.
 
-        This creates a convolutional neural net with the structure
+        **This creates a convolutional neural net with the structure
         (Conv2D layer, MaxPooling2D layer) * n, Flatten layer, Dense layer(s), 
-        Output layer
+        Output layer** 
 
         The number of Conv2d/Maxpooling layers is determined by the length of 
         the filter/kernel_size/pool_size parameter lists given in the params 
@@ -120,7 +120,7 @@ class CondExpCNN(CondExpBase):
                           'batch_size'  : 32,
                           'n_epochs'    : 20,
                           'optimizer'   : 'adam',
-                            'opt_config'  : {},
+                          'opt_config'  : {},
                             'verbose'     : 1,
                             'weights_path': None,
                             'loss'        : 'mean_squared_error',
