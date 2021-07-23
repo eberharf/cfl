@@ -1,3 +1,11 @@
+# NOTE: this file contains somewhat repeated information with the requirements.txt on
+# main branch 
+# (the difference is that requirements.txt is for pip installing dependencies
+# and this requirements.yml is for creating a conda virtual environment with the
+# dependencies for cfl )
+# TODO: this file may be useful if you clone the repository, but right now is not
+# used/referenced in our current setup instructions
+
 # this file contains the requirements for the cfl package
 
 # to create a conda environment from this file, run the commands:
