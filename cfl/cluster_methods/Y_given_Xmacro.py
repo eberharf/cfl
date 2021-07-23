@@ -1,5 +1,5 @@
 """
-a helper file used by `kmeans.py` to find P(Y=y|X=Xclass),
+a helper file used before effect-side clustering to find P(Y=y|X=Xclass),
 the conditional probability of each y value, given each X-macrovariable.
 
 Contains functions for clustering categorical and continuous 1-D Ys
