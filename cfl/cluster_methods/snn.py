@@ -17,6 +17,10 @@ construct the k-nearest neighbors graph, so this method may also suffer from
 some of the shortfalls of other clustering methods in high-dimensional space.
 
 
+This method is also an example of a custom clustering method that can be used
+for CFL clustering in the exact same way as any other Sklearn clustering method
+because it follows the same interface. 
+
 
 this code is modified by Jenna Kahn from the implemention in
 " Shared Nearest Neighbor Clustering Algorithm: Implementation and Evaluation "
