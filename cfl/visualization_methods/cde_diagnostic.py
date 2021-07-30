@@ -1,3 +1,9 @@
+'''
+contains two main functions: `pyx_scatter()` and `cde_diagnostic()` and helpers for
+those functions. 
+
+These functions can be used to examine the quality of the CDE's learning
+'''
 import matplotlib.pyplot as plt
 import numpy as np 
 
@@ -5,14 +11,13 @@ import numpy as np
 def pyx_scatter(cfl_experiment, ground_truth=None): 
     '''creates a scatter plot with a sample of points from the CDE output,
     colored by ground truth (if given). 
-    and also returns the average predictions for each
-    CFL macro cause class
     
-    Only good for 1D effect data 
+    NOTE: 
+        This visualization method is only good for 1D effect data.
 
     Example Usage: 
-
     ```
+        from cfl.visualization_methods import cde_diagnostic as cd 
         fig, ax = pyx_scatter(cfl_experiment, ground_truth)
         plt.show()
     ```
@@ -22,7 +27,11 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
         ground_truth (np array): (Optional) an array, aligned with the CFL training data 
             that contains the ground truth macrovariable labels for the cause data.
             If provided, the points in the plot will be colored according to their
-            ground truth state 
+            ground truth state. Otherwise, all points will be colored the same. 
+
+    Returns: 
+        (Fig) - A `matplotlib.pyplot Figure` object that contains the scatter plot
+        (Axes) - A `matplotlib.pyplot Axes` object that shows the scatter plot
 ''' 
 
     pyx = cfl_experiment.retrieve_results('dataset_train')['CDE']['pyx'] # get training results 
@@ -73,26 +82,37 @@ def __pyx_scatter_gt_legend(ax, pyx, ground_truth_labels):
 
 def cde_diagnostic(cfl_experiment): 
     '''Creates a figure to help diagnose whether the CDE is predicting the
-target variable(s) effectively or should be tuned further 
+    target variable(s) effectively or should be tuned further. 
 
+    This function creates a figure with two subplots. The first shows the actual
+    distribution of the Y variable(s), according to the data. The second shows
+    the predicted distribution of the Y variable(s), as outputted by the CDE.
 
-    Creates a figure with three subplots
-    First: actual distribution of the Y variable(s), according to the data 
-    Second: predicted distribution of the Y variable(s), as output by the CDE 
-    Third: difference between subplots 1 and 2
+    If the effect data (`Y`) has type `continuous` (as specified in the
+    `data_info` dictionary), then histograms showing the distribution of the
+    effect variable are created. If Y is continuous
+    and multidimensional, a stacked histogram with each feature is created. If Y has type
+    `categorical`, bar charts with the mean values for each feature in Y are created. 
 
-    This function may not work for higher dimensional continuous Ys. 
+    If the CDE is doing a good job of learning the effect, the two subplots
+    should contain similar or near-identical distributions.
 
-    # these should ideally look fairly similar if the CDE is doing well 
-    creates a histogram if Y has type 'continuous', bar chart if Y has type
-    'categorical'.
+    Note: 
+        This function may not work for higher dimensional continuous Ys. 
+
     Params: 
         cfl_experiment (cfl.experiment.Experiment) - a trained CFL pipeline 
-    Returns 
+    Returns: 
         (Fig) - A `matplotlib.pyplot Figure` object that contains the diagnostic plot
         (Axes) - An array of `matplotlib.pyplot Axes` objects that are the
         subplots of the Figure object 
 
+    Example Usage: 
+    ```
+        from cfl.visualization_methods import cde_diagnostic as cd 
+        fig, axes = cd.cde_diagnostic(cfl_experiment)
+        plt.show()
+    ```
     '''
 
     Y = cfl_experiment.get_dataset('dataset_train').get_Y()
@@ -144,8 +164,7 @@ def __for_continuous_Y(Y, pyx):
     single histogram. 
 
     If Y contains multiple variables, they will be plotted together as a
-    side-by-side histogram (note: this is not be the best way to display the
-    data for viewing)
+    stacked histogram. 
     """         
 
     fig, axes = plt.subplots(nrows= 1, ncols=2, figsize=(16, 5), sharex=True, sharey=True) #figsize selected bc it worked well for one example plot

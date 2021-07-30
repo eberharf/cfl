@@ -1,3 +1,5 @@
+'''these two functions are for viewing images'''
+
 import random
 
 import matplotlib.pyplot as plt

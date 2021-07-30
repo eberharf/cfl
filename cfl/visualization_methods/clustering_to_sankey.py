@@ -3,22 +3,26 @@ Iman Wahle and Jenna Kahn
 1/8/20
 Sankey diagram code
 
+Create a Sankey diagram to show how samples move between clusters when cluster
+parameters are varied. 
+
 Usage of this function:
 
+```
+  import plotly.graph_objects as go
+  from cfl.visualization_methods import clustering_to_sankey as sk
 
-import plotly.graph_objects as go
-from cfl.visualization_methods import clustering_to_sankey as sk
+  #x_lbls_L = list of x labels from several different rounds of clustering on the same data
 
-#x_lbls_L = list of x labels from several different rounds of clustering on the same data
+  link, label = sk.convert_lbls_to_sankey_nodes(x_lbls_L)
+  # plot
+  fig = go.Figure(data=
+            [go.Sankey(node = dict(pad = 15, thickness=20, label = label, color =  "blue"),
+                      link = link)])
 
-link, label = sk.convert_lbls_to_sankey_nodes(x_lbls_L)
-# plot
-fig = go.Figure(data=
-          [go.Sankey(node = dict(pad = 15, thickness=20, label = label, color =  "blue"),
-                     link = link)])
-
-fig.update_layout(title_text="Sample Sankey", font_size=10)
-fig.show()
+  fig.update_layout(title_text="Sample Sankey", font_size=10)
+  fig.show()
+```
 '''
 
 import numpy as np
