@@ -1,3 +1,13 @@
+'''this script generates a synthetic data set that 
+you can use for trying out CFL.
+
+Example Usage: 
+    import big5_toy_data as btd
+    X, Y = btd.big5_for_cfl()
+    << and then run CFL >>
+    
+'''
+
 import numpy as np
 import pandas as pd
 from io import BytesIO

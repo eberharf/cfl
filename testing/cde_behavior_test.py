@@ -1,3 +1,11 @@
+''' The following code tests that the CDEs behave in a reasonable way, without
+checking for specific results. 
+
+Currently, the only implemented test is to check that the training loss goes
+down between the beginning of training and the end. 
+'''
+
+
 import os
 import unittest
 
@@ -5,14 +13,10 @@ import numpy as np
 
 import cfl.density_estimation_methods
 from cfl.dataset import Dataset
-from cdes_for_testing import cde_input_shapes
+from cdes_for_testing import all_cdes
 import generate_for_cde_regression as gc 
 
 
-
-''' The following code runs all tests in CondExpBehaviorTests on all implemented
-    CondExpXxxx classes.
-'''
 
 
 def make_cde_behavior_tests(cond_exp_class):
@@ -27,15 +31,8 @@ def make_cde_behavior_tests(cond_exp_class):
             cde_params = gc.get_params()
             self.ceb, self.dataset = gc.setup_CDE_data(X, Y, cde_input_shapes, cond_exp_class, cde_params)
         
-
-        # load the results to compare against 
-        def load_correct_results(self, ceb): 
-            self.og_results = np.load(os.path.join(gc.RESOURCE_PATH, ceb.name + '_pyx.npy'))
-
-
         def test_loss_decreases(self):
             self.setUp()
-            self.load_correct_results(self.ceb)
 
             # train the CDE 
             train_loss = self.ceb.train(self.dataset)['train_loss']
@@ -55,7 +52,8 @@ def make_cde_behavior_tests(cond_exp_class):
     return CondExpBehaviorTests
 
 
-for cond_exp_class in cde_input_shapes.keys():
+# run on all CDEs that are in the all_cdes list 
+for cond_exp_class in all_cdes:
     class ConcreteBehaviorTests(make_cde_behavior_tests(cond_exp_class)):
         pass
 

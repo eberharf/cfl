@@ -24,7 +24,7 @@ dependencies:
   - matplotlib=3.3.1  # creates plots (used for visualization)
   - tensorflow  # machine learning
   - keras
-  - numpy=1.19.2 # array manipulation and fast computing
+  - numpy=1.19.2 # array manipulation and fast computing # needs to be >1.17
   - scikit-learn=0.23.2 # used to import clustering methods and other algorithms/metrics
   - jupyter # for jupyter notebooks
   - ipykernel # to add dependencies to kernel during set-up
