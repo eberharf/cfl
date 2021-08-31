@@ -12,7 +12,7 @@ from cfl.density_estimation_methods.cde_interface import Block #base class
 # Things that descend from this class should have a self.name attribute but this class doesn't 
 # since CondExpBase objects are not supposed to be created by the user 
 
-from data_generator import DataGenerator
+# from data_generator import DataGenerator
 
 
 class CondExpBase(Block):
