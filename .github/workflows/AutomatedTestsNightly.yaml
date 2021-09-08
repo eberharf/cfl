@@ -1,0 +1,68 @@
+name: AutomatedTestsNightly
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: what's going on
+      run: echo $GITHUB_WORKSPACE
+      
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: append cfl to pythonpath
+      run:  |
+        %CD%
+        echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
+#     - name: test import cfl
+#       run: |
+#         python testing/import_check.py
+      
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+          activate-environment: cfl-env
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          environment-file: requirements.yml
+          auto-activate-base: false
+          
+
+# #     - name: Set up Python 3.8
+# #       uses: actions/setup-python@v2
+# #       with:
+# #         python-version: 3.8
+
+# #     - name: Add conda to system path
+# #       run: echo $CONDA/bin >> $GITHUB_PATH
+
+# #     - name: Install dependencies
+# #       run: conda env update --file requirements.yml --name base
+
+# #     - name: append cfl to pythonpath
+# #       run: |
+# #         echo "D:\a\cfl\cfl" >> $GITHUB_ENV
+# #         echo "D:\a\cfl\cfl" >> $GITHUB_PATH
+# #         echo "cfl" >> $GITHUB_ENV
+# #         echo "cfl" >> $GITHUB_PATH
+    - name: Test with pytest
+      run: |
+        conda env list
+        ls
+        pytest -s

@@ -1,0 +1,17 @@
+#### A pip install requirements file
+#### contains the packages needed to build the documentation
+recommonmark == 0.7.1
+nbsphinx == 0.8.5 
+
+# for jupyter notebooks
+ipykernel
+
+# needed for autodoc stuff 
+tensorflow 
+
+tqdm # progress bar
+matplotlib  # creates plots (used for visualization)
+keras
+numpy # array manipulation and fast computing
+scikit-learn # used to import clustering methods and other algorithms/metrics
+jupyter # for jupyter notebooks

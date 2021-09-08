@@ -6,28 +6,39 @@ import matplotlib.pyplot as plt
 from cfl.density_estimation_methods.condExpBase import CondExpBase
 
 class CondExpKC(CondExpBase):
-    ''' A child class of CondExpBase that loosely recreates the
-        model construted in Chalupka 2015 visual bars code.
+    ''' 
+    A child class of CondExpBase that loosely recreates the
+    model construted in Chalupka 2015 visual bars code.
 
-        This model expects to receive a series of (10, 10) grayscale images
-        as input
+    This model expects to receive a series of (10, 10) grayscale images
+    as input
 
-        See CondExpBase documentation for more details.
-
+    See CondExpBase documentation for more details.
+    # TODO: method/attribute summary
     '''
     def __init__(self, data_info, params):
-        ''' Initialize model and define network.
-            Arguments:
-                data_info : a dictionary containing information about the data
-                    that will be passed in. Should contain 'X_dims' and 'Y_dims' as keys
-                params : dictionary containing parameters for the model
+        ''' 
+        Initialize model and define network.
+
+        Arguments:
+            data_info (dict) : a dictionary containing information about the 
+                data that will be passed in. Should contain 'X_dims',
+                'Y_dims', and 'Y_type' as keys.
+            params (dict) : dictionary containing parameters for the model.
+        Returns: 
+            None
         '''
-        self.name = 'CondExpKC'
         super().__init__(data_info, params)
 
     def _get_default_params(self):
-        '''model and learning parameters. Most of these parameters are actually used
-        in the learning step (implemented in CondExpBase), not model construction here '''
+        ''' 
+        Returns the default parameters specific to this type of Block.
+
+        Arguments:
+            None
+        Returns:
+            dict : dictionary of default parameters
+        '''
 
         return {'batch_size'  : 32,
                 'n_epochs'    : 20,
@@ -43,10 +54,14 @@ class CondExpKC(CondExpBase):
             }
 
     def _build_model(self):
-        ''' Define the neural network based on dimensions passed in during initialization.
-            This model is roughly modeled off of Chalupka 2015 visual bars code.
-            Arguments: None
-            Returns: the model (tf.keras.models.Model object)
+        ''' 
+        Define the neural network based on specifications in self.params.
+
+        This model is roughly modeled off of Chalupka 2015 visual bars code.
+        Arguments: 
+            None
+        Returns: 
+            tf.keras.models.Model : untrained model specified in self.params.
         '''
 
         model = tf.keras.models.Sequential([

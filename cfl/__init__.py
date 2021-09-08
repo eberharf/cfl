@@ -1,9 +1,6 @@
 # The root directory for the `cfl` package.
 # This folder contains all the functional code necessary to run `cfl`.
-import cfl.visualization_methods
-import cfl.cluster_methods
-import cfl.density_estimation_methods
-import cfl.util
-import cfl.dataset
-import cfl.experiment
-import cfl.block
+
+__version__ = '1.0.1' 
+__author__= 'Jenna Kahn and Iman Wahle'
+__credits__= '2021, California Institute of Technology'

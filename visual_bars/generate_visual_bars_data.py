@@ -1,43 +1,44 @@
-#Jenna Kahn
-#adapted from dataset_binary_gratings.py (Chalupka 2015)
-
-import numpy as np # must be numpy 1.17 or higher
+import numpy as np  # must be numpy 1.17 or higher
 import math
 import matplotlib.pyplot as plt
 
-########
-# A binary image dataset created from the following probabilities:
-# (H1 is a "hidden variable", VB is "vertical bars"
-#     and HB stands for "horizontal bars".)
-
-# Causal graph:
-# H1 is a binary variable that, when on, causes vertical bars and increases
-# the probability of T (the target variable). Horizontal bars also increase
-# the probability of T directly, but vertical bars do not increase the probability
-# of T. Thus, H1 is a hidden source of confounding.
+'''
+# Jenna Kahn
+# adapted from dataset_binary_gratings.py (Chalupka 2015)
 
 
-# P(H=0) = 0.5, P(H=1) = 0.5
+A binary image dataset created from the following probabilities:
+(H1 is a "hidden variable", VB is "vertical bars"
+    and HB stands for "horizontal bars".)
+
+Causal graph:
+H1 is a binary variable that, when on, causes vertical bars and increases
+the probability of T (the target variable). Horizontal bars also increase
+the probability of T directly, but vertical bars do not increase the probability
+of T. Thus, H1 is a hidden source of confounding.
 
 
-# Below is the 'ground truth' that CFL should attempt to recover:
-# H2 = the presence of horizontal bars in image
-# H1 = presence of confounding hidden variable
-
-# class labels and P(T) for each class:
-# 0. p(T|H1=0,H2=0) = 0.1
-# 1. p(T|H1=1,H2=0) = 0.4
-# 2. P(T|H1=0,H2=1) = 0.7
-# 3. P(T|H1=1,H2=1) = 1.
+P(H=0) = 0.5, P(H=1) = 0.5
 
 
-# Here are some example function calls using this class:
-# vb_data = VisualBarsData(n_samples=20, noise_lvl=0.1)
-# vb_data.getImages()
-# vb_data.getGroundTruth()
-# vb_data.getTarget()
-# vb_data.viewImages()
-########
+Below is the 'ground truth' that CFL should attempt to recover:
+H2 = the presence of horizontal bars in image
+H1 = presence of confounding hidden variable/vertical bar in image
+
+class labels and P(T) for each class:
+0. p(T|H1=0,H2=0) = 0.1    NO bars
+1. p(T|H1=1,H2=0) = 0.4    Vertical bar only
+2. P(T|H1=0,H2=1) = 0.7    Horizontal bar only
+3. P(T|H1=1,H2=1) = 1.     Both bars
+
+
+Here are some example function calls using this class:
+vb_data = VisualBarsData(n_samples=20, noise_lvl=0.1)
+vb_data.getImages()
+vb_data.getGroundTruth()
+vb_data.getTarget()
+vb_data.viewImages()
+'''
 
 class VisualBarsData():
 
@@ -46,17 +47,28 @@ class VisualBarsData():
         generates the ground labels for each image, and generates the target behavior associated
         with each image in separate, aligned np arrays
 
-        Parameters
-        n_samples (int): number of images to generate
-        im_shape (tuple with two numbers): size of images to generate in pixels
-        noise_lvl (float between 0 and 1): the amount of random noise that the images should contain (default is 0)
-        set_random_seed (int): Optional, if enabled sets the random generator to a specific seed, allowing reproducible random results
-        '''
-        assert 0 <= noise_lvl <= 1, "noise_lvl must be between 0 and 1"
-        assert len(im_shape)==2, "im_shape should contain the dimensions of a 2D image"
-        assert n_samples > 0, "n_samples must be a positive integer (the number of images to generate"
+        Parameters:
+            n_samples (int): number of images to generate
+            im_shape (2-tuple): size of each image to generate, in pixels
+            noise_lvl (float [0,1]): the amount of random noise that each image should contain (default is 0)
+            set_random_seed (int): Optional, if enabled sets the random generator to a specific seed, allowing reproducible random results
+            hBarFreq, vBarFreq (float between 0 and 1): the frequency with which a horizontal bar and a vertical bar (respectively) appear in the set of images
 
-        self.n_samples = n_samples #number of images to generate
+        Returns: 
+            None
+        '''  
+        assert 0 <= noise_lvl <= 1, "noise_lvl must be between 0 and 1 but is {}".format(
+            noise_lvl)
+        assert len(
+            im_shape) == 2, "im_shape should contain the dimensions of a 2D image but instead is {}".format(im_shape)
+        assert n_samples > 0, "n_samples must be a positive integer (the number of images to generate) but instead is {}".format(
+            n_samples)
+        assert 0 <= hBarFreq <= 1, "hBarFreq must be between 0 and 1 but is {}".format(
+            hBarFreq)
+        assert 0 <= vBarFreq <= 1, "vBarFreq must be between 0 and 1 but is {}".format(
+            vBarFreq)
+
+        self.n_samples = n_samples  # number of images to generate
         self.im_shape = im_shape
 
         self.random = np.random.default_rng(set_random_seed) # create a random number generator (optionally seeded to allow reproducible results)
@@ -78,13 +90,21 @@ class VisualBarsData():
 
     def _generate_images(self, n_samples, im_shape, noise_lvl):
         '''
-        generates binary images containing some combination of vertical
-        bars and/or horizontal bars (or neither)
+        Generates the 'ground truth'
+        classification labels for each image based on whether hidden variable is
+        active and/or horizontal bars present
 
-        inputs:
-        n_samples = number of images to generate
-        im_shape = dimensions of each image
-        noise_lvl = amount of noise in images (can be between 0 and 1)
+        Parameters:
+            X_images (np array) : array of binary images 
+            Hs (np array) :  aligned with X_images, where Hs[i] indicates whether the hidden variable
+                is active for X_images[i]
+            HBs (np array) :  aligned with X_images, where HBs[i] indicates whether there is a horizontal bar
+                in X_images[i] or not 
+
+        Note:
+            modified from the behave() function in ai_gratings.py (Chalupka 2015)
+            #TODO: proper citation ?
+
         '''
 
         # X_images = array containing each image (each val in array represents a pixel)
@@ -135,29 +155,34 @@ class VisualBarsData():
         gt_labels = np.zeros(self.n_samples) #gt_labels = array containing "ground truth" class labels for each image in X_images
 
         for i in range(self.n_samples):
-            H1 = self.Hs[i] #H1 = indicates whether the vertical bar hidden var is active (1) or not (0)
-            H2 = self.HBs[i] #H2 = indicates whether the current image contains a horizontal bar (1) or not (0)
+            # H1 = indicates whether the vertical bar hidden var is active (1) or not (0)
+            H1 = self.H1[i]
+            # H2 = indicates whether the current image contains a horizontal bar (1) or not (0)
+            H2 = self.HBs[i]
 
-            if H2==0 and H1 ==0:
-                gt_labels[i] = 0 # e.g. p(T|H2,H1) = 0.1
-            if H2==0 and H1 ==1:
-                gt_labels[i] = 1 # p(T|H2,H1) = 0.4
-            if H2==1 and H1 ==0:
-                gt_labels[i] = 2 # P(T|H2,H1) = 0.7
-            if H2==1 and H1 ==1:
-                gt_labels[i] = 3 # P(T|H2,H) = 1.
+            if H2 == 0 and H1 == 0:
+                gt_labels[i] = 0  
+            if H2 == 0 and H1 == 1:
+                gt_labels[i] = 1  
+            if H2 == 1 and H1 == 0:
+                gt_labels[i] = 2 
+            if H2 == 1 and H1 == 1:
+                gt_labels[i] = 3  
 
         return gt_labels.astype(int)
 
     def _generate_target(self):
         '''probabilistically generates the target behavior for each image, based on the
          ground truth probabilities expressed at the top of this file'''
-        p_dict = {0: 0.1, 1: 0.4, 2: 0.7, 3: 1.}
+        
+        # this is the ground truth probability distribution 
+        # key= macrovariable class of image, value= probability that target equals one
+        P_DICT = {0: 0.1, 1: 0.4, 2: 0.7, 3: 1.}
 
         target_vals = np.zeros(self.n_samples)
 
         for i in range(self.n_samples):
-            currentP = p_dict[self.gt_labels[i]]
+            currentP = P_DICT[self.gt_labels[i]]
             target_vals[i] = (self.random.random() < currentP)
         return target_vals
 
