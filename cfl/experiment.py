@@ -7,7 +7,7 @@ from cfl.dataset import Dataset
 from cfl.block import Block
 import cfl.density_estimation_methods as cdem
 # import cfl.cluster_methods as ccm
-from cfl.cluster_methods import clusterer
+import cfl.cluster_methods as ccm
 from cfl import intervention_rec
 
 '''
@@ -34,7 +34,8 @@ BLOCK_KEY = {   'CondExpVB'     : cdem.CondExpVB,
                 'CondExpCNN'    : cdem.CondExpCNN,
                 'CondExpCNN3D'  : cdem.CondExpCNN3D,
                 'CondExpMod'    : cdem.CondExpMod,
-                'Clusterer'     : clusterer.Clusterer } #TODO: maybe change this so that instead of 
+                'Cause_Clusterer'  : ccm.Cause_Clusterer,
+                'Effect_Clusterer' : ccm.Effect_Clusterer} #TODO: maybe change this so that instead of 
                                                             # calling clusterer, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods  
 
 class Experiment():
