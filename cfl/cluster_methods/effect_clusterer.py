@@ -6,7 +6,7 @@ from cfl.dataset import Dataset
 import numpy as np
 from cfl.cluster_methods.Y_given_Xmacro import sample_Y_dist # calculate 
                                                              # P(Y|Xmacro)
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import *
 
 #TODO: next step: add very clear documentation about how to add new module. 
 # Include:
@@ -69,7 +69,7 @@ from sklearn.cluster import DBSCAN
         results = c.train(data, prev_results)
  """
 
-class Effect_Clusterer(Block):
+class EffectClusterer(Block):
 
     def __init__(self, data_info, params):
         """
@@ -106,7 +106,7 @@ class Effect_Clusterer(Block):
         super().__init__(data_info=data_info, params=params) 
         
         #attributes:
-        self.name = 'Clusterer'
+        self.name = 'EffectClusterer'
         self.Y_type = data_info['Y_type']
         self.model = self._create_model()
 
@@ -118,7 +118,7 @@ class Effect_Clusterer(Block):
             model_params = {key: self.params[key] for key in model_keys}
 
             # create model
-            model = eval(self.params['model'])(*model_params)
+            model = eval(self.params['model'])(**model_params)
         else:
             model = self.params['model']
         return model
@@ -147,6 +147,7 @@ class Effect_Clusterer(Block):
 
         default_params =  {'model' : DBSCAN(),
                            'precompute_distances' : True,
+                           'verbose' : 1
                           }
         return default_params
 

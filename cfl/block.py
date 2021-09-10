@@ -122,7 +122,7 @@ class Block(metaclass=ABCMeta):
         '''
         ...
 
-    def _check_model_params(self, input_params):
+    def _check_model_params(self, input_params, prune=False):
         """
          Check that all expected model parameters have been provided,
             and substitute the default if not. Remove any unused but
@@ -150,17 +150,20 @@ class Block(metaclass=ABCMeta):
 
         # check for parameters that are provided but not needed
         # remove if found
-        paramsToRemove = []
-        for param in input_params:
-            if param not in default_params.keys():
-                paramsToRemove.append(param)
-                if verbose > 0:
-                    print(f'{param} specified but not used by this block type')
+        # TODO: we used to prune by default but now it removes unrecognized
+        # sklearn clustering params - do we ever really need to prune?
+        if prune:
+            paramsToRemove = []
+            for param in input_params:
+                if param not in default_params.keys():
+                    paramsToRemove.append(param)
+                    if verbose > 0:
+                        print(f'{param} specified but not used by this block type')
 
-        # remove unnecessary parameters after we're done iterating
-        # to not cause problems
-        for param in paramsToRemove:
-            input_params.pop(param)
+            # remove unnecessary parameters after we're done iterating
+            # to not cause problems
+            for param in paramsToRemove:
+                input_params.pop(param)
 
         # check for needed parameters
         # add if not found

@@ -1,2 +1,2 @@
-from cfl.cluster_methods.cause_clusterer import Cause_Clusterer
-from cfl.cluster_methods.effect_clusterer import Effect_Clusterer
+from cfl.cluster_methods.cause_clusterer import CauseClusterer
+from cfl.cluster_methods.effect_clusterer import EffectClusterer

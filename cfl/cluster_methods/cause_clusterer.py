@@ -4,7 +4,7 @@ import pickle #for saving code
 from cfl.block import Block
 from cfl.dataset import Dataset
 import numpy as np
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import *
 
 #TODO: next step: add very clear documentation about how to add new module. 
 # Include:
@@ -65,7 +65,7 @@ from sklearn.cluster import DBSCAN
         results = c.train(data, prev_results)
     """
 
-class Cause_Clusterer(Block):
+class CauseClusterer(Block):
 
     def __init__(self, data_info, params):
         """
@@ -97,7 +97,7 @@ class Cause_Clusterer(Block):
         super().__init__(data_info=data_info, params=params) 
         
         #attributes:
-        self.name = 'Clusterer'
+        self.name = 'CauseClusterer'
         self.model = self._create_model()
 
     def _create_model(self):
@@ -108,7 +108,7 @@ class Cause_Clusterer(Block):
             model_params = {key: self.params[key] for key in model_keys}
 
             # create model
-            model = eval(self.params['model'])(*model_params)
+            model = eval(self.params['model'])(**model_params)
         else:
             model = self.params['model']
         return model
@@ -134,7 +134,8 @@ class Cause_Clusterer(Block):
 
         """
 
-        default_params =  {'model' : DBSCAN()}
+        default_params =  { 'model' : DBSCAN(),
+                            'verbose' : 1}
         return default_params
 
 

@@ -32,9 +32,9 @@ def test_param_setting():
     data_info = {'X_dims': X.shape, 
                  'Y_dims': Y.shape, 
                  'Y_type': 'continuous'}
-    cause_cluster_params = {'name' : 'KMeans', 
+    cause_cluster_params = {'model' : 'KMeans', 
                             'n_clusters' : 3}
-    effect_cluster_params = {'name' : 'DBSCAN',
+    effect_cluster_params = {'model' : 'DBSCAN',
                              'eps' : 0.1}
     block_names = ['CondExpMod', 'Cause_Clusterer', 'Effect_Clusterer']
     block_params = [{'show_plot' : False}, cause_cluster_params, effect_cluster_params]

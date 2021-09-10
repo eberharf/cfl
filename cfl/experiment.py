@@ -34,8 +34,8 @@ BLOCK_KEY = {   'CondExpVB'     : cdem.CondExpVB,
                 'CondExpCNN'    : cdem.CondExpCNN,
                 'CondExpCNN3D'  : cdem.CondExpCNN3D,
                 'CondExpMod'    : cdem.CondExpMod,
-                'Cause_Clusterer'  : ccm.Cause_Clusterer,
-                'Effect_Clusterer' : ccm.Effect_Clusterer} #TODO: maybe change this so that instead of 
+                'CauseClusterer'  : ccm.CauseClusterer,
+                'EffectClusterer' : ccm.EffectClusterer} #TODO: maybe change this so that instead of 
                                                             # calling clusterer, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods  
 
 class Experiment():

@@ -1,0 +1,36 @@
+---
+
+
+exp_params : 
+  exp_name : 'my_exp'
+  past_exp_path : None
+  exp_notes : 'Testing out different # clusters'
+
+data_params : 
+  Y_type : 'continuous'
+  dataset_train : 
+    X_file_path : '/path/to/Xtrain.npy'
+    Y_file_path : 'path/to/Ytrain.npy'
+  dataset_predict0 :
+    X_file_path : '/path/to/X_dataset_predict0.npy'
+    Y_file_path : '/path/to/Y_dataset_predict0.npy'
+  dataset_predict1 :
+    X_file_path : '/path/to/X_dataset_predict1.npy'
+    Y_file_path : '/path/to/Y_dataset_predict1.npy'
+
+block0_params :
+  block_name : 'CDE' 
+  n_epochs : 50
+  dense_units : [20]
+  verbose : 1
+
+block1_params :
+  block_name : 'Clusterer'
+  x_model : KMeans
+  x_model_params : 
+    n_clusters : 2
+  y_model : None
+  
+block2_params : 
+  block_name : 'InterventionRec'
+  eps : 0.1
