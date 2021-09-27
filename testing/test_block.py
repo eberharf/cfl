@@ -46,7 +46,9 @@ def test_check_model_params():
     assert bb.params['param1'] == 10, "'param1' value should be equal to value in input but instead is {}".format(bb.params['param1']) 
 
     # check that 'chicken' is removed
-    assert 'chicken' not in bb.params.keys(), "'chicken' should no longer be in bb.params.keys()."
+    # UPDATE: we stopped pruning because Clusterers don't know what params they 
+    # need - it depends on what kind of model is specified. 
+    # assert 'chicken' not in bb.params.keys(), "'chicken' should no longer be in bb.params.keys()."
     
     # check that 'lr', 'Drake', and 'hello' are added
     assert 'lr' in bb.params.keys(), "Necessary param addition unsuccessful for 'lr'"

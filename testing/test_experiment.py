@@ -95,10 +95,11 @@ def test_cde_experiment():
 
 
     ## CDE and cluster experiment 
-    cluster_params = {} 
+    c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
+    e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
 
-    block_names = ['CondExpMod', 'Clusterer']
-    block_params = [condExp_params, cluster_params]
+    block_names = ['CondExpMod', 'CauseClusterer', 'EffectClusterer']
+    block_params = [condExp_params, c_cluster_params, e_cluster_params]
 
     my_exp_clust = Experiment(X_train=x, Y_train=y, data_info=data_info, 
                 block_names=block_names, block_params=block_params, blocks=None, 
@@ -111,10 +112,10 @@ def test_cde_experiment():
         prev_results=train_results_cde)
 
     # check output of clusterer block
-    assert 'x_lbls' in train_results_clust['Clusterer'].keys(), \
-        'Clusterer train fxn should specify x_lbls in results'
-    assert 'y_lbls' in train_results_clust['Clusterer'].keys(), \
-        'Clusterer train fxn should specify y_lbls in results'
+    assert 'x_lbls' in train_results_clust['CauseClusterer'].keys(), \
+        'CauseClusterer train fxn should specify x_lbls in results'
+    assert 'y_lbls' in train_results_clust['EffectClusterer'].keys(), \
+        'EffectClusterer train fxn should specify y_lbls in results'
     
 
     #try to train clusterer again - it should not work 
@@ -139,11 +140,11 @@ def test_clusterer_experiment():
                 'Y_dims': y.shape, 
                 'Y_type': 'categorical'}
 
-    cluster_params = {'x_model' : DBSCAN(),
-                      'y_model' : DBSCAN()}
+    c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
+    e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
 
-    block_names = ['Clusterer']
-    block_params = [cluster_params]
+    block_names = ['CauseClusterer', 'EffectClusterer']
+    block_params = [c_cluster_params, e_cluster_params]
 
     # make new CFL Experiment with clusterer only
     my_exp_cluster = Experiment(X_train=x, Y_train=y, data_info=data_info, 
@@ -212,11 +213,11 @@ def test_load_past_experiment():
                     'standardize': False,
                     'best': True}
 
-    cluster_params = {'x_model' : DBSCAN(),
-                      'y_model' : DBSCAN()}
+    c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
+    e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
 
-    block_names = ['CondExpMod', 'Clusterer']
-    block_params = [condExp_params, cluster_params]
+    block_names = ['CondExpMod', 'CauseClusterer', 'EffectClusterer']
+    block_params = [condExp_params, c_cluster_params, e_cluster_params]
 
     # make CFL Experiment
     old_exp = Experiment(X_train=x, Y_train=y, data_info=data_info, 

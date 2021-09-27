@@ -13,6 +13,7 @@ from sklearn.metrics import adjusted_mutual_info_score as ami
 import cfl.visualization_methods.visual_bars_vis as vis
 
 RESULTS_PATH = 'testing/tmp_test_results'
+SHOW_PLOTS = False
 
 def generate_vb_data(n_samples):
     # create a visual bars data set 
@@ -69,6 +70,7 @@ def make_vis_bar_regression_tests():
                             'optimizer'   : 'adam',
                             'loss'        : 'mean_squared_error',
                             'best'        : True,
+                            'show_plot' : SHOW_PLOTS
                         }
             cause_cluster_params = {'model' : 'KMeans', 'n_clusters' : self.n_xbar}
             effect_cluster_params = {'model' : 'KMeans', 'n_clusters' : self.n_ybar}
@@ -108,7 +110,8 @@ def make_vis_bar_regression_tests():
 
         def test_show_xbar_examples(self):
             print(np.unique(self.results['CauseClusterer']['x_lbls']))
-            vis.viewImagesAndLabels(
+            if SHOW_PLOTS:
+                vis.viewImagesAndLabels(
                                 np.squeeze(self.x), 
                                 im_shape=(10,10), 
                                 n_examples=10, 
