@@ -166,6 +166,7 @@ class CauseClusterer(Block):
 
         # do clustering 
         self.model.fit(pyx)
+        self.trained = True
         x_lbls = self.model.labels_
         
         results_dict = {'x_lbls'  : x_lbls}
