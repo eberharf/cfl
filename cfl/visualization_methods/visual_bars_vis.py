@@ -1,3 +1,6 @@
+'''these functions are currently a (worse) repeat of the things in general_vis'''
+
+
 import random
 
 import matplotlib.pyplot as plt

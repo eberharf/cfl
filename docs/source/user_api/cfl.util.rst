@@ -1,5 +1,5 @@
-cfl.util package
-================
+Miscillaneous useful functions (utils) 
+=======================================
 
 Submodules
 ----------

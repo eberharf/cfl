@@ -1,43 +1,44 @@
-# Jenna Kahn
-# adapted from dataset_binary_gratings.py (Chalupka 2015)
-
 import numpy as np  # must be numpy 1.17 or higher
 import math
 import matplotlib.pyplot as plt
 
-########
-# A binary image dataset created from the following probabilities:
-# (H1 is a "hidden variable", VB is "vertical bars"
-#     and HB stands for "horizontal bars".)
-
-# Causal graph:
-# H1 is a binary variable that, when on, causes vertical bars and increases
-# the probability of T (the target variable). Horizontal bars also increase
-# the probability of T directly, but vertical bars do not increase the probability
-# of T. Thus, H1 is a hidden source of confounding.
+'''
+# Jenna Kahn
+# adapted from dataset_binary_gratings.py (Chalupka 2015)
 
 
-# P(H=0) = 0.5, P(H=1) = 0.5
+A binary image dataset created from the following probabilities:
+(H1 is a "hidden variable", VB is "vertical bars"
+    and HB stands for "horizontal bars".)
+
+Causal graph:
+H1 is a binary variable that, when on, causes vertical bars and increases
+the probability of T (the target variable). Horizontal bars also increase
+the probability of T directly, but vertical bars do not increase the probability
+of T. Thus, H1 is a hidden source of confounding.
 
 
-# Below is the 'ground truth' that CFL should attempt to recover:
-# H2 = the presence of horizontal bars in image
-# H1 = presence of confounding hidden variable/vertical bar in image
-
-# class labels and P(T) for each class:
-# 0. p(T|H1=0,H2=0) = 0.1    NO bars
-# 1. p(T|H1=1,H2=0) = 0.4    Vertical bar only
-# 2. P(T|H1=0,H2=1) = 0.7    Horizontal bar only
-# 3. P(T|H1=1,H2=1) = 1.     Both bars
+P(H=0) = 0.5, P(H=1) = 0.5
 
 
-# Here are some example function calls using this class:
-# vb_data = VisualBarsData(n_samples=20, noise_lvl=0.1)
-# vb_data.getImages()
-# vb_data.getGroundTruth()
-# vb_data.getTarget()
-# vb_data.viewImages()
-########
+Below is the 'ground truth' that CFL should attempt to recover:
+H2 = the presence of horizontal bars in image
+H1 = presence of confounding hidden variable/vertical bar in image
+
+class labels and P(T) for each class:
+0. p(T|H1=0,H2=0) = 0.1    NO bars
+1. p(T|H1=1,H2=0) = 0.4    Vertical bar only
+2. P(T|H1=0,H2=1) = 0.7    Horizontal bar only
+3. P(T|H1=1,H2=1) = 1.     Both bars
+
+
+Here are some example function calls using this class:
+vb_data = VisualBarsData(n_samples=20, noise_lvl=0.1)
+vb_data.getImages()
+vb_data.getGroundTruth()
+vb_data.getTarget()
+vb_data.viewImages()
+'''
 
 class VisualBarsData():
 

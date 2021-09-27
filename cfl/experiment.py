@@ -66,7 +66,9 @@ class Experiment():
             block_params (list of dicts) : list of dicts specifying parameters for each block specified
                            in block_names. Default is None. 
             blocks (list of Blocks): list of block objects. Default is None.
-            results_path (str) : path to directory to save this experiment to. Default is `''`. 
+            verbose (int): Amount of output to print. Possible values are 0, 1, 2. Default is 1.
+            results_path (str) : path to directory to save this experiment to.
+                Default is `''`.
 
         Note: There are three ways to specify Blocks: 
                 1) specify `past_exp_path`
@@ -74,11 +76,9 @@ class Experiment():
                 3) specify `blocks`. 
               Do not specify all four of these parameters. 
         '''
+        self.verbose = verbose
 
-        # # check data input types
-        # assert isinstance(X_train, np.ndarray), 'X should be of type np.ndarray'
-        # assert isinstance(Y_train, np.ndarray), 'Y should be of type np.ndarray' #TODO: remove (duplicate of work done by Dataset class)
-
+        # OPTION 1 for Experiment initialization: load from path 
         # if loading from past experiment, make sure no other block
         # specifications are provided ...
         if past_exp_path is not None:
@@ -86,28 +86,46 @@ class Experiment():
             assert (block_params is None), 'block_params should not be specified.'
             assert (blocks is None), 'blocks should not be specified.'
 
+            # load in trained block info if past experiment provided
+            for block in blocks:
+                fn = os.path.join(past_exp_path, 'trained_blocks', block.get_name())
+                block.load_block(fn)
+            self.is_trained = True
+
+
+        # OPTION 2 for Experiment initialization: create blocks from strings 
         # otherwise, make sure block names and params are both provided, and that 
         # blocks is left unpopulated ...
         if (block_names is not None) or (block_params is not None):
             assert (block_names is not None), 'block_names should be specified.'
             assert (block_params is not None), 'block_params should be specified.'
             assert (blocks is None), 'blocks should not be specified.'
+            self.is_trained = False
+            # add verbosity to params that don't specify
+            block_params = self.__propagate_verbosity(self.verbose, block_params)
         
+        #OPTION 3 for Experiment initialization: blocks pre-created 
         # otherwise, make sure that only blocks is provided.
         if blocks is not None:
             assert (block_names is None), 'block_names should not be specified.'
             assert (block_params is None), 'block_params should not be specified.'
+            
+            for block in self.blocks:
+                assert isinstance(block, Block), \
+                    'A specified block is not of type Block.'
+
+            self.is_trained = False
 
         # make sure one of the three Experiment definitions is supplied
         assert (past_exp_path is not None) or \
                ((block_names is not None) and (block_params is not None)) or \
                (blocks is not None), 'Must provide one of the Experiment definitions.'
 
+
         # build and track training dataset
         # Note: explicitly stating one dataset for training as an Experiment
         # attribute enforces the definition that an Experiment is a unique 
         # configuration of a trained CFL.
-        self.is_trained = False
         self.data_info = data_info
         self.datasets = {}
         self.dataset_train = self.add_dataset(X=X_train, Y=Y_train, \
@@ -115,11 +133,6 @@ class Experiment():
                                               Xraw=X_train_raw, \
                                               Yraw=Y_train_raw)
         self.datasets[self.dataset_train.get_name()] = self.dataset_train
-
-        # add verbosity to params that don't specify
-        self.verbose = verbose
-        if block_params is not None:
-            block_params = self.__propagate_verbosity(self.verbose, block_params)
         
         # build experiment directory
         self.save_path = self.__make_exp_dir(results_path)
@@ -129,23 +142,16 @@ class Experiment():
             print(f'Loading in Experiment from {past_exp_path}')
             block_names, block_params = self.__load_params(os.path.join(past_exp_path, 'params'))
 
-        # build blocks from names and params if blocks not provided
+
+        # build blocks from names and params if blocks not provided (ie in Options 1
+        # or 2)
         if blocks is None:
             blocks = []
             for bn,bp in zip(block_names, block_params): # data_info
                 blocks.append(self.__build_block(bn,bp))
         
-        # load in trained block info if past experiment provided
-        if past_exp_path is not None:
-            for block in blocks:
-                fn = os.path.join(past_exp_path, 'trained_blocks', block.get_name())
-                block.load_block(fn)
-            self.is_trained = True
 
-        self.blocks = blocks # TODO: need to populate block_names and block_params
-        for block in self.blocks:
-            assert isinstance(block, Block), \
-                'A specified block is not of type Block.'
+        self.blocks = blocks
 
         # TODO: check that interfaces match
         # TODO: assert in the function itself so we can give more info
@@ -262,85 +268,6 @@ class Experiment():
         dataset.set_cfl_results(all_results)
         return all_results        
 
-    def __save_results(self, results, dataset, block):
-        ''' Save results for a given dataset and block. 
-
-            Arguments: 
-                results (dict) : dictionary of results from running block on dataset. 
-                dataset (Dataset) : dataset object to run block on. 
-                block (Block) : block to run on dataset. 
-
-            Returns: 
-                None
-        '''
-
-        # check inputs
-        assert isinstance(results, dict), 'results should be a dict.'
-        assert isinstance(dataset, Dataset), 'dataset should be of type Dataset.'
-        assert isinstance(block, Block), \
-            'block should be of a type that inherits Block.'
-
-        if self.save_path is not None:
-            dir_name = os.path.join(self.save_path, dataset.get_name())
-            if not os.path.exists(dir_name):
-                os.mkdir(dir_name)
-
-            file_name = os.path.join(dir_name, block.get_name() + '_results.pickle')
-            with open(file_name, 'wb') as f:
-                pickle.dump(results, f) 
-                # TODO: eventually, we have to be careful about what pickle 
-                # protocol we use for compatibility across python versions
-
-    def __save_params(self):
-        ''' Helper function to save params associated with each block in 
-            self.blocks. Primarily used in Experiment initialization. 
-        '''
-
-        if self.save_path is not None:
-            assert self.blocks is not None, 'self.blocks does not exist yet.'
-            assert not os.path.exists(os.path.join(self.save_path, 'params')), 'Params already saved.'
-            os.mkdir(os.path.join(self.save_path, 'params'))
-            
-            for block,block_name in zip(self.blocks, self.block_names):
-                fn = os.path.join(self.save_path, 'params', block_name)
-                with open(fn, 'wb') as f:
-                    pickle.dump(block.get_params(), f)
-
-            fn = os.path.join(self.save_path, 'params', 'block_graph')
-            with open(fn, 'wb') as f:
-                pickle.dump(self.block_names, f) 
-    
-
-    def __load_params(self, params_path):
-        ''' Helper function to load params from a specified previous
-            experiment to be used in this experiment. Primarily used in 
-            Experiment initialization. 
-            
-            Arguments: 
-                params_path (str) : path to where params are saved in previous 
-                              Experiment. 
-            
-            Returns: 
-                list of strs : ordered list of blocks used in previous
-                              Experiment. Blocks identified by name (should be
-                              the same name that block.get_name() returns). 
-                              
-                list of dicts : ordered list of params dictionaries associated 
-                               with each block. 
-        '''
-        assert isinstance(params_path, str), 'params_path should be a str.'
-        assert os.path.exists(params_path), \
-            f'The params_path specified does not exist: {params_path}.'
-
-        with open(os.path.join(params_path, 'block_graph'), 'rb') as f:
-            block_graph = pickle.load(f)
-        block_params = []
-        for bn in block_graph:
-            with open(os.path.join(params_path, bn), 'rb') as f:
-                block_params.append(pickle.load(f))
-        return block_graph, block_params
-
-
     def add_dataset(self, X, Y, dataset_name, Xraw=None, Yraw=None):
         ''' Add a new dataset to be tracked by this Experiment. 
             
@@ -403,11 +330,13 @@ class Experiment():
 
     def get_data_info(self): 
         return self.data_info
+
     # TODO: this function doesn't work right now
     def load_results_from_file(self, dataset_name='dataset_train'):
         ''' Load and return saved results from running a given dataset
-            through the Experiment pipeline. Different from get_results because
-            this loads the saved results from their save directory
+            through the Experiment pipeline. This function differs from 
+            `retrieve_results()` because this loads the saved results 
+            from their save directory
 
             Arguments: 
                 dataset_name (str) : name of Dataset to load results for. Defaults
@@ -455,35 +384,6 @@ class Experiment():
         dataset = self.datasets['dataset_train']
         return dataset.cfl_results
 
-
-    def __build_block(self, block_name, block_param):
-        ''' Given a Block's name and associated params, instantiate a Block 
-            object. 
-
-            Arguments: 
-                block_name : name of Block to instantiate. (str)
-                block_param : dictionary of parameters that specify this 
-                              Block. (dict)
-
-            Returns: instantiated Block. (Block descendent)
-
-            Note: for now, I will just implement this using the dict translation
-            method. Once we have time, we can look into using the registration
-            method.
-        '''
-
-        # check inputs
-        assert isinstance(block_name, str), 'block_name should be of type str.'
-        assert isinstance(block_param, dict), \
-            'block_param should be of type dict.'
-        assert block_name in BLOCK_KEY.keys(), block_name + ' has not been ' + \
-            'added to BLOCK_KEY yet. Please do so before proceeding. Note: ' + \
-            'this is a temporary system until we set up Block registration.' 
-
-        return BLOCK_KEY[block_name](data_info=self.data_info, 
-                                     params=block_param)
-
-
     # def check_blocks_compatibility(self):
     #     ''' Check that each Block in self.blocks is compatible with the Blocks
     #         that precede and follow it. 
@@ -501,7 +401,44 @@ class Experiment():
     #     '''
 
     #     return True
+    def get_save_path(self):
+        ''' Return the path at which experiment results are saved.
+            Arguments: None
+            Returns:
+                str : path to experiment
+        '''
+        return self.save_path
 
+    def get_intervention_recs(self, dataset_name, k_samples=100, eps=0.5):
+        ''' For a given dataset, this function selects a subset of samples that
+            serve as optimal interventions to perform when testing for confounding
+            in CFL's observational partition.
+            TODO: complete documentation
+        '''
+        assert self.blocks is not None, 'blocks have not been defined yet.'
+        
+        cfl_results = self.get_dataset(dataset_name).get_cfl_results()
+        assert cfl_results is not None, 'There are no results for this Dataset.'
+
+        # TODO: standardize block names as CDE and Clusterer so those can be
+        # hardcoded here. Right now there's no way to know if blocks[0] is actually
+        # a CDE
+        return intervention_rec.get_recommendations(
+                    pyx=cfl_results[self.blocks[0].get_name()]['pyx'], 
+                    cluster_labels=cfl_results[self.blocks[1].get_name()]['x_lbls'], 
+                    k_samples=k_samples, 
+                    eps=eps,
+                    to_plot=False,
+                    series='series'
+                )    
+
+    def __propagate_verbosity(self, verbose, block_params):
+        for pi in range(len(block_params)):
+            if 'verbose' not in block_params[pi].keys():
+                modified_params = block_params[pi]
+                modified_params['verbose'] = verbose
+                block_params[pi] = modified_params
+        return block_params
     
     def __make_exp_dir(self, results_path):
         ''' Build directory to which to save this Experiment. 
@@ -537,46 +474,113 @@ class Experiment():
         os.mkdir(os.path.join(save_path, 'trained_blocks'))
         return save_path
 
-    def __propagate_verbosity(self, verbose, block_params):
-        for pi in range(len(block_params)):
-            if 'verbose' not in block_params[pi].keys():
-                modified_params = block_params[pi]
-                modified_params['verbose'] = verbose
-                block_params[pi] = modified_params
-        return block_params
+    def __build_block(self, block_name, block_param):
+        ''' Given a Block's name and associated params, instantiate a Block 
+            object. 
 
-    def get_intervention_recs(self, dataset_name, k_samples=100, eps=0.5):
-        ''' For a given dataset, this function selects a subset of samples that
-            serve as optimal interventions to perform when testing for confounding
-            in CFL's observational partition.
-            TODO: complete documentation
+            Arguments: 
+                block_name : name of Block to instantiate. (str)
+                block_param : dictionary of parameters that specify this 
+                              Block. (dict)
+
+            Returns: instantiated Block. (Block descendent)
+
+            Note: for now, I will just implement this using the dict translation
+            method. Once we have time, we can look into using the registration
+            method.
         '''
-        assert self.blocks is not None, 'blocks have not been defined yet.'
-        
-        cfl_results = self.get_dataset(dataset_name).get_cfl_results()
-        assert cfl_results is not None, 'There are no results for this Dataset.'
 
-        # TODO: standardize block names as CDE and Clusterer so those can be
-        # hardcoded here. Right now there's no way to know if blocks[0] is actually
-        # a CDE
-        return intervention_rec.get_recommendations(
-                    pyx=cfl_results[self.blocks[0].get_name()]['pyx'], 
-                    cluster_labels=cfl_results[self.blocks[1].get_name()]['x_lbls'], 
-                    k_samples=k_samples, 
-                    eps=eps,
-                    to_plot=False,
-                    series='series'
-                ) 
-        
+        # check inputs
+        assert isinstance(block_name, str), 'block_name should be of type str.'
+        assert isinstance(block_param, dict), \
+            'block_param should be of type dict.'
+        assert block_name in BLOCK_KEY.keys(), block_name + ' has not been ' + \
+            'added to BLOCK_KEY yet. Please do so before proceeding. Note: ' + \
+            'this is a temporary system until we set up Block registration.' 
 
-    def get_save_path(self):
-        ''' Return the path at which experiment results are saved.
-            Arguments: None
-            Returns:
-                str : path to experiment
+        return BLOCK_KEY[block_name](data_info=self.data_info, 
+                                     params=block_param)
+
+    def __save_results(self, results, dataset, block):
+        ''' Save results for a given dataset and block. 
+            The Dataset's name (as specified when the Dataset object was
+            created) is saved to identify the source of the results. 
+
+            Arguments: 
+                results (dict) : dictionary of results from running block on dataset. 
+                dataset (Dataset) : dataset object to run block on. 
+                block (Block) : block to run on dataset. 
+
+            Returns: 
+                None
         '''
-        return self.save_path
 
+        # check inputs
+        assert isinstance(results, dict), 'results should be a dict.'
+        assert isinstance(dataset, Dataset), 'dataset should be of type Dataset.'
+        assert isinstance(block, Block), \
+            'block should be of a type that inherits Block.'
+
+        if self.save_path is not None:
+            dir_name = os.path.join(self.save_path, dataset.get_name())
+            if not os.path.exists(dir_name):
+                os.mkdir(dir_name)
+
+            file_name = os.path.join(dir_name, block.get_name() + '_results.pickle')
+            with open(file_name, 'wb') as f:
+                pickle.dump(results, f) 
+                # TODO: eventually, we have to be careful about what pickle 
+                # protocol we use for compatibility across python versions
+
+    def __save_params(self):
+        ''' Helper function to save params associated with each block in 
+            self.blocks. Primarily used in Experiment initialization. 
+        '''
+
+        if self.save_path is not None:
+            assert self.blocks is not None, 'self.blocks does not exist yet.'
+            assert not os.path.exists(os.path.join(self.save_path, 'params')), 'Params already saved.'
+            os.mkdir(os.path.join(self.save_path, 'params'))
+            
+            block_graph = []
+            for block in self.blocks:
+                block_graph.append(block.get_name())
+                fn = os.path.join(self.save_path, 'params', block.get_name())
+                with open(fn, 'wb') as f:
+                    pickle.dump(block.get_params(), f)
+
+            fn = os.path.join(self.save_path, 'params', 'block_graph')
+            with open(fn, 'wb') as f:
+                pickle.dump(block_graph, f) 
+    
+    def __load_params(self, params_path):
+        ''' Helper function to load params from a specified previous
+            experiment to be used in this experiment. Primarily used in 
+            Experiment initialization. 
+            
+            Arguments: 
+                params_path (str) : path to where params are saved in previous 
+                              Experiment. 
+            
+            Returns: 
+                list of strs : ordered list of blocks used in previous
+                              Experiment. Blocks identified by name (should be
+                              the same name that block.get_name() returns). 
+                              
+                list of dicts : ordered list of params dictionaries associated 
+                               with each block. 
+        '''
+        assert isinstance(params_path, str), 'params_path should be a str.'
+        assert os.path.exists(params_path), \
+            'The params_path specified does not exist.'
+
+        with open(os.path.join(params_path, 'block_graph'), 'rb') as f:
+            block_graph = pickle.load(f)
+        block_params = []
+        for bn in block_graph:
+            with open(os.path.join(params_path, bn), 'rb') as f:
+                block_params.append(pickle.load(f))
+        return block_graph, block_params
 
 ########### HELPER FUNCTIONS ##################################################
 

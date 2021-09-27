@@ -1,4 +1,4 @@
-cfl.visualization\_methods package
+Visualization Methods
 ==================================
 
 Submodules

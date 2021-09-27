@@ -1,12 +1,13 @@
 from abc import abstractmethod
 import pickle #for saving code
 
+import numpy as np
+from sklearn.cluster import DBSCAN
+
 from cfl.block import Block
 from cfl.dataset import Dataset
-import numpy as np
 from cfl.cluster_methods.Y_given_Xmacro import sample_Y_dist # calculate 
                                                              # P(Y|Xmacro)
-from sklearn.cluster import DBSCAN
 
 #TODO: next step: add very clear documentation about how to add new module. 
 # Include:
@@ -179,9 +180,17 @@ class Clusterer(Block):
 
         return results_dict
 
+    # TODO: the name 'predict' is still a lie because 'fit_predict' is not the
+    # same as predict
     def predict(self, dataset, prev_results):
         """  
         Assign new datapoints to clusters found in training.
+
+        NOTE: 
+            TODO: fit_predict is different than predict, so this code is WRONG  
+        however, kmeans is the only clustering function in sklearn that has 
+        a predict function defined so we're doing this for now
+
 
         Arguments:
             dataset (Dataset): Dataset object containing X, Y and pyx data to 
@@ -206,10 +215,6 @@ class Clusterer(Block):
         pyx = prev_results['pyx']
 
         x_lbls = self.xmodel.fit_predict(pyx)
-
-        # NOTE: TODO: fit_predict is different than predict, so this code is WRONG  
-        # however, kmeans is the only clustering function in sklearn that has 
-        # a predict function defined so we're doing this for now
 
         # if we are also clustering effect data 
         if self.ymodel is not None: 

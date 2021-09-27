@@ -20,17 +20,17 @@ import sys
 sys.path.insert(0, os.path.abspath('../..')) 
 
 # further modules needed for autodoc
-import nibabel 
 import tensorflow
 
 # -- Project information -----------------------------------------------------
+import cfl
 
 project = 'cfl'
-copyright = '2021, California Institute of Technology'
-author = 'Jenna Kahn, Iman Wahle, Frederick Eberhardt'
+copyright = cfl.__credits__
+author = cfl.__author__
 
 # The full version, including alpha/beta/rc tags
-release = '0.0'
+release = cfl.__version__ 
 
 
 # -- General configuration ---------------------------------------------------

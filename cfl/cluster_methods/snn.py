@@ -1,4 +1,28 @@
-'''this code is modified by Jenna Kahn from the implemention in
+'''
+This code provides an implementation of Shared Nearest Neighbor (SNN) Clustering
+for use in the clustering step of CFL. 
+
+SNN is a variation of DBSCAN that uses a non-Euclidean distance metric to
+cluster points. It was developed as an alternative to DBSCAN that performs
+better at creating clusters across regions with variable densities of points.
+
+We implement it here as a method that may do better in high-dimensional spaces. 
+Clustering methods that use Euclidean distance metrics tend to perform poorly in
+high-dimensional spaces because the distances between all points become
+approximately equal as dimensionality increases. Instead of finding nearby
+points with Euclidean distance, SNN uses an alternative distance metric based on
+the neighbor of nearest neighbors shared between two points. However, SNN
+clustering still (in the current implementation) uses Euclidean distance to
+construct the k-nearest neighbors graph, so this method may also suffer from
+some of the shortfalls of other clustering methods in high-dimensional space.
+
+
+This method is also an example of a custom clustering method that can be used
+for CFL clustering in the exact same way as any other Sklearn clustering method
+because it follows the same interface. 
+
+
+this code is modified by Jenna Kahn from the implemention in
 " Shared Nearest Neighbor Clustering Algorithm: Implementation and Evaluation "
 in github repository  albert-espin/snn-clustering
 
@@ -26,7 +50,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
-# TODO: add a bit of information about the point of SNN and when you would want to use it
 
 import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
@@ -51,22 +74,22 @@ def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     """
     n_samples = X.shape[0]
 
-    # the knn_graph is a sparse matrix showing the connectivity of the nearest neighbors
+    # the knn_graph is a sparse binary matrix showing the connectivity of the nearest neighbors
     # knn_graph has the shape (n_samples, n_samples), where knn_graph[i][j] = 1 if j is
-    # a k-nearest neighbor of i and = 0 otherwise
+    # a k-nearest neighbor of i and 0 otherwise
     knn_graph = kneighbors_graph(X, n_neighbors=neighbor_num, include_self=False)
     knn_array = knn_graph.toarray()
 
+    # similarity(p, q) = size(NN(p) intersect NN(q))
     # finding the dot product of the original array with its transpose gives an array
     # whose (i, j)th element is the number of shared neighbors between X[i] and X[j]
-    # similarity(p, q) = size(NN(p) intersect NN(q))
     num_shared_neighbors = np.dot(knn_array, knn_array.T)
 
     # now we go from the shared nearest neighbor similarity metric to the
     # SNN distance metric, which is defined for two points in X as
     # dist(x0, x1) = 1 - len(kNN(x0).intersect(knn(x1))) / k
 
-    normalization_factor = np.sum(knn_array, axis=1) #NOTE: as far as I can tell, this normalization should be equal to k in all
+    normalization_factor = np.sum(knn_array, axis=1) #NOTE: as far as I can tell, normalization_factor should be equal to k in all
     # cases, but the original code had the normalization as a function of the SNN
     # similarity, and I'm scared to change it in case my understanding is wrong
 
