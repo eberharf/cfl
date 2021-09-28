@@ -1,4 +1,3 @@
-from abc import abstractmethod
 import pickle #for saving code
 
 from cfl.block import Block
@@ -147,7 +146,6 @@ class EffectClusterer(Block):
 
         default_params =  {'model' : DBSCAN(),
                            'precompute_distances' : True,
-                           'verbose' : 1
                           }
         return default_params
 

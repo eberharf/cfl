@@ -56,7 +56,8 @@ def make_vis_bar_regression_tests():
 
             # setup cfl pipeline
             data_info = {'X_dims': self.x.shape, 'Y_dims': self.y.shape, 'Y_type': 'categorical'}            
-            cde_params = {  'filters'          : [8],
+            cde_params = {  'model' : 'CondExpCNN',
+                            'filters'          : [8],
                             'input_shape'      : data_info['X_dims'][1:],
                             'kernel_size'      : [(4, 4)],
                             'pool_size'        : [(2, 2)],
@@ -72,9 +73,9 @@ def make_vis_bar_regression_tests():
                             'best'        : True,
                             'show_plot' : SHOW_PLOTS
                         }
-            cause_cluster_params = {'model' : 'KMeans', 'n_clusters' : self.n_xbar}
-            effect_cluster_params = {'model' : 'KMeans', 'n_clusters' : self.n_ybar}
-            block_names = ['CondExpCNN', 'CauseClusterer', 'EffectClusterer']
+            cause_cluster_params = {'model' : 'KMeans', 'n_clusters' : self.n_xbar, 'random_state' : 42, 'verbose' : 0}
+            effect_cluster_params = {'model' : 'KMeans', 'n_clusters' : self.n_ybar, 'random_state' : 42, 'verbose' : 0}
+            block_names = ['CDE', 'CauseClusterer', 'EffectClusterer']
             block_params = [cde_params, cause_cluster_params, effect_cluster_params]
             exp = Experiment(X_train=self.x, Y_train=self.y, data_info=data_info, 
                 block_names=block_names, block_params=block_params, blocks=None, 

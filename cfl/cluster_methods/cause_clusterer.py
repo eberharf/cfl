@@ -1,4 +1,3 @@
-from abc import abstractmethod
 import pickle #for saving code
 
 from cfl.block import Block
@@ -134,8 +133,7 @@ class CauseClusterer(Block):
 
         """
 
-        default_params =  { 'model' : DBSCAN(),
-                            'verbose' : 1}
+        default_params =  { 'model' : DBSCAN(),}
         return default_params
 
 

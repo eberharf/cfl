@@ -31,8 +31,8 @@ CDE_PARAMS = {'batch_size': 128,
                 'standardize': False,
                 'best': True}
 
-C_CLUSTER_PARAMS = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
-E_CLUSTER_PARAMS = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
+C_CLUSTER_PARAMS = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42, 'verbose' : 0}
+E_CLUSTER_PARAMS = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42, 'verbose' : 0}
 
 def generate_vb_data():
     # create a visual bars data set 
@@ -70,7 +70,7 @@ def test_intervention_recs():
                 'Y_dims': y.shape, 
                 'Y_type': 'categorical'}
 
-    block_names = ['CondExpMod', 'CauseClusterer']
+    block_names = ['CDE', 'CauseClusterer']
     block_params = [CDE_PARAMS, C_CLUSTER_PARAMS]
 
     # make new CFL Experiment with CDE only

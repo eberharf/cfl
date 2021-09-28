@@ -6,7 +6,6 @@ import numpy as np
 from cfl.dataset import Dataset
 from cfl.block import Block
 import cfl.density_estimation_methods as cdem
-# import cfl.cluster_methods as ccm
 import cfl.cluster_methods as ccm
 from cfl import intervention_rec
 
@@ -29,11 +28,7 @@ Methods in Experiment Class:
 # NOTE: the keys of this dictionary are passed as part of the 'block_names'
 # list. They are different than the names of the attributes in each block's
 # self.name attribute
-BLOCK_KEY = {   'CondExpVB'     : cdem.CondExpVB, 
-                'CondExpKC'     : cdem.CondExpKC,
-                'CondExpCNN'    : cdem.CondExpCNN,
-                'CondExpCNN3D'  : cdem.CondExpCNN3D,
-                'CondExpMod'    : cdem.CondExpMod,
+BLOCK_KEY = {   'CDE'             : cdem.CDE,
                 'CauseClusterer'  : ccm.CauseClusterer,
                 'EffectClusterer' : ccm.EffectClusterer} #TODO: maybe change this so that instead of 
                                                             # calling clusterer, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods  
@@ -78,35 +73,34 @@ class Experiment():
         '''
         self.verbose = verbose
 
-        # OPTION 1 for Experiment initialization: load from path 
+        # OPTION 1 for Experiment initialization: load from path. 
         # if loading from past experiment, make sure no other block
-        # specifications are provided ...
+        # specifications are provided
         if past_exp_path is not None:
             assert (block_names is None), 'block_names should not be specified.'
             assert (block_params is None), 'block_params should not be specified.'
             assert (blocks is None), 'blocks should not be specified.'
 
-            # load in trained block info if past experiment provided
-            for block in blocks:
-                fn = os.path.join(past_exp_path, 'trained_blocks', block.get_name())
-                block.load_block(fn)
-            self.is_trained = True
+            # load in block names and params
+            print(f'Loading in Experiment from {past_exp_path}')
+            block_names, block_params = self.__load_params(os.path.join(past_exp_path, 'params'))
 
 
-        # OPTION 2 for Experiment initialization: create blocks from strings 
-        # otherwise, make sure block names and params are both provided, and that 
-        # blocks is left unpopulated ...
-        if (block_names is not None) or (block_params is not None):
+        # OPTION 2 for Experiment initialization: create blocks from strings. 
+        # make sure block names and params are both provided, and that 
+        # blocks is left unpopulated 
+        elif (block_names is not None) or (block_params is not None):
             assert (block_names is not None), 'block_names should be specified.'
             assert (block_params is not None), 'block_params should be specified.'
             assert (blocks is None), 'blocks should not be specified.'
             self.is_trained = False
             # add verbosity to params that don't specify
-            block_params = self.__propagate_verbosity(self.verbose, block_params)
+            # removed because was causing problems with some sklearn models that don't have a verbose param
+            # block_params = self.__propagate_verbosity(self.verbose, block_params)
         
-        #OPTION 3 for Experiment initialization: blocks pre-created 
-        # otherwise, make sure that only blocks is provided.
-        if blocks is not None:
+        #OPTION 3 for Experiment initialization: blocks pre-created. 
+        # make sure that only blocks is provided.
+        elif blocks is not None:
             assert (block_names is None), 'block_names should not be specified.'
             assert (block_params is None), 'block_params should not be specified.'
             
@@ -120,7 +114,6 @@ class Experiment():
         assert (past_exp_path is not None) or \
                ((block_names is not None) and (block_params is not None)) or \
                (blocks is not None), 'Must provide one of the Experiment definitions.'
-
 
         # build and track training dataset
         # Note: explicitly stating one dataset for training as an Experiment
@@ -137,21 +130,20 @@ class Experiment():
         # build experiment directory
         self.save_path = self.__make_exp_dir(results_path)
 
-        # load in params from past experiment if provided
-        if past_exp_path is not None:
-            print(f'Loading in Experiment from {past_exp_path}')
-            block_names, block_params = self.__load_params(os.path.join(past_exp_path, 'params'))
-
-
         # build blocks from names and params if blocks not provided (ie in Options 1
         # or 2)
         if blocks is None:
             blocks = []
             for bn,bp in zip(block_names, block_params): # data_info
                 blocks.append(self.__build_block(bn,bp))
-        
 
-        self.blocks = blocks
+        # load in trained block info if past experiment provided
+        if past_exp_path is not None:
+            for block in blocks:
+                fn = os.path.join(past_exp_path, 'trained_blocks', block.get_name())
+                block.load_block(fn)
+            self.is_trained = True
+
 
         # TODO: check that interfaces match
         # TODO: assert in the function itself so we can give more info
@@ -159,6 +151,7 @@ class Experiment():
         # assert self.check_blocks_compatibility(), 'Specified blocks are incompatible'
         
         # save configuration parameters for each block
+        self.blocks = blocks
         self.block_names = block_names
         self.block_params = block_params
         self.__save_params()

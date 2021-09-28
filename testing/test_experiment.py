@@ -47,7 +47,8 @@ def test_cde_experiment():
                 'Y_type': 'categorical'}
 
     # parameters for CDE 
-    condExp_params = {'batch_size': 128,
+    condExp_params = {'model' : 'CondExpMod',
+                    'batch_size': 128,
                     'optimizer': 'adam',
                     'n_epochs': 2,
                     'opt_config': {'lr': 0.001},
@@ -61,7 +62,7 @@ def test_cde_experiment():
                     'standardize': False,
                     'best': True}
 
-    block_names = ['CondExpMod']
+    block_names = ['CDE']
     block_params = [condExp_params]
 
     # make new CFL Experiment with CDE only
@@ -98,7 +99,7 @@ def test_cde_experiment():
     c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
     e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
 
-    block_names = ['CondExpMod', 'CauseClusterer', 'EffectClusterer']
+    block_names = ['CDE', 'CauseClusterer', 'EffectClusterer']
     block_params = [condExp_params, c_cluster_params, e_cluster_params]
 
     my_exp_clust = Experiment(X_train=x, Y_train=y, data_info=data_info, 
@@ -199,7 +200,8 @@ def test_load_past_experiment():
                 'Y_type': 'categorical'}
 
     # parameters for CDE 
-    condExp_params = {'batch_size': 128,
+    condExp_params = {'model' : 'CondExpMod', 
+                    'batch_size': 128,
                     'optimizer': 'adam',
                     'n_epochs': 2,
                     'opt_config': {'lr': 0.001},
@@ -213,10 +215,10 @@ def test_load_past_experiment():
                     'standardize': False,
                     'best': True}
 
-    c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
-    e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
+    c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42, 'verbose' : 0}
+    e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42, 'verbose' : 0}
 
-    block_names = ['CondExpMod', 'CauseClusterer', 'EffectClusterer']
+    block_names = ['CDE', 'CauseClusterer', 'EffectClusterer']
     block_params = [condExp_params, c_cluster_params, e_cluster_params]
 
     # make CFL Experiment
