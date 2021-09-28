@@ -6,6 +6,7 @@ import numpy as np
 from cfl.cluster_methods.Y_given_Xmacro import sample_Y_dist # calculate 
                                                              # P(Y|Xmacro)
 from sklearn.cluster import *
+from cfl.cluster_methods.cluster_tuning_util import tune
 
 #TODO: next step: add very clear documentation about how to add new module. 
 # Include:
@@ -107,19 +108,20 @@ class EffectClusterer(Block):
         #attributes:
         self.name = 'EffectClusterer'
         self.Y_type = data_info['Y_type']
-        self.model = self._create_model()
+        if not params['tune']:
+            self.model = self._create_model(self.params)
 
-    def _create_model(self):
-        if isinstance(self.params['model'], str):
+    def _create_model(self, params):
+        if isinstance(params['model'], str):
             # pull dict entries to pass into clusterer object
-            excluded_keys = ['model', 'precompute_distances']
-            model_keys = list(set(self.params.keys()) - set(excluded_keys))
-            model_params = {key: self.params[key] for key in model_keys}
+            excluded_keys = ['model', 'tune', 'precompute_distances']
+            model_keys = list(set(params.keys()) - set(excluded_keys))
+            model_params = {key: params[key] for key in model_keys}
 
             # create model
-            model = eval(self.params['model'])(**model_params)
+            model = eval(params['model'])(**model_params)
         else:
-            model = self.params['model']
+            model = params['model']
         return model
 
     def get_params(self):
@@ -178,6 +180,18 @@ class EffectClusterer(Block):
         # sample P(Y|Xclass)
         y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls, 
             precompute_distances=self.params['precompute_distances'])
+
+
+        # tune model hyperparameters if requested
+        if self.params['tune']:
+            params_to_remove = ['tune', 'precompute_distances']
+            tunable_params = self.params.copy()
+            for ptr in params_to_remove:
+                tunable_params.pop(ptr)
+            tuned_params = tune(y_probs, tunable_params)
+            for k in tuned_params.keys():
+                self.params[k] = tuned_params[k]
+            self.model = self._create_model(self.params)
 
         # do y clustering
         self.model.fit(y_probs)
