@@ -82,7 +82,7 @@ def visualize_errors(errs, params_list, params_to_tune):
         
         # 2D heatmap
         fig,ax = plt.subplots()
-        im = ax.imshow(shaped_errs, vmin=0)
+        im = ax.imshow(shaped_errs)
         ax.set_xlabel(k1)
         ax.set_ylabel(k0)
         ax.set_xticks(range(len(params_to_tune[k1])))
