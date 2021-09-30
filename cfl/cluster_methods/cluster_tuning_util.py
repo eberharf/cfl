@@ -80,15 +80,20 @@ def visualize_errors(errs, params_list, params_to_tune):
                 idx = np.where((k0_vals==k_ord_0) & (k1_vals==k_ord_1))
                 shaped_errs[k_ord_0_i,k_ord_1_i] = errs[idx[0]] # have to take the first one bc there may be more dimensions varied
         
+        # exclude any outliers
+        shaped_errs[shaped_errs > np.median(shaped_errs)*10] = np.nan
+        shaped_errs = np.ma.masked_invalid(shaped_errs)
+        plt.get_cmap().set_bad(color = 'w', alpha = 1.)
+
         # 2D heatmap
         fig,ax = plt.subplots()
         im = ax.imshow(shaped_errs)
         ax.set_xlabel(k1)
         ax.set_ylabel(k0)
         ax.set_xticks(range(len(params_to_tune[k1])))
-        ax.set_xticklabels(params_to_tune[k1])
+        ax.set_xticklabels(np.round(params_to_tune[k1],5), rotation=90)
         ax.set_yticks(range(len(params_to_tune[k0])))
-        ax.set_yticklabels(params_to_tune[k0])
+        ax.set_yticklabels(np.round(params_to_tune[k0],5))
         plt.colorbar(im)
         plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
         plt.show()
