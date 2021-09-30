@@ -82,9 +82,13 @@ def visualize_errors(errs, params_list, params_to_tune):
         
         # 2D heatmap
         fig,ax = plt.subplots()
-        im = ax.imshow(shaped_errs)
-        ax.set_xlabel(k0)
-        ax.set_ylabel(k1)
+        im = ax.imshow(shaped_errs, vmin=0)
+        ax.set_xlabel(k1)
+        ax.set_ylabel(k0)
+        ax.set_xticks(range(len(params_to_tune[k1])))
+        ax.set_xticklabels(params_to_tune[k1])
+        ax.set_yticks(range(len(params_to_tune[k0])))
+        ax.set_yticklabels(params_to_tune[k0])
         plt.colorbar(im)
         plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
         plt.show()
@@ -124,6 +128,7 @@ def tune(data_to_cluster, params):
     # get list of parameter combos to optimize over
     param_combos = get_parameter_combinations(params)
     errs = np.zeros((len(param_combos),)) 
+    print('Beginning clusterer tuning')
     for ci,cur_params in enumerate(param_combos.copy()):
         # create model with given params
         model_params = cur_params.copy()

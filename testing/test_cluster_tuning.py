@@ -36,7 +36,7 @@ def test_cause_kmeans_tuning():
 
 def test_cause_dbscan_tuning():
     params = {  'model'      : ['DBSCAN'], 
-                'eps' : [0.01,0.1,1],
+                'eps' : [0.001,0.01,0.1,1],
                 'min_samples' : range(3,5),
                 'tune'      : True}
     clusterer = CauseClusterer(data_info, params)
