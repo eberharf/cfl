@@ -119,7 +119,7 @@ def get_user_params(suggested_params):
             else:
                 v_type = type(suggested_params[param_name])
                 try:
-                    v = v.astype(v_type)
+                    v = v_type(v)
                     chosen_params[param_name] = v
                 except:
                     raise TypeError(f'{param_name} should be of type {v_type}')
