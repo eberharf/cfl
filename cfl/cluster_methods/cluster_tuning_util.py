@@ -34,9 +34,7 @@ def compute_predictive_error(Xlr, Ylr, n_iter=100):
     return np.mean(errs)
 
 def get_parameter_combinations(param_ranges):
-    print(param_ranges)
     param_combos = list(ParameterGrid(param_ranges))
-    print(param_combos)
     return param_combos
 
 
@@ -56,10 +54,7 @@ def visualize_errors(errs, params_list, params_to_tune):
         k0_vals = np.array([pl[k0] for pl in params_list])
         shaped_errs = np.zeros((len(params_to_tune[k0]),))
         for k_ord_i,k_ord in enumerate(params_to_tune[k0]):
-            print('check')
-            print(k0_vals, k_ord)
             idx = np.where(k0_vals==k_ord)
-            print(idx)
             shaped_errs[k_ord_i] = errs[idx[0]]
 
         # 1D bar plot
