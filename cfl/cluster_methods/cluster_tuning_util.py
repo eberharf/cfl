@@ -40,15 +40,56 @@ def get_parameter_combinations(param_ranges):
     return param_combos
 
 
-def visualize_errors(errs, params_list=None):
-    fig,ax = plt.subplots()
-    ax.barh(range(len(errs)), errs)
-    ax.set_yticks(range(len(errs)))
-    if params_list is not None:
-        ax.set_yticklabels(params_list)
-    ax.set_xlabel('Error')
-    plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
-    plt.show()
+def visualize_errors(errs, params_list, params_to_tune):
+
+    # pick variables to plot
+    tuned_k = []
+    for k in params_to_tune.keys():
+        if len(params_to_tune[k]) > 1:
+            tuned_k.append(k)
+    
+    # if only one tuned param
+    if len(tuned_k) < 1:
+        raise ValueError()
+    elif len(tuned_k)==1:
+        k0 = tuned_k[0]
+        k0_vals = np.array([pl[k0] for pl in params_list])
+        shaped_errs = np.zeros((len(params_to_tune[k0]),))
+        for k_ord_i,k_ord in enumerate(params_to_tune[k0]):
+            print('check')
+            print(k0_vals, k_ord)
+            idx = np.where(k0_vals==k_ord)
+            print(idx)
+            shaped_errs[k_ord_i] = errs[idx[0]]
+
+        # 1D bar plot
+        fig,ax = plt.subplots()
+        ax.barh(params_to_tune[k0], shaped_errs)
+        ax.set_ylabel(k0)
+        ax.set_xlabel('Error')
+        plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
+        plt.show()
+
+    else:
+        k0,k1 = tuned_k[0],tuned_k[1]
+        k0_vals = np.array([pl[k0] for pl in params_list])
+        k1_vals = np.array([pl[k1] for pl in params_list])
+        shaped_errs = np.zeros((len(params_to_tune[k0]), len(params_to_tune[k1])))
+        for k_ord_0_i,k_ord_0 in enumerate(params_to_tune[k0]):
+            for k_ord_1_i,k_ord_1 in enumerate(params_to_tune[k1]):
+                idx = np.where((k0_vals==k_ord_0) & (k1_vals==k_ord_1))
+                shaped_errs[k_ord_0_i,k_ord_1_i] = errs[idx[0]] # have to take the first one bc there may be more dimensions varied
+        
+        # 2D heatmap
+        fig,ax = plt.subplots()
+        im = ax.imshow(shaped_errs)
+        ax.set_xlabel(k0)
+        ax.set_ylabel(k1)
+        plt.colorbar(im)
+        plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
+        plt.show()
+    
+    
 
 
 def suggest_elbow_idx(errs):
@@ -99,7 +140,7 @@ def tune(data_to_cluster, params):
             one_hot_encode(lbls, np.unique(lbls)), data_to_cluster)
 
     # visualize errors and solicit user input
-    visualize_errors(errs, param_combos)
+    visualize_errors(errs, param_combos, params)
     suggested_params = param_combos[suggest_elbow_idx(errs)]
     chosen_params = get_user_params(suggested_params)
 
