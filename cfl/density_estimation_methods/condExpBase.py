@@ -172,10 +172,11 @@ class CondExpBase(Block):
         
         # log GPU device if available
         device_name = tf.test.gpu_device_name()
-        if device_name is not '':
-            print('Using GPU device: ', device_name)
-        else:
-            print('No GPU device detected.')
+        if self.params['verbose'] > 0:
+            if device_name is not '':
+                print('Using GPU device: ', device_name)
+            else:
+                print('No GPU device detected.')
             
         try: 
             # specify checkpoint save callback

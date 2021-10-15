@@ -57,11 +57,16 @@ def visualize_errors(errs, params_list, params_to_tune):
             idx = np.where(k0_vals==k_ord)
             shaped_errs[k_ord_i] = errs[idx[0]]
 
+        # exclude any outliers
+        shaped_errs[shaped_errs > np.median(shaped_errs)*10] = np.nan
+        shaped_errs = np.ma.masked_invalid(shaped_errs)
+        plt.get_cmap().set_bad(color = 'w', alpha = 1.)
+
         # 1D bar plot
         fig,ax = plt.subplots()
-        ax.barh(params_to_tune[k0], shaped_errs)
-        ax.set_ylabel(k0)
-        ax.set_xlabel('Error')
+        ax.bar(params_to_tune[k0], shaped_errs)
+        ax.set_xlabel(k0)
+        ax.set_ylabel('Error')
         plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
         plt.show()
 
@@ -100,7 +105,7 @@ def suggest_elbow_idx(errs):
     # TODO: does this assume monotonically decreasing error?
     deltas = np.array([errs[i]-errs[0] for i in range(len(errs))])
     per_deltas = deltas / (errs[-1] - errs[0])
-    elbow_idx = np.where(per_deltas > 0.8)[0][0]
+    elbow_idx = np.where(per_deltas > 0.9)[0][0]
     return elbow_idx
 
 def get_user_params(suggested_params):
