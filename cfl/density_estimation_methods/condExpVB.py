@@ -29,7 +29,6 @@ class CondExpVB(CondExpBase): # TODO: this class should be renamed
         Returns: 
             None
         '''
-
         super().__init__(data_info, params)
 
     def _get_default_params(self):

@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod
 
-
 class Block(metaclass=ABCMeta):
     '''A Block is an object that can:
         1) be trained on a Dataset
@@ -178,15 +177,6 @@ class Block(metaclass=ABCMeta):
         return input_params
 
     def get_params(self): 
-        """get the current parameter settings for the Block
-
-        Parameters: 
-            None
-
-        Returns:
-            dict: dictionary of current parameters
-        """
-
         return self.params
 
 
