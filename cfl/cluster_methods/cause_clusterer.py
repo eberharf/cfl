@@ -136,7 +136,8 @@ class CauseClusterer(Block):
 
         """
 
-        default_params =  { 'model' : 'DBSCAN', 'tune' : False}
+        default_params =  { 'model' : 'DBSCAN', 
+                            'tune' : False}
         return default_params
                 
 

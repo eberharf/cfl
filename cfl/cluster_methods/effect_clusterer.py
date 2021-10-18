@@ -148,6 +148,7 @@ class EffectClusterer(Block):
 
         default_params =  {'model' : DBSCAN(),
                            'precompute_distances' : True,
+                           'tune' : False,
                           }
         return default_params
 
