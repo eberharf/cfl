@@ -1,5 +1,8 @@
 import numpy as np
 
+# Boolean, unsigned integer, signed integer, float, complex.
+_NUMERIC_KINDS = set('buifc')
+
 """Dataset Module"""
 
 class Dataset():
@@ -37,6 +40,15 @@ class Dataset():
                 'Actual type: {}'.format(type(Yraw))
         assert isinstance(name, str), 'name should be of type str. ' + \
             'Actual type: {}'.format(type(name))
+        for data,name in zip([X,Y,Xraw,Yraw],['X','Y','Xraw','Yraw']):
+            if data is not None:
+                try:
+                    assert np.sum(np.isnan(data))==0, 'np.nan entries not accepted'
+                except:
+                    raise TypeError(f'The entries in {name} should be of a ' + \
+                    f'numeric data type. Got type {data.dtype} ' + \
+                    'instead')
+
 
         self.X = X
         self.Y = Y
