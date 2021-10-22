@@ -43,7 +43,7 @@ class Experiment():
 
     def __init__(self, data_info, X_train, Y_train, X_train_raw=None, 
                  Y_train_raw=None, past_exp_path=None, block_names=None, 
-                 block_params=None, blocks=None, verbose=1, results_path=''):
+                 block_params=None, blocks=None, verbose=1, results_path=None):
         ''' 
         Sets up and trains an Experiment.
 
@@ -63,7 +63,7 @@ class Experiment():
             blocks (list of Blocks): list of block objects. Default is None.
             verbose (int): Amount of output to print. Possible values are 0, 1, 2. Default is 1.
             results_path (str) : path to directory to save this experiment to.
-                Default is `''`.
+                If None, results will not be saved. Default is None.
 
         Note: There are three ways to specify Blocks: 
                 1) specify `past_exp_path`
@@ -209,8 +209,10 @@ class Experiment():
                 self.__save_results(results, dataset, block)
 
                 # save trained block
-                fn = os.path.join(self.save_path, 'trained_blocks', block.get_name())
-                block.save_block(fn)
+                if self.save_path is not None:
+                    fn = os.path.join(self.save_path, 'trained_blocks', 
+                                      block.get_name())
+                    block.save_block(fn)
                 
                 # pass results on to next block
                 prev_results = results
@@ -366,6 +368,9 @@ class Experiment():
         '''
 
         # check inputs
+        if self.save_path is None:
+            raise FileNotFoundError('results_path was not specified for this \
+                Experiment, so results were not saved.')
         assert isinstance(dataset_name, str), \
             'dataset_name should be of type str.'
 
@@ -469,6 +474,9 @@ class Experiment():
                             (`'path/to/dir/experiment000x'` in the example above).
                             
         '''
+
+        if results_path is None:
+            return None
 
         # check inputs
         assert isinstance(results_path, str), \
