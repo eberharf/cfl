@@ -170,14 +170,14 @@ class Experiment():
 
         if not self.is_trained:
 
+            if self.verbose > 0:
+                print(20*'#' + ' Beginning CFL Experiment training. ' + 20*'#')
+
             # check inputs
             assert isinstance(dataset, (type(None), Dataset, str)), \
                 'dataset should be None, or of type Dataset or str.'
             assert isinstance(prev_results, (type(None), dict)), \
                 'prev_results should be None or a dict'
-
-            if self.verbose > 0:
-                print('Training CFL pipeline.')
 
             # pull specified dataset
             if dataset is None: #if you don't specify a dataset, use the one specified in initialization
@@ -200,6 +200,8 @@ class Experiment():
             # this is the main logic - train each block 
             for block in self.blocks:
                 # train current block
+                if self.verbose > 0:
+                    print(f'Beginning {block.get_name()} training...')
                 results = block.train(dataset, prev_results)
                 all_results[block.get_name()] = results
 
@@ -212,10 +214,18 @@ class Experiment():
                 
                 # pass results on to next block
                 prev_results = results
-            
+
+                if self.verbose > 0:
+                    print(f'{block.get_name()} training complete.')
+
             self.is_trained = True
             dataset.set_cfl_results(all_results)
+
+            if self.verbose > 0:
+                print('Experiment training complete.')
+
             return all_results
+
         else: 
             raise Exception('This Experiment has already been trained. ' + \
                 'If you would like to use a new Dataset for training, ' + \
@@ -233,6 +243,10 @@ class Experiment():
                  (dict of dicts) : dict of results dictionaries from all Blocks.
         '''
 
+
+        if self.verbose > 0:
+            print('Beginning Experiment prediction.')
+
         # check inputs
         assert isinstance(dataset, (type(None), Dataset, str)), \
             'dataset should be None, or of type Dataset or str.'
@@ -249,6 +263,8 @@ class Experiment():
         all_results = {}
         for block in self.blocks:
             # predict with current block
+            if self.verbose > 0:
+                print(f'Beginning {block.get_name()} prediction...')
             results = block.predict(dataset, prev_results)
             all_results[block.get_name()] = results
 
@@ -256,9 +272,16 @@ class Experiment():
             self.__save_results(results, dataset, block)
 
             # pass results on to next block
-            prev_results = results    
+            prev_results = results   
+
+            if self.verbose > 0:
+                print(f'{block.get_name()} prediction complete.')
 
         dataset.set_cfl_results(all_results)
+
+        if self.verbose > 0:
+            print('Prediction complete.')
+
         return all_results        
 
     def add_dataset(self, X, Y, dataset_name, Xraw=None, Yraw=None):

@@ -121,13 +121,13 @@ class CondExpCNN(CondExpBase):
                           'n_epochs'    : 20,
                           'optimizer'   : 'adam',
                           'opt_config'  : {},
-                            'verbose'     : 1,
-                            'weights_path': None,
-                            'loss'        : 'mean_squared_error',
-                            'show_plot'   : True,
-                            'standardize' : False,
-                            'best'        : True,
-                            'tb_path'     : None,
+                          'verbose'     : 1,
+                          'weights_path': None,
+                          'loss'        : 'mean_squared_error',
+                          'show_plot'   : True,
+                          'standardize' : False,
+                          'best'        : True,
+                          'tb_path'     : None,
                          }
         return default_params
 

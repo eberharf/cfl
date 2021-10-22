@@ -105,7 +105,7 @@ class CauseClusterer(Block):
     def _create_model(self, params):
         if isinstance(params['model'], str):
             # pull dict entries to pass into clusterer object
-            excluded_keys = ['model', 'tune']
+            excluded_keys = ['model', 'tune', 'verbose']
             model_keys = list(set(params.keys()) - set(excluded_keys))
             model_params = {key: params[key] for key in model_keys}
 
@@ -137,7 +137,8 @@ class CauseClusterer(Block):
         """
 
         default_params =  { 'model' : 'DBSCAN', 
-                            'tune' : False}
+                            'tune' : False, 
+                            'verbose' : 1}
         return default_params
                 
 

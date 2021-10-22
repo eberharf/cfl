@@ -114,7 +114,7 @@ class EffectClusterer(Block):
     def _create_model(self, params):
         if isinstance(params['model'], str):
             # pull dict entries to pass into clusterer object
-            excluded_keys = ['model', 'tune', 'precompute_distances']
+            excluded_keys = ['model', 'tune', 'precompute_distances', 'verbose']
             model_keys = list(set(params.keys()) - set(excluded_keys))
             model_params = {key: params[key] for key in model_keys}
 
@@ -149,6 +149,7 @@ class EffectClusterer(Block):
         default_params =  {'model' : DBSCAN(),
                            'precompute_distances' : True,
                            'tune' : False,
+                           'verbose' : 1,
                           }
         return default_params
 
