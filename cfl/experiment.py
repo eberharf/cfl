@@ -42,7 +42,8 @@ class Experiment():
 
 
     def __init__(self, data_info, X_train, Y_train, X_train_raw=None, 
-                 Y_train_raw=None, past_exp_path=None, block_names=None, 
+                 Y_train_raw=None, in_sample_idx=None, out_sample_idx=None,
+                 past_exp_path=None, block_names=None, 
                  block_params=None, blocks=None, verbose=1, results_path=None):
         ''' 
         Sets up and trains an Experiment.
@@ -124,7 +125,9 @@ class Experiment():
         self.dataset_train = self.add_dataset(X=X_train, Y=Y_train, \
                                               dataset_name='dataset_train', \
                                               Xraw=X_train_raw, \
-                                              Yraw=Y_train_raw)
+                                              Yraw=Y_train_raw,
+                                              in_sample_idx=in_sample_idx,
+                                              out_sample_idx=out_sample_idx)
         self.datasets[self.dataset_train.get_name()] = self.dataset_train
         
         # build experiment directory
@@ -286,7 +289,8 @@ class Experiment():
 
         return all_results        
 
-    def add_dataset(self, X, Y, dataset_name, Xraw=None, Yraw=None):
+    def add_dataset(self, X, Y, dataset_name, Xraw=None, Yraw=None,
+                    in_sample_idx=None, out_sample_idx=None):
         ''' Add a new dataset to be tracked by this Experiment. 
             
             Arguments: 

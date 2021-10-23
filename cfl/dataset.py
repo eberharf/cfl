@@ -9,7 +9,8 @@ class Dataset():
     """The Dataset class stores the X and Y datasets so that they can be easily 
     passed through steps of CFL and saved consistently"""
 
-    def __init__(self, X, Y, name='dataset', Xraw=None, Yraw=None):
+    def __init__(self, X, Y, name='dataset', Xraw=None, Yraw=None,
+                 in_sample_idx=None, out_sample_idx=None):
         ''' Initialize Dataset.
 
             Arguments:
@@ -40,6 +41,12 @@ class Dataset():
                 'Actual type: {}'.format(type(Yraw))
         assert isinstance(name, str), 'name should be of type str. ' + \
             'Actual type: {}'.format(type(name))
+        assert isinstance(in_sample_idx, (np.ndarray, type(None))), \
+            'in_sample_idx should be of type np.ndarray or None. Actual type: \
+            {}'.format(type(in_sample_idx))
+        assert isinstance(out_sample_idx, (np.ndarray, type(None))), \
+            'in_sample_idx should be of type np.ndarray or None. Actual type: \
+            {}'.format(type(out_sample_idx))
         for data,name in zip([X,Y,Xraw,Yraw],['X','Y','Xraw','Yraw']):
             if data is not None:
                 try:
@@ -62,6 +69,9 @@ class Dataset():
             self.Yraw = self.Y
         else:
             self.Yraw = Yraw
+        
+        self.in_sample_idx = in_sample_idx
+        self.in_sample_idx = out_sample_idx
 
         self.name = name
         self.cfl_results = None
@@ -89,3 +99,15 @@ class Dataset():
     
     def set_cfl_results(self, cfl_results):
         self.cfl_results = cfl_results
+
+    def get_in_sample_idx(self):
+        return self.in_sample_idx
+    
+    def get_out_sample_idx(self):
+        return self.out_sample_idx
+
+    def set_in_sample_idx(self, in_sample_idx):
+        self.in_sample_idx = in_sample_idx
+    
+    def set_out_sample_idx(self, out_sample_idx):
+        self.out_sample_idx = out_sample_idx
