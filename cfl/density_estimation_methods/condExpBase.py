@@ -154,10 +154,19 @@ class CondExpBase(Block):
             return {'pyx' : self.model.predict(dataset.X)}
 
         # train-test split
-        dataset.split_data = train_test_split(dataset.X, dataset.Y, 
-                                              shuffle=True, train_size=0.75)
-
-        Xtr, Xts, Ytr, Yts = dataset.split_data
+        if dataset.get_in_sample_idx() is None:
+            Xtr, Xva, Ytr, Yva, in_sample_idx, out_sample_idx = \
+                train_test_split(dataset.X, dataset.Y, \
+                                 range(dataset.X.shape[0]), shuffle=True, \
+                                 train_size=0.75)
+            dataset.set_in_sample_idx(in_sample_idx)
+            dataset.set_out_sample_idx(out_sample_idx)
+            
+        else:
+            Xtr = dataset.X[dataset.get_in_sample_idx()]
+            Ytr = dataset.Y[dataset.get_in_sample_idx()]
+            Xva = dataset.X[dataset.get_out_sample_idx()]
+            Yva = dataset.Y[dataset.get_out_sample_idx()]
 
         # build optimizer
         optimizer = tf.keras.optimizers.get(
@@ -191,6 +200,7 @@ class CondExpBase(Block):
                 now = datetime.datetime.now()
                 dt_id = now.strftime("%d%m%Y%H%M%S") #this creates a string based on the current date and time up to the second (NOTE: if you create a bunch of CFLs all at once maybe you'd need a more precise ID)
                 checkpoint_path = 'tmp_checkpoints'+dt_id
+                os.mkdir(checkpoint_path)
 
                 # ModelCheckpoint saves model checkpoints to specified path during training 
                 best_path = os.path.join(checkpoint_path, 'best_weights')
@@ -207,12 +217,21 @@ class CondExpBase(Block):
                                 log_dir=self.params['tb_path'])
                 callbacks = [tb_callback] + callbacks
             
+            if self.params['optuna_callback'] is not None:
+                callbacks = [self.params['optuna_callback']] + callbacks
+            
+            if self.params['early_stopping']:
+                es_callback = tf.keras.callbacks.EarlyStopping(
+                                    monitor="val_loss",
+                                    patience=5 )
+                callbacks = [es_callback] + callbacks
+
             # train model
             history = self.model.fit(
                 Xtr, Ytr,
                 batch_size=self.params['batch_size'],
                 epochs=self.params['n_epochs'],
-                validation_data=(Xts,Yts),
+                validation_data=(Xva,Yva),
                 callbacks=callbacks,
                 verbose=self.params['verbose']
             )

@@ -5,4 +5,5 @@ from cfl.density_estimation_methods.condExpCNN3D import CondExpCNN3D
 from cfl.density_estimation_methods.condExpKC import CondExpKC
 from cfl.density_estimation_methods.condExpMod import CondExpMod
 from cfl.density_estimation_methods.condExpVB import CondExpVB 
+from cfl.density_estimation_methods.condExpDIY import CondExpDIY 
 from cfl.density_estimation_methods.CDE import CDE

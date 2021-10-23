@@ -48,7 +48,6 @@ class CondExpMod(CondExpBase):
                 'weights_path': None,
                 'loss'        : 'mean_squared_error',
                 'show_plot'   : True,
-                'standardize' : False,
                 'best'        : True,
                 'tb_path'     : None,
             }
@@ -56,7 +55,7 @@ class CondExpMod(CondExpBase):
 
     def _check_param_shapes(self):
         '''
-        Verify that a valid CNN structure was specified in self.params.
+        Verify that valid model params were specified in self.params.
         
         Arguments: 
             None
