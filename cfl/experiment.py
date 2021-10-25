@@ -327,7 +327,8 @@ class Experiment():
             'A Dataset named {} has already been added to this Experiment.'.format(dataset_name)
 
         # make new Dataset, add to Experiment's dict of datasets
-        dataset = Dataset(X=X, Y=Y, Xraw=Xraw, Yraw=Yraw, name=dataset_name)
+        dataset = Dataset(X=X, Y=Y, name=dataset_name, Xraw=Xraw, Yraw=Yraw,
+                          in_sample_idx=in_sample_idx, out_sample_idx=out_sample_idx)
         self.datasets[dataset_name] = dataset
         return dataset
 
