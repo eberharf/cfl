@@ -47,12 +47,12 @@ class Dataset():
         assert isinstance(out_sample_idx, (np.ndarray, type(None))), \
             'in_sample_idx should be of type np.ndarray or None. Actual type: \
             {}'.format(type(out_sample_idx))
-        for data,data_name in zip([X,Y,Xraw,Yraw],['X','Y','Xraw','Yraw']):
+        for data,name in zip([X,Y,Xraw,Yraw],['X','Y','Xraw','Yraw']):
             if data is not None:
                 try:
                     assert np.sum(np.isnan(data))==0, 'np.nan entries not accepted'
                 except:
-                    raise TypeError(f'The entries in {data_name} should be of a ' + \
+                    raise TypeError(f'The entries in {name} should be of a ' + \
                     f'numeric data type. Got type {data.dtype} ' + \
                     'instead')
 
@@ -71,7 +71,7 @@ class Dataset():
             self.Yraw = Yraw
         
         self.in_sample_idx = in_sample_idx
-        self.out_sample_idx = out_sample_idx
+        self.in_sample_idx = out_sample_idx
 
         self.name = name
         self.cfl_results = None
