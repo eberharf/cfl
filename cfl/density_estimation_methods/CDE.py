@@ -41,11 +41,7 @@ class CDE(Block):
         return self.model.get_params()
 
     def _get_default_params(self):
-        """ Private method that specifies default clustering method parameters.
-            Note: clustering method currently defaults to DBSCAN. While DBSCAN
-            is a valid starting method, the choice of clustering method is
-            highly dependent on your dataset. Please do not rely on the defaults
-            without considering your use case.
+        """ Private method that specifies default CDE parameters.
 
             Arguments: None
             Returns: 
