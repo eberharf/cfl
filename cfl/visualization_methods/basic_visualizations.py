@@ -12,7 +12,8 @@ macrostate_vis(data=data, exp_id=0, cause_or_effect='cause', subtract_global_mea
 
 def visualize_macrostates(data, feature_names, exp_path, 
                           data_series='dataset_train', cause_or_effect='cause', 
-                          subtract_global_mean='True'):
+                          subtract_global_mean='True', figsize=None,
+                          kwargs={}):
     
     if cause_or_effect=='cause':
         fn = os.path.join(exp_path, f'{data_series}/CauseClusterer_results.pickle')
@@ -27,11 +28,11 @@ def visualize_macrostates(data, feature_names, exp_path,
 
     _plot(data, lbls, feature_names=feature_names, 
           subtract_global_mean=subtract_global_mean,
-          fig_path=fig_path)
+          fig_path=fig_path, kwargs=kwargs)
 
 
 def _plot(data, lbls, feature_names=None, subtract_global_mean=True,
-          fig_path=None):
+          fig_path=None, figsize=None, kwargs={}):
     
     u_lbls = np.unique(lbls)
     n_lbls = len(u_lbls)
@@ -57,11 +58,11 @@ def _plot(data, lbls, feature_names=None, subtract_global_mean=True,
         cmap = 'Blues'
 
     if len(data.shape[1:])==1:
-        fig = _plot_1D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names)
+        fig = _plot_1D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names, figsize, kwargs)
     elif len(data.shape[1:])==2:
-        fig = _plot_2D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names)
+        fig = _plot_2D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names, figsize, kwargs)
     elif len(data.shape[1:])==3:
-        fig = _plot_3D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names)
+        fig = _plot_3D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names, figsize, kwargs)
     else:
         'No support for visualizing >3-dimensional samples'
 
@@ -71,12 +72,19 @@ def _plot(data, lbls, feature_names=None, subtract_global_mean=True,
     else:
         plt.show()
 
-def _plot_1D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names):
+def _plot_1D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names,
+             figsize=None, kwargs={}):
     # plot
-    fig,ax = plt.subplots(1, n_lbls, figsize=(3*n_lbls, 2*np.ceil(n_features[0]/5)))
+    if figsize is None:
+        figsize = (3*n_lbls, 3*np.ceil(n_features[0]/5))
+    fig,ax = plt.subplots(1, n_lbls, figsize=figsize)
     for li in range(n_lbls):
-        im = ax[li].imshow(np.expand_dims(means[li],-1), vmin=vmin, vmax=vmax, 
-                           cmap=cmap)
+        if 'cmap' not in kwargs.keys():
+            im = ax[li].imshow(np.expand_dims(means[li],-1), vmin=vmin, 
+                vmax=vmax, cmap=cmap, **kwargs)
+        else:
+            im = ax[li].imshow(np.expand_dims(means[li],-1), vmin=vmin, 
+                vmax=vmax, **kwargs)
         ax[li].set_title(f'Macrostate {u_lbls[li]}')
         ax[li].set_xticks([])
         ax[li].set_yticks(range(n_features[0]))
@@ -94,11 +102,18 @@ def _plot_1D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names)
     return fig
 
 
-def _plot_2D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names):
+def _plot_2D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names,
+             figsize=None, kwargs={}):
     # plot
-    fig,ax = plt.subplots(1, n_lbls, figsize=(3*np.ceil(n_features[1]/5)*n_lbls, 2*np.ceil(n_features[0]/5)))
+    if figsize is None:
+        figsize = (3*np.ceil(n_features[1]/5)*n_lbls, 3*np.ceil(n_features[0]/5))
+    fig,ax = plt.subplots(1, n_lbls, figsize=figsize)
     for li in range(n_lbls):
-        im = ax[li].imshow(means[li], vmin=vmin, vmax=vmax, cmap=cmap)
+        if 'cmap' not in kwargs.keys():
+            im = ax[li].imshow(means[li], vmin=vmin, vmax=vmax, cmap=cmap, 
+                               **kwargs)
+        else:
+            im = ax[li].imshow(means[li], vmin=vmin, vmax=vmax, **kwargs)
         ax[li].set_title(f'Macrostate {u_lbls[li]}')
         ax[li].set_xticks(range(n_features[1]))
         ax[li].set_yticks(range(n_features[0]))
@@ -117,12 +132,20 @@ def _plot_2D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names)
 
     return fig
 
-def _plot_3D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names):
+def _plot_3D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names,
+             figsize=None, kwargs={}):
     # plot
-    fig,ax = plt.subplots(n_features[2], n_lbls, figsize=(3*np.ceil(n_features[1]/5)*n_lbls, 3*np.ceil(n_features[0]/5)*n_features[2]))
+    if figsize is None:
+        figsize = (3*np.ceil(n_features[1]/5)*n_lbls, 3*np.ceil(n_features[0]/5)*n_features[2])
+    fig,ax = plt.subplots(n_features[2], n_lbls, figsize=figsize)
     for fi in range(n_features[2]):
         for li in range(n_lbls):
-            im = ax[fi,li].imshow(means[li,:,:,fi], vmin=vmin, vmax=vmax, cmap=cmap)
+            if 'cmap' not in kwargs.keys():
+                im = ax[fi,li].imshow(means[li,:,:,fi], vmin=vmin, vmax=vmax, 
+                                      cmap=cmap, **kwargs)
+            else:
+                im = ax[fi,li].imshow(means[li,:,:,fi], vmin=vmin, vmax=vmax, 
+                                      **kwargs)
             if fi==0:
                 ax[fi,li].set_title(f'Macrostate {u_lbls[li]}\n{feature_names[2][fi]}')
             else:
