@@ -62,9 +62,10 @@ def visualize_errors(errs, params_list, params_to_tune):
         shaped_errs = np.ma.masked_invalid(shaped_errs)
         plt.get_cmap().set_bad(color = 'w', alpha = 1.)
 
-        # 1D bar plot
+        # 1D line plot
         fig,ax = plt.subplots()
-        ax.bar(params_to_tune[k0], shaped_errs)
+        ax.plot(params_to_tune[k0], shaped_errs)
+        ax.set_xticks(params_to_tune[k0])
         ax.set_xlabel(k0)
         ax.set_ylabel('Error')
         plt.savefig('tmp_cluster_tuning', bbox_inches='tight')

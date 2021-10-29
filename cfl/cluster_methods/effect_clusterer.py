@@ -186,7 +186,7 @@ class EffectClusterer(Block):
 
         # tune model hyperparameters if requested
         if self.params['tune']:
-            params_to_remove = ['tune', 'precompute_distances']
+            params_to_remove = ['tune', 'verbose', 'precompute_distances']
             tunable_params = self.params.copy()
             for ptr in params_to_remove:
                 tunable_params.pop(ptr)

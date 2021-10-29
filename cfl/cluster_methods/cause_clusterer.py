@@ -169,7 +169,7 @@ class CauseClusterer(Block):
 
         # tune model hyperparameters if requested
         if self.params['tune']:
-            params_to_remove = ['tune']
+            params_to_remove = ['tune', 'verbose']
             tunable_params = self.params.copy()
             for ptr in params_to_remove:
                 tunable_params.pop(ptr)
