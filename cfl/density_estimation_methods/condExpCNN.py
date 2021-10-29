@@ -128,6 +128,9 @@ class CondExpCNN(CondExpBase):
                           'standardize' : False,
                           'best'        : True,
                           'tb_path'     : None,
+                          'optuna_callback'   : None,
+                          'optuna_trial'      : None,
+                          'early_stopping'    : False,
                          }
         return default_params
 

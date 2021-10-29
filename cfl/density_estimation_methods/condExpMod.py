@@ -50,6 +50,9 @@ class CondExpMod(CondExpBase):
                 'show_plot'   : True,
                 'best'        : True,
                 'tb_path'     : None,
+                'optuna_callback'   : None,
+                'optuna_trial'      : None,
+                'early_stopping'    : False,
             }
 
 

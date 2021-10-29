@@ -223,7 +223,7 @@ class CondExpBase(Block):
             if self.params['early_stopping']:
                 es_callback = tf.keras.callbacks.EarlyStopping(
                                     monitor="val_loss",
-                                    patience=5 )
+                                    patience=20 )
                 callbacks = [es_callback] + callbacks
 
             # train model
@@ -278,8 +278,7 @@ class CondExpBase(Block):
         '''
         fig,ax = plt.subplots()
         ax.plot(range(len(train_loss)), train_loss, label='train_loss')
-        ax.plot(np.linspace(0,len(train_loss),len(val_loss)).astype(int), 
-            val_loss, label='val_loss')
+        ax.plot(range(len(val_loss)), val_loss, label='val_loss')
         ax.set_xlabel('Epochs')
         ax.set_ylabel(self.params['loss'])
         ax.set_title('Training and Test Loss')
