@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from cfl.dataset import Dataset
 from cfl.util.data_processing import one_hot_encode
 from sklearn.cluster import *
+from tqdm import tqdm
+
 
 def _score(true, pred):
     return np.mean(np.power(true-pred, 2))
@@ -63,11 +65,13 @@ def visualize_errors(errs, params_list, params_to_tune):
         plt.get_cmap().set_bad(color = 'w', alpha = 1.)
 
         # 1D line plot
-        fig,ax = plt.subplots()
+        fig,ax = plt.subplots(figsize=(5*len(params_to_tune[k0])//20,3))
         ax.plot(params_to_tune[k0], shaped_errs)
         ax.set_xticks(params_to_tune[k0])
+        ax.set_xticklabels(params_to_tune[k0])
         ax.set_xlabel(k0)
         ax.set_ylabel('Error')
+        ax.set_title('Prediction Error (MSE)')
         plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
         plt.show()
 
@@ -95,12 +99,12 @@ def visualize_errors(errs, params_list, params_to_tune):
         ax.set_xticklabels(np.round(params_to_tune[k1],5), rotation=90)
         ax.set_yticks(range(len(params_to_tune[k0])))
         ax.set_yticklabels(np.round(params_to_tune[k0],5))
+        ax.set_title('Prediction Error (MSE)')
         plt.colorbar(im)
         plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
         plt.show()
     
     
-
 
 def suggest_elbow_idx(errs):
     # TODO: does this assume monotonically decreasing error?
@@ -135,7 +139,7 @@ def tune(data_to_cluster, params):
     param_combos = get_parameter_combinations(params)
     errs = np.zeros((len(param_combos),)) 
     print('Beginning clusterer tuning')
-    for ci,cur_params in enumerate(param_combos.copy()):
+    for ci,cur_params in tqdm(enumerate(param_combos.copy())):
         # create model with given params
         model_params = cur_params.copy()
         model_name = model_params.pop('model')

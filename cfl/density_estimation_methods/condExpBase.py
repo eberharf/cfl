@@ -149,8 +149,8 @@ class CondExpBase(Block):
         assert isinstance(prev_results, (type(None), dict)),\
             'prev_results is not NoneType or dict'
         if self.trained:
-            print('Model has already been trained, will return predictions on \
-                training data.')
+            print('Model has already been trained, will return predictions ' + \
+                'on training data.')
             return {'pyx' : self.model.predict(dataset.X)}
 
         # train-test split
