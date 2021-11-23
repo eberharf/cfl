@@ -2,9 +2,23 @@
 import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
 import matplotlib.pyplot as plt
+from cfl.post_cfl.post_cfl_util import *
+from sklearn.decomposition import PCA
 
-def get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5, 
-    to_plot=True, series='series'):
+def get_recommendataions(exp, data=None, dataset_name='dataset_train', 
+                         cause_or_effect='cause', visualize=True, k_samples=100,
+                         eps=0.5):
+
+    pyx = load_pyx(exp, dataset_name)
+    cluster_labels = load_macrolbls(exp, dataset_name, cause_or_effect)
+    exp_path = get_exp_path(exp)
+    recs =  _get_recommendations(pyx, cluster_labels, k_samples=k_samples,
+                                 eps=eps, visualize=visualize, exp_path=exp_path,
+                                 dataset_name=dataset_name)
+    np.save(os.path.join(exp_path, dataset_name, 'intervention_recs'), recs)
+
+def _get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5, 
+    visualize=True, exp_path=None, dataset_name=None):
     ''' For a set of data points, compute density for each point, extract
         high density samples, and discard points near cluster boundaries. Plot
         and return location of resulting subset of points.
@@ -33,8 +47,9 @@ def get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5,
     final_mask = _discard_boundary_samples(pyx, hd_mask, cluster_labels, eps=eps)
 
     # plot clusters in pyx with high-confidence points in black
-    if to_plot:
-        _plot_results(pyx, hd_mask, final_mask, cluster_labels, series)
+    if visualize:
+        _plot_results(pyx, hd_mask, final_mask, cluster_labels, exp_path,
+                      dataset_name)
 
     return final_mask
 
@@ -178,8 +193,11 @@ def _discard_boundary_samples(pyx, high_density_mask, cluster_labels, eps=0.5):
     return final_mask
 
 
-def _plot_results(pyx, hd_mask, final_mask, cluster_labels, series):
-    assert pyx.shape[1]==2, 'pyx must be 2D to plot'
+def _plot_results(pyx, hd_mask, final_mask, cluster_labels, exp_path, 
+                  dataset_name):
+    if pyx.shape[1]>2: 
+        print('Warning: pyx has more than 2 dimensions. Projecting down to 2D')
+        pyx = PCA(n_components=2).fit_transform(pyx)
     names = ['High-density', 'High-density, boundary removal']
     fig,ax = plt.subplots(1,2,figsize=(10,4))
     for i,mask in enumerate([hd_mask,final_mask]):
@@ -188,5 +206,6 @@ def _plot_results(pyx, hd_mask, final_mask, cluster_labels, series):
                 pyx[np.where(mask)[0],1], 
                 c='black')
         ax[i].set_title(
-            series + f'\n{names[i]}\nNumber of selected points: {np.sum(mask)}')
-    plt.savefig(f'demo_figures/{series}', bbox_inches='tight')
+            f'\n{names[i]}\nNumber of selected points: {np.sum(mask)}')
+    plt.savefig(os.path.join(exp_path, dataset_name, 'intervention_recs'), 
+                bbox_inches='tight')
