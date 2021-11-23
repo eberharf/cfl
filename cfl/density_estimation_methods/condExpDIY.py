@@ -37,6 +37,14 @@ class CondExpDIY(CondExpBase):
         Returns:
             dict : dictionary of default parameters
         '''
+        def build_model():
+            model = tf.keras.models.Sequential([
+                tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],)),
+                tf.keras.layers.Dense(units=50),
+                tf.keras.layers.Dense(units=self.data_info['Y_dims'][1]),
+            ])
+            return model
+
         return {'batch_size'        : 32,
                 'n_epochs'          : 20,
                 'optimizer'         : 'adam',
@@ -50,6 +58,7 @@ class CondExpDIY(CondExpBase):
                 'optuna_callback'   : None,
                 'optuna_trial'      : None,
                 'early_stopping'    : False,
+                'build_model'       : build_model
             }
 
 
