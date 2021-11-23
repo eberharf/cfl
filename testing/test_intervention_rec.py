@@ -58,7 +58,7 @@ def generate_vb_data():
     return x,y
 
 def test_intervention_recs():
-    ''' check if my_exp.get_intervention_recs('dataset_train') runs without
+    ''' check if IR.get_recommendations runs without
         failing and if results match prior results.
     '''
 
@@ -79,11 +79,13 @@ def test_intervention_recs():
                 results_path=RESULTS_PATH)
 
     train_results = my_exp.train()
+    exp_path = my_exp.get_save_path()
     
     # check if recommended interventions match prior results
     # np.save(os.path.join(RESOURCE_PATH, 'recs'), 
     #         my_exp.get_intervention_recs('dataset_train'))
-    recs = my_exp.get_intervention_recs('dataset_train')
+    recs = IR.get_recommendations(exp_path, dataset_name='dataset_train', 
+                               cause_or_effect='cause', visualize=False)
     old_recs = np.load(os.path.join(RESOURCE_PATH, 'recs.npy'))
 
     assert np.array_equal(recs, old_recs), f'{recs[0]}, {old_recs[0]}'

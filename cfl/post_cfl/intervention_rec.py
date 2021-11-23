@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from cfl.post_cfl.post_cfl_util import *
 from sklearn.decomposition import PCA
 
-def get_recommendataions(exp, data=None, dataset_name='dataset_train', 
+def get_recommendations(exp, data=None, dataset_name='dataset_train', 
                          cause_or_effect='cause', visualize=True, k_samples=100,
                          eps=0.5):
 
@@ -16,6 +16,7 @@ def get_recommendataions(exp, data=None, dataset_name='dataset_train',
                                  eps=eps, visualize=visualize, exp_path=exp_path,
                                  dataset_name=dataset_name)
     np.save(os.path.join(exp_path, dataset_name, 'intervention_recs'), recs)
+    return recs
 
 def _get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5, 
     visualize=True, exp_path=None, dataset_name=None):
