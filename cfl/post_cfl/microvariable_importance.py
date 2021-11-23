@@ -93,15 +93,15 @@ def plot_disc_vals(disc_vals,fig_path=None):
         plt.show()
 
 
-def compute_microvariable_importance(micro_data, exp, 
+def compute_microvariable_importance(exp, data, 
                                      dataset_name='dataset_train', 
                                      cause_or_effect='cause'):
-    if isinstance(micro_data, str):
-        micro_data = np.load(micro_data)
+    if isinstance(data, str):
+        data = np.load(data)
     macro_lbls = load_macrolbls(exp, dataset_name, cause_or_effect)
     exp_path = get_exp_path(exp)
 
-    disc_vals = discriminate_clusters(micro_data, macro_lbls)
+    disc_vals = discriminate_clusters(data, macro_lbls)
     np.save(os.path.join(exp_path, dataset_name, 'microvariable_importance'), 
             disc_vals)
     # plot_disc_vals(disc_vals,fig_path=os.path.join(

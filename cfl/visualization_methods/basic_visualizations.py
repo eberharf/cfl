@@ -10,7 +10,7 @@ macrostate_vis(data=data, exp_id=0, cause_or_effect='cause', subtract_global_mea
 
 '''
 
-def visualize_macrostates(data, feature_names, exp_path, 
+def visualize_macrostates(exp_path, data, feature_names, 
                           data_series='dataset_train', cause_or_effect='cause', 
                           subtract_global_mean='True', figsize=None,
                           kwargs={}):

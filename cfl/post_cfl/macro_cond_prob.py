@@ -35,7 +35,7 @@ def visualize_cond_prob(P_Ym_given_Xm, uxlbls, uylbls, fig_path=None):
     plt.show()
 
 
-def compute_macro_cond_prob(data, exp, dataset_name='dataset_train', 
+def compute_macro_cond_prob(exp, data=None, dataset_name='dataset_train', 
                             visualize=True):
     xlbls = load_macrolbls(exp, dataset_name=dataset_name, 
                            cause_or_effect='cause')
