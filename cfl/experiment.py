@@ -407,7 +407,7 @@ class Experiment():
                         specifies which Block the results come from. The
                         second key specifies the specific result.
         '''
-        dataset = self.datasets['dataset_train']
+        dataset = self.datasets[dataset_name]
         return dataset.cfl_results
 
     # def check_blocks_compatibility(self):
