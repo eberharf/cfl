@@ -8,7 +8,7 @@ from sklearn.cluster import KMeans
 from cfl.experiment import Experiment
 from visual_bars import generate_visual_bars_data as vbd
 from cfl.util.data_processing import one_hot_encode
-from cfl import intervention_rec as IR
+from cfl.post_cfl import intervention_rec as IR
 
 # Note: change if you want results somewhere else (folder will be deleted at 
 #       end of run)
