@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import pickle
+from cfl.post_cfl.post_cfl_util import *
 
 def compute_cond_prob(xlbls, ylbls):
 
@@ -34,17 +35,18 @@ def visualize_cond_prob(P_Ym_given_Xm, uxlbls, uylbls, fig_path=None):
     plt.show()
 
 
-def macro_cond_prob(exp_path, dataset='dataset_train'):
-    xpath = os.path.join(exp_path, dataset, 'CauseClusterer_results.pickle')
-    with open(xpath, 'rb') as f:
-        xlbls = pickle.load(f)['x_lbls']
-    ypath = os.path.join(exp_path, dataset, 'EffectClusterer_results.pickle')
-    with open(ypath, 'rb') as f:
-        ylbls = pickle.load(f)['y_lbls']
+def compute_macro_cond_prob(data, exp, dataset_name='dataset_train', 
+                            visualize=True):
+    xlbls = load_macrolbls(exp, dataset_name=dataset_name, 
+                           cause_or_effect='cause')
+    ylbls = load_macrolbls(exp, dataset_name=dataset_name, 
+                           cause_or_effect='effect')
+    exp_path = get_exp_path(exp)
     P_Ym_given_Xm = compute_cond_prob(xlbls, ylbls)
-    save_path = os.path.join(exp_path,dataset, 'macro_cond_prob')
+    save_path = os.path.join(exp_path, dataset_name, 'macro_cond_prob')
     np.save(save_path, P_Ym_given_Xm)
-    visualize_cond_prob(P_Ym_given_Xm, np.unique(xlbls), np.unique(ylbls), 
-                        save_path)
+    if visualize:
+        visualize_cond_prob(P_Ym_given_Xm, np.unique(xlbls), np.unique(ylbls), 
+                            save_path)
     return P_Ym_given_Xm
 
