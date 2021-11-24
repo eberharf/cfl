@@ -27,9 +27,9 @@ Methods in Experiment Class:
 # NOTE: the keys of this dictionary are passed as part of the 'block_names'
 # list. They are different than the names of the attributes in each block's
 # self.name attribute
-BLOCK_KEY = {   'CDE'             : cdem.CDE,
-                'CauseClusterer'  : ccm.CauseClusterer,
-                'EffectClusterer' : ccm.EffectClusterer} #TODO: maybe change this so that instead of 
+BLOCK_KEY = {   'CondProbEstimator' : cdem.CondProbEstimator,
+                'CauseClusterer'    : ccm.CauseClusterer,
+                'EffectClusterer'   : ccm.EffectClusterer} #TODO: maybe change this so that instead of 
                                                             # calling clusterer, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods  
 
 class Experiment():

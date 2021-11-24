@@ -2,14 +2,14 @@
 from cfl.block import Block
 import cfl.density_estimation_methods as c
 
-class CDE(Block):
+class CondProbEstimator(Block):
     
     def __init__(self, data_info, params):
         # parameter checks and self.params assignment done here 
         super().__init__(data_info=data_info, params=params) 
         
         #attributes:
-        self.name = 'CDE'
+        self.name = 'CondProbEstimator'
         self.model = self._create_model()
 
     def _create_model(self):
