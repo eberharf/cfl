@@ -1,7 +1,7 @@
-from cfl.density_estimation_methods.condExpMod import CondExpMod 
-from cfl.density_estimation_methods.condExpCNN import CondExpCNN 
+from cfl.cond_prob_estimation.condExpMod import CondExpMod 
+from cfl.cond_prob_estimation.condExpCNN import CondExpCNN 
 # from cfl.density_estimation_methods.condExpVB import CondExpVB
-from cfl.density_estimation_methods.condExpDIY import CondExpDIY
+from cfl.cond_prob_estimation.condExpDIY import CondExpDIY
 # this doesn't include condexpKC because it is anticipated to
 # be deleted in the future 
 # TODO: doesn't include condexpCNN3D

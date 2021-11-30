@@ -5,7 +5,7 @@ import os
 import numpy as np
 from cfl.dataset import Dataset
 from cfl.block import Block
-import cfl.density_estimation_methods as cdem
+import cfl.cond_prob_estimation as cdem
 import cfl.cluster_methods as ccm
 
 '''

@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from cfl.density_estimation_methods.condExpBase import CondExpBase
+from cfl.cond_prob_estimation.condExpBase import CondExpBase
 
 class CondExpKC(CondExpBase):
     ''' 

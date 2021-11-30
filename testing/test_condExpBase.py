@@ -1,5 +1,5 @@
 import pytest
-from cfl.density_estimation_methods.condExpMod import CondExpMod
+from cfl.cond_prob_estimation.condExpMod import CondExpMod
 import tensorflow as tf
 # tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 import visual_bars.generate_visual_bars_data as vbd

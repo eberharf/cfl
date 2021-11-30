@@ -11,7 +11,7 @@ import shutil
 
 import numpy as np
 
-import cfl.density_estimation_methods
+import cfl.cond_prob_estimation
 import cdes_for_testing
 from cdes_for_testing import cde_input_shapes
 from visual_bars import generate_visual_bars_data as vbd

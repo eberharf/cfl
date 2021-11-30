@@ -70,7 +70,7 @@ def test_intervention_recs():
                 'Y_dims': y.shape, 
                 'Y_type': 'categorical'}
 
-    block_names = ['CDE', 'CauseClusterer']
+    block_names = ['CondProbEstimator', 'CauseClusterer']
     block_params = [CDE_PARAMS, C_CLUSTER_PARAMS]
 
     # make new CFL Experiment with CDE only

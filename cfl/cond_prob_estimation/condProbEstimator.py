@@ -1,6 +1,6 @@
 
 from cfl.block import Block
-import cfl.density_estimation_methods as c
+import cfl.cond_prob_estimation as c
 
 class CondProbEstimator(Block):
     

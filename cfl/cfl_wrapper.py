@@ -1,5 +1,5 @@
 
-import cfl.density_estimation_methods as cdem
+import cfl.cond_prob_estimation as cdem
 import cfl.cluster_methods as ccm
 from cfl.core_cfl_objects.two_step_cfl import Two_Step_CFL_Core
 
