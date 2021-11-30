@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 # sys.path.append('/home/ec2-user/cfl')
-from cfl.cluster_methods.Y_given_Xmacro import _continuous_Y
+from cfl.clustering.Y_given_Xmacro import _continuous_Y
 from time import time
 
 n_samples = 13000

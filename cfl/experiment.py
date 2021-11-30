@@ -6,7 +6,7 @@ import numpy as np
 from cfl.dataset import Dataset
 from cfl.block import Block
 import cfl.cond_prob_estimation as cdem
-import cfl.cluster_methods as ccm
+import cfl.clustering as ccm
 
 '''
 Methods in Experiment Class: 

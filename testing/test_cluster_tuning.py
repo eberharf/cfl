@@ -1,9 +1,9 @@
 
 
 
-from cfl.cluster_methods.effect_clusterer import EffectClusterer
+from cfl.clustering.effect_clusterer import EffectClusterer
 import numpy as np
-from cfl.cluster_methods import CauseClusterer
+from cfl.clustering import CauseClusterer
 from cfl.dataset import Dataset
 
 n_samples,nx,ny = 1000,4,3

@@ -1,12 +1,11 @@
+from typing import Type
 import pickle #for saving code
 
 from cfl.block import Block
 from cfl.dataset import Dataset
 import numpy as np
-from cfl.cluster_methods.Y_given_Xmacro import sample_Y_dist # calculate 
-                                                             # P(Y|Xmacro)
 from sklearn.cluster import *
-from cfl.cluster_methods.cluster_tuning_util import tune
+from cfl.clustering.cluster_tuning_util import tune
 
 #TODO: next step: add very clear documentation about how to add new module. 
 # Include:
@@ -14,12 +13,10 @@ from cfl.cluster_methods.cluster_tuning_util import tune
 # - tests to run with new module to ensure that it works right?
 
 
-""" This class uses  clustering to form the observational partition that CFL is
-    trying to identify over the effect space. It trains a user-defined 
-    clustering model, to cluster datapoints based on a proxy for P(Y=y|X) 
-    (more information on this proxy can be found in the helper file 
-    Y_given_Xmacro.py). Once this model is trained, it can then be used to 
-    assign new datapoints to the clusters found.
+""" This class uses clustering to form the observational partition that CFL is
+    trying to identify over the cause space. It trains a user-defined clustering 
+    model to cluster datapoints based on P(Y|X=x). Once the model is trained,
+    it can then be used to assign new datapoints to the clusters found.
 
     Attributes:
         params (dict): a set of parameters specifying a clusterer. The 'model' 
@@ -28,14 +25,14 @@ from cfl.cluster_methods.cluster_tuning_util import tune
                        follows the scikit-learn interface. If the former,
                        additional keys may be specified as parameters to the
                        sklearn object.
-        model: clusterer for effect data
+        model: clusterer for cause data
         data_info (dict) : dictionary with the keys 'X_dims', 'Y_dims', and 
             'Y_type' (whether the y data is categorical or continuous)
         name : name of the model so that the model type can be recovered from
             saved parameters (str) #TODO: remove
 
     Methods:
-        train : fit a model with proxy for P(Y=y|X).
+        train : fit a model with P(Y|X=x) found by CDE.
         predict : assign new datapoints to clusters found in train
         evaluate_clusters : evaluate the goodness of clustering based on metric
                             specified in cluster_metric()
@@ -52,7 +49,7 @@ from cfl.cluster_methods.cluster_tuning_util import tune
 
         X = cause data 
         y = effect data 
-        prev_results = cause clustering results
+        prev_results = CDE results
         data = Dataset(X, y)
 
         # syntax 1
@@ -67,9 +64,9 @@ from cfl.cluster_methods.cluster_tuning_util import tune
                       params={'model': DBSCAN_model})
 
         results = c.train(data, prev_results)
- """
+    """
 
-class EffectClusterer(Block):
+class CauseClusterer(Block):
 
     def __init__(self, data_info, params):
         """
@@ -83,12 +80,7 @@ class EffectClusterer(Block):
                              clusterer model object that follows the 
                              scikit-learn interface. If the former, additional 
                              keys may be specified as parameters to the
-                             sklearn object.
-                             'precompute_distances' may also be specified. If
-                             true, a pre-caching method will be used that
-                             reduces runtime but is more memory-intensive. If
-                             false, the original compute-on-the-fly method
-                             will be used. (defaults to True)
+                             sklearn object. 
 
                             Note: If a clusterer object is passed in as the 
                             value to for 'model', the clusterer object needs 
@@ -106,15 +98,14 @@ class EffectClusterer(Block):
         super().__init__(data_info=data_info, params=params) 
         
         #attributes:
-        self.name = 'EffectClusterer'
-        self.Y_type = data_info['Y_type']
+        self.name = 'CauseClusterer'
         if not params['tune']:
             self.model = self._create_model(self.params)
 
     def _create_model(self, params):
         if isinstance(params['model'], str):
             # pull dict entries to pass into clusterer object
-            excluded_keys = ['model', 'tune', 'precompute_distances', 'verbose']
+            excluded_keys = ['model', 'tune', 'verbose']
             model_keys = list(set(params.keys()) - set(excluded_keys))
             model_params = {key: params[key] for key in model_keys}
 
@@ -130,7 +121,6 @@ class EffectClusterer(Block):
             Returns: 
                 dict: dictionary of parameter names (keys) and values (values)
         '''
-
         return self.params
 
     def _get_default_params(self):
@@ -146,13 +136,11 @@ class EffectClusterer(Block):
 
         """
 
-        default_params =  {'model' : DBSCAN(),
-                           'precompute_distances' : True,
-                           'tune' : False,
-                           'verbose' : 1,
-                          }
+        default_params =  { 'model' : 'DBSCAN', 
+                            'tune' : False, 
+                            'verbose' : 1}
         return default_params
-
+                
 
     def train(self, dataset, prev_results):
         """
@@ -161,48 +149,42 @@ class EffectClusterer(Block):
         Arguments:
             dataset (Dataset): Dataset object containing X, Y and pyx data to 
                                assign parition labels to
-            prev_results (dict): dictionary that contains a key called 'x_lbls', 
-                                 whose value is an array of labels over the
-                                 dataset samples.
-        Returns: 
-            y_lbls (np.ndarray): Y macrovariable class assignments for this 
-                                 Dataset 
+            prev_results (dict): dictionary that contains a key called 'pyx', 
+                                 whose value is an array of probabilities
+        Returns:
+            x_lbls (np.ndarray): X macrovariable class assignments for this 
+                                 Dataset
         """
         
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
             'prev_results is not NoneType or dict'
-        assert 'x_lbls' in prev_results.keys(), \
-            'Generate x_lbls with cause_clusterer before clustering on effect.'
+        assert 'pyx' in prev_results.keys(), \
+            'Generate pyx predictions with CDE before clustering.'
         # TODO: decide whether to track self.trained status and whether to check
         #       that here depending on whether we have to refit the clustering
         #       every time we have new data
 
-        x_lbls = prev_results['x_lbls']
-        # sample P(Y|Xclass)
-        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls, 
-            precompute_distances=self.params['precompute_distances'])
-
+        pyx = prev_results['pyx']
 
         # tune model hyperparameters if requested
         if self.params['tune']:
-            params_to_remove = ['tune', 'verbose', 'precompute_distances']
+            params_to_remove = ['tune', 'verbose']
             tunable_params = self.params.copy()
             for ptr in params_to_remove:
                 tunable_params.pop(ptr)
-            tuned_params = tune(y_probs, tunable_params)
+            tuned_params = tune(pyx, tunable_params)
             for k in tuned_params.keys():
                 self.params[k] = tuned_params[k]
             self.model = self._create_model(self.params)
 
-        # do y clustering
-        self.model.fit(y_probs)
-        y_lbls = self.model.labels_
 
+        # do clustering 
+        self.model.fit(pyx)
         self.trained = True
-        results_dict = {'y_lbls'  : y_lbls,
-                        'y_probs' : y_probs}
-
+        x_lbls = self.model.labels_
+        
+        results_dict = {'x_lbls'  : x_lbls}
         return results_dict
 
     def predict(self, dataset, prev_results):
@@ -212,39 +194,29 @@ class EffectClusterer(Block):
         Arguments:
             dataset (Dataset): Dataset object containing X, Y and pyx data to 
                                assign partition labels to 
-            prev_results (dict): dictionary that contains a key called 'x_lbls', 
-                                 whose value is an array of labels over the
-                                 dataset samples.
+            prev_results (dict): dictionary that contains a key called 'pyx', 
+                                 whose value is an array of probabilities
         Returns:
             x_lbls (np.ndarray): X macrovariable class assignments for this 
                                  Dataset 
-            y_lbls (np.ndarray) : Y macrovariable class assignments for this 
-                                  Dataset 
-                     
         """
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
             'prev_results is not NoneType or dict'
-        assert 'x_lbls' in prev_results.keys(), \
-            'Generate x_lbls with cause_clusterer before clustering on effect.'
+        assert 'pyx' in prev_results.keys(), \
+            'Generate pyx predictions with CDE before clustering.'
 
         assert self.trained, "Remember to train the model before prediction."
 
-        x_lbls = prev_results['x_lbls']
+        pyx = prev_results['pyx']
+
+        x_lbls = self.model.fit_predict(pyx)
 
         # NOTE: TODO: fit_predict is different than predict, so this code is WRONG  
         # however, kmeans is the only clustering function in sklearn that has 
         # a predict function defined so we're doing this for now
 
-        # sample P(Y|Xclass)
-        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
-
-        # do y clustering
-        y_lbls = self.model.fit_predict(y_probs)
-
-        results_dict = {'y_lbls'  : y_lbls, 
-                        'y_probs' : y_probs}
-
+        results_dict = {'x_lbls' : x_lbls}
         return results_dict
 
 

@@ -5,8 +5,8 @@ import shutil
 import os
 from sklearn.cluster import KMeans, DBSCAN
 
-from cfl.cluster_methods.snn import SNN
-from cfl.cluster_methods.clusterer import Clusterer
+from cfl.clustering.snn import SNN
+from cfl.clustering.clusterer import Clusterer
 from cfl.dataset import Dataset
 
 ''' The following code runs all tests in CondExpInputTests on all listed

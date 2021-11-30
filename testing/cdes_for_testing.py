@@ -14,7 +14,6 @@ all_cdes = [CondExpMod, CondExpCNN, CondExpDIY] # CondExpVB]
 # storing this information in this format seems kind of jank but I couldn't
 # think of something cleaner for passing information around 
 cde_input_shapes = { CondExpCNN: 4,  # (n_samples, im_height, im_width, n_channels)
-                    #   CondExpVB: 2,  # (n_samples, n_features)
                      CondExpMod: 2,  # (n_samples, n_features)
                      CondExpDIY: 2,
                  }

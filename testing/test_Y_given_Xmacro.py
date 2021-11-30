@@ -1,5 +1,5 @@
 import numpy as np
-import cfl.cluster_methods.Y_given_Xmacro as YGX
+import cfl.clustering.Y_given_Xmacro as YGX
 from time import time
 
 DATA_INFO = {  'X_dims' : (10000,3), 

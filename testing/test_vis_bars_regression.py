@@ -10,7 +10,7 @@ from cfl.experiment import Experiment
 from visual_bars import generate_visual_bars_data as vbd
 from cfl.util.data_processing import one_hot_encode
 from sklearn.metrics import adjusted_mutual_info_score as ami
-import cfl.visualization_methods.visual_bars_vis as vis
+import visual_bars.visual_bars_vis as vis
 
 RESULTS_PATH = 'testing/tmp_test_results'
 SHOW_PLOTS = False
