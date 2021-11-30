@@ -198,17 +198,24 @@ def _discard_boundary_samples(pyx, high_density_mask, cluster_labels, eps=0.5):
 
 
 def _plot_results(pyx, hd_mask, final_mask, cluster_labels, exp_path, 
-                  dataset_name):
+                  dataset_name, feature_names=None):
+    if feature_names is None:
+        feature_names = ['Feature 1', 'Feature 2']
     if pyx.shape[1]>2: 
         print('Warning: pyx has more than 2 dimensions. Projecting down to 2D')
         pyx = PCA(n_components=2).fit_transform(pyx)
+        feature_names = ['Principal Component 1', 'Principal Component 2']
+
     names = ['High-density', 'High-density, boundary removal']
     fig,ax = plt.subplots(1,2,figsize=(10,4))
     for i,mask in enumerate([hd_mask,final_mask]):
         ax[i].scatter(pyx[:,0], pyx[:,1], c=cluster_labels, alpha=0.4, s=2)
         ax[i].scatter(pyx[np.where(mask)[0],0], pyx[np.where(mask)[0],1], 
-                      c='black',s=2)
-        ax[i].set_title(
-            f'\n{names[i]}\nNumber of selected points: {np.sum(mask)}')
+                      c='black',s=3)
+        # ax[i].set_title(
+        #     f'\n{names[i]}\nNumber of selected points: {np.sum(mask)}')
+        ax[i].set_title('High-yield Interventions by Cluster')
+        ax[i].set_xlabel(feature_names[0])
+        ax[i].set_ylabel(feature_names[1])
     plt.savefig(os.path.join(exp_path, dataset_name, 'intervention_recs'), 
                 bbox_inches='tight')
