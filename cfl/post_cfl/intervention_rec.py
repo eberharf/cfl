@@ -65,7 +65,9 @@ def _compute_density(pyx):
             np.ndarray : array of density proxys aligned with pyx of shape
                          (n_samples,)
     '''
-    
+    # TODO: this should be implemented such that higher values = more dense
+    # so that downstream usage doesn't have to know what estimation was used
+
     # precompute pairwise distances between all points
     distance_matrix = euclidean_distances(pyx, pyx)
 
@@ -83,8 +85,10 @@ def _get_high_density_samples(density, cluster_labels, k_samples=None):
     ''' Returns the highest density samples per cluster. 
 
         Arguments:
-            pyx (np.ndarray) : density metric for each sample in pyx, of shape
-                               (n_samples,) 
+            density (np.ndarray) : computed density for each sample in pyx, of 
+                                   shape (n_samples,) 
+            cluster_labels (np.ndarray) : array of integer cluster labels
+                                          aligned with pyx of shape (n_samples,)
             k_samples (int) : number of samples to extract *per cluster*. If
                               None, returns all cluster members. If greater 
                               than number of cluster members, returns all 
@@ -134,14 +138,13 @@ def _discard_boundary_samples(pyx, high_density_mask, cluster_labels, eps=0.5):
         cluster boundary. 
 
         Arguments: 
-            pyx (np.ndarray) : density metric for each sample in pyx, of shape
-                               (n_samples,) 
+            pyx (np.ndarray) : pyx (np.ndarray) : output of a CDE Block of shape 
+                               (n_samples, n target features) 
             high_density_mask (np.ndarray) : mask of shape (n_samples,) 
                                              indicating which samples are 
                                              considered high-density
             cluster_labels (np.ndarray) : array of integer cluster labels
-                                aligned with pyx of shape
-                                (n_samples,)
+                                aligned with pyx of shape (n_samples,)
         Returns:
             np.ndarray : mask of shape (n_samples,) where value of 1 means 
                          that a) a point is considered high-density and 
@@ -202,10 +205,9 @@ def _plot_results(pyx, hd_mask, final_mask, cluster_labels, exp_path,
     names = ['High-density', 'High-density, boundary removal']
     fig,ax = plt.subplots(1,2,figsize=(10,4))
     for i,mask in enumerate([hd_mask,final_mask]):
-        ax[i].scatter(pyx[:,0], pyx[:,1], c=cluster_labels, alpha=0.4)
-        ax[i].scatter(pyx[np.where(mask)[0],0], 
-                pyx[np.where(mask)[0],1], 
-                c='black')
+        ax[i].scatter(pyx[:,0], pyx[:,1], c=cluster_labels, alpha=0.4, s=2)
+        ax[i].scatter(pyx[np.where(mask)[0],0], pyx[np.where(mask)[0],1], 
+                      c='black',s=2)
         ax[i].set_title(
             f'\n{names[i]}\nNumber of selected points: {np.sum(mask)}')
     plt.savefig(os.path.join(exp_path, dataset_name, 'intervention_recs'), 
