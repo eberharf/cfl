@@ -4,7 +4,7 @@
 <p align="center">
 <img src=docs/logo.jpg width="300" />
 </p>
-<h1 align="center">Causal Feature Learning (CFL)</h1>
+<h1 align="center">Causal Feature Learning</h1>
 
 ## Set-up 
 

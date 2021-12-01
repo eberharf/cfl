@@ -161,7 +161,7 @@ def make_cluster_io_tests(cluster_model):
             self.assertRaises(ValueError, self.c.save_block, path)
 
         def test_save_block_correct_input_type(self):
-            path = 'testing/tmp_test_path'
+            path = 'tests/tmp_test_path'
             self.c.save_block(path)
             os.remove(path)
 

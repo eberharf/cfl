@@ -12,8 +12,8 @@ from cfl.post_cfl import intervention_rec as IR
 
 # Note: change if you want results somewhere else (folder will be deleted at 
 #       end of run)
-RESULTS_PATH = 'testing/tmp_cde_results'
-RESOURCE_PATH = 'testing/resources/test_intervention_rec'
+RESULTS_PATH = 'tests/tmp_cde_results'
+RESOURCE_PATH = 'tests/resources/test_intervention_rec'
 
 # parameters for CDE 
 CDE_PARAMS = {'batch_size': 128,

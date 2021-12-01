@@ -3,7 +3,7 @@ from cfl.experiment import Experiment
 import numpy as np
 import pytest
 
-RESULTS_PATH = 'testing/tmp_test_results'
+RESULTS_PATH = 'tests/tmp_test_results'
 
 def test_full_pipeline():
     X = np.random.normal(size=(1000,3))

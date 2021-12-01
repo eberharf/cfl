@@ -12,7 +12,7 @@ from cfl.util.data_processing import one_hot_encode
 from sklearn.metrics import adjusted_mutual_info_score as ami
 import visual_bars.visual_bars_vis as vis
 
-RESULTS_PATH = 'testing/tmp_test_results'
+RESULTS_PATH = 'tests/tmp_test_results'
 SHOW_PLOTS = False
 
 def generate_vb_data(n_samples):

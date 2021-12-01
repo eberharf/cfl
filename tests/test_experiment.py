@@ -1,4 +1,4 @@
-from testing.test_intervention_rec import RESULTS_PATH
+from tests.test_intervention_rec import RESULTS_PATH
 import pytest
 import numpy as np
 import os
@@ -13,7 +13,7 @@ import random
 from sklearn.cluster import DBSCAN
 
 # Note: change if you want results somewhere else (folder will be deleted at end of run)
-# RESULTS_PATH = 'testing/tmp_test_results'
+# RESULTS_PATH = 'tests/tmp_test_results'
 
 # hypothesis 
 ############### HELPER FUNCTIONS #################
@@ -162,12 +162,12 @@ def test_clusterer_experiment():
     train_results_cluster = my_exp_cluster.train(dataset=dataset_train_cluster, prev_results=prev_results)
     
     # # tmp save
-    # np.save('testing/resources/test_experiment/x_lbls.npy', train_results_cluster['Clusterer']['x_lbls'])
-    # np.save('testing/resources/test_experiment/y_lbls.npy', train_results_cluster['Clusterer']['y_lbls'])
+    # np.save('tests/resources/test_experiment/x_lbls.npy', train_results_cluster['Clusterer']['x_lbls'])
+    # np.save('tests/resources/test_experiment/y_lbls.npy', train_results_cluster['Clusterer']['y_lbls'])
     
     # # load in correct labels
-    # x_lbls_expected = np.load('testing/resources/test_experiment/x_lbls.npy')
-    # y_lbls_expected = np.load('testing/resources/test_experiment/y_lbls.npy')
+    # x_lbls_expected = np.load('tests/resources/test_experiment/x_lbls.npy')
+    # y_lbls_expected = np.load('tests/resources/test_experiment/y_lbls.npy')
 
     # # check clustering values
     # assert np.array_equal(train_results_cluster['Kmeans']['x_lbls'], x_lbls_expected), \

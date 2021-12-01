@@ -41,7 +41,7 @@ TS_SPLIT = N_TRAIN - TR_SPLIT
 X_DIM = 100
 Y_DIM = 1
 
-WEIGHTS_PATH = 'testing/test_results/test_condExpBase_resources/experiment0000/dataset0/checkpoints/best_weights'
+WEIGHTS_PATH = 'tests/test_results/test_condExpBase_resources/experiment0000/dataset0/checkpoints/best_weights'
 
 DATA_INFO = { 'X_dims' : (N_TRAIN,X_DIM),
               'Y_dims' : (N_TRAIN,Y_DIM), 
@@ -185,7 +185,7 @@ def test_save_parameters():
                             )
 
     ceb_obj_tmp.load_parameters(WEIGHTS_PATH)
-    new_path = 'testing/test_results/tmp_weights.h5'
+    new_path = 'tests/test_results/tmp_weights.h5'
     ceb_obj_tmp.save_parameters(new_path)
 
     assert os.path.exists(new_path), 'File for saved parameters does not exist.'
