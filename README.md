@@ -1,7 +1,8 @@
-# Welcome to CFL 
-
-![Build Status](https://github.com/eberharf/cfl/workflows/dev_regression_tests/badge.svg)
+![Build Status](https://github.com/eberharf/cfl/workflows/AutomatedTests/badge.svg)
 [![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360/)
+
+# Causal Feature Learning (CFL)
+<img src=docs/logo.svg width="400" />
 
 ## Set-up 
 
