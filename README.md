@@ -14,14 +14,13 @@ Go [here](https://cfl.readthedocs.io/en/latest/getting_started/SETUP.html) for i
 
 Go to the [examples](https://cfl.readthedocs.io/en/latest/examples/cfl_code_intro.html) section of our Read The Docs page to see several demonstrations of how to use the CFL code. Check out the [Background](https://cfl.readthedocs.io/en/latest/getting_started/cfl_intro.html) on CFL for a quick theoretical introduction.
 
------------------------------------------
--------------------------------------------
+
 ## Repository Contents
 ### `cfl`
 This folder contains all of the functional code for CFL. The most current function-level documentation for the `cfl` package is currently in the docstrings (API level documentation will soon be added to ReadtheDocs)
 
 
-### `examples`
+### `docs/source/examples`
 contains example applications of `cfl` for various data sets. Look here if you're just getting started.
 
 ### `visual_bars`
@@ -32,12 +31,12 @@ Contains code for generating visual bars data set (see Chalupka 2015) and code t
 ### `data/el_nino`
 Contains the pickle file for the El Nino data. See the `el_nino_example.ipynb` notebook for an example of how to load this data.
 
-### `data/galaxies`
-Contains the .dvc (data version control) files associated with each file of the galaxy data. The actual data is stored on Google Drive.
+<!-- ### `data/galaxies`
+Contains the .dvc (data version control) files associated with each file of the galaxy data. The actual data is stored on Google Drive. -->
 
-Instructions on how to use .dvc are in `examples/dvc_intro.md`
+<!-- Instructions on how to use .dvc are in `examples/dvc_intro.md` -->
 
-### `testing`
+### `tests`
 This folder contains the automated test suite for checking the expected functionality of the code and preventing regression (loss of functionality).
 
 --------------------------------------------
@@ -84,4 +83,4 @@ or use the BibTex reference:
 
 ## Questions? Comments? Feedback? 
 
-Contact Iman Wahle or Jenna Kahn. 
+Contact Iman Wahle (iwahle@caltech.edu) or Jenna Kahn. 
