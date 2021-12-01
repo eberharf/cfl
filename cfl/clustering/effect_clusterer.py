@@ -1,14 +1,14 @@
-import pickle #for saving code
+import pickle  # for saving code
 
 from cfl.block import Block
 from cfl.dataset import Dataset
 import numpy as np
-from cfl.clustering.Y_given_Xmacro import sample_Y_dist # calculate 
-                                                             # P(Y|Xmacro)
+from cfl.clustering.Y_given_Xmacro import sample_Y_dist  # calculate
+# P(Y|Xmacro)
 from sklearn.cluster import *
 from cfl.clustering.cluster_tuning_util import tune
 
-#TODO: next step: add very clear documentation about how to add new module. 
+# TODO: next step: add very clear documentation about how to add new module.
 # Include:
 # - demo code?
 # - tests to run with new module to ensure that it works right?
@@ -69,6 +69,7 @@ from cfl.clustering.cluster_tuning_util import tune
         results = c.train(data, prev_results)
  """
 
+
 class EffectClusterer(Block):
 
     def __init__(self, data_info, params):
@@ -101,11 +102,11 @@ class EffectClusterer(Block):
         Return
             None
         """
-        
-        # parameter checks and self.params assignment done here 
-        super().__init__(data_info=data_info, params=params) 
-        
-        #attributes:
+
+        # parameter checks and self.params assignment done here
+        super().__init__(data_info=data_info, params=params)
+
+        # attributes:
         self.name = 'EffectClusterer'
         self.Y_type = data_info['Y_type']
         if not params['tune']:
@@ -114,7 +115,8 @@ class EffectClusterer(Block):
     def _create_model(self, params):
         if isinstance(params['model'], str):
             # pull dict entries to pass into clusterer object
-            excluded_keys = ['model', 'tune', 'precompute_distances', 'verbose']
+            excluded_keys = ['model', 'tune',
+                             'precompute_distances', 'verbose']
             model_keys = list(set(params.keys()) - set(excluded_keys))
             model_params = {key: params[key] for key in model_keys}
 
@@ -146,13 +148,12 @@ class EffectClusterer(Block):
 
         """
 
-        default_params =  {'model' : DBSCAN(),
-                           'precompute_distances' : True,
-                           'tune' : False,
-                           'verbose' : 1,
+        default_params = {'model': DBSCAN(),
+                          'precompute_distances': True,
+                          'tune': False,
+                          'verbose': 1,
                           }
         return default_params
-
 
     def train(self, dataset, prev_results):
         """
@@ -168,7 +169,7 @@ class EffectClusterer(Block):
             y_lbls (np.ndarray): Y macrovariable class assignments for this 
                                  Dataset 
         """
-        
+
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
             'prev_results is not NoneType or dict'
@@ -180,9 +181,8 @@ class EffectClusterer(Block):
 
         x_lbls = prev_results['x_lbls']
         # sample P(Y|Xclass)
-        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls, 
-            precompute_distances=self.params['precompute_distances'])
-
+        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls,
+                                precompute_distances=self.params['precompute_distances'])
 
         # tune model hyperparameters if requested
         if self.params['tune']:
@@ -200,8 +200,8 @@ class EffectClusterer(Block):
         y_lbls = self.model.labels_
 
         self.trained = True
-        results_dict = {'y_lbls'  : y_lbls,
-                        'y_probs' : y_probs}
+        results_dict = {'y_lbls': y_lbls,
+                        'y_probs': y_probs}
 
         return results_dict
 
@@ -220,7 +220,7 @@ class EffectClusterer(Block):
                                  Dataset 
             y_lbls (np.ndarray) : Y macrovariable class assignments for this 
                                   Dataset 
-                     
+
         """
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
@@ -232,8 +232,8 @@ class EffectClusterer(Block):
 
         x_lbls = prev_results['x_lbls']
 
-        # NOTE: TODO: fit_predict is different than predict, so this code is WRONG  
-        # however, kmeans is the only clustering function in sklearn that has 
+        # NOTE: TODO: fit_predict is different than predict, so this code is WRONG
+        # however, kmeans is the only clustering function in sklearn that has
         # a predict function defined so we're doing this for now
 
         # sample P(Y|Xclass)
@@ -242,13 +242,13 @@ class EffectClusterer(Block):
         # do y clustering
         y_lbls = self.model.fit_predict(y_probs)
 
-        results_dict = {'y_lbls'  : y_lbls, 
-                        'y_probs' : y_probs}
+        results_dict = {'y_lbls': y_lbls,
+                        'y_probs': y_probs}
 
         return results_dict
 
-
     ############ SAVE/LOAD FUNCTIONS (required by block.py) ###################
+
     def save_block(self, file_path):
         ''' Save both cluster models to specified path.
             Arguments:
@@ -284,4 +284,4 @@ class EffectClusterer(Block):
             raise ValueError('file_path does not exist.')
 
         self.model = model_dict['model']
-        self.trained = True 
+        self.trained = True

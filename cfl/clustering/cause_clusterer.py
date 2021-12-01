@@ -1,5 +1,5 @@
 from typing import Type
-import pickle #for saving code
+import pickle  # for saving code
 
 from cfl.block import Block
 from cfl.dataset import Dataset
@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.cluster import *
 from cfl.clustering.cluster_tuning_util import tune
 
-#TODO: next step: add very clear documentation about how to add new module. 
+# TODO: next step: add very clear documentation about how to add new module.
 # Include:
 # - demo code?
 # - tests to run with new module to ensure that it works right?
@@ -66,6 +66,7 @@ from cfl.clustering.cluster_tuning_util import tune
         results = c.train(data, prev_results)
     """
 
+
 class CauseClusterer(Block):
 
     def __init__(self, data_info, params):
@@ -93,11 +94,11 @@ class CauseClusterer(Block):
         Return
             None
         """
-        
-        # parameter checks and self.params assignment done here 
-        super().__init__(data_info=data_info, params=params) 
-        
-        #attributes:
+
+        # parameter checks and self.params assignment done here
+        super().__init__(data_info=data_info, params=params)
+
+        # attributes:
         self.name = 'CauseClusterer'
         if not params['tune']:
             self.model = self._create_model(self.params)
@@ -136,11 +137,10 @@ class CauseClusterer(Block):
 
         """
 
-        default_params =  { 'model' : 'DBSCAN', 
-                            'tune' : False, 
-                            'verbose' : 1}
+        default_params = {'model': 'DBSCAN',
+                          'tune': False,
+                          'verbose': 1}
         return default_params
-                
 
     def train(self, dataset, prev_results):
         """
@@ -155,7 +155,7 @@ class CauseClusterer(Block):
             x_lbls (np.ndarray): X macrovariable class assignments for this 
                                  Dataset
         """
-        
+
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
             'prev_results is not NoneType or dict'
@@ -178,13 +178,12 @@ class CauseClusterer(Block):
                 self.params[k] = tuned_params[k]
             self.model = self._create_model(self.params)
 
-
-        # do clustering 
+        # do clustering
         self.model.fit(pyx)
         self.trained = True
         x_lbls = self.model.labels_
-        
-        results_dict = {'x_lbls'  : x_lbls}
+
+        results_dict = {'x_lbls': x_lbls}
         return results_dict
 
     def predict(self, dataset, prev_results):
@@ -212,15 +211,15 @@ class CauseClusterer(Block):
 
         x_lbls = self.model.fit_predict(pyx)
 
-        # NOTE: TODO: fit_predict is different than predict, so this code is WRONG  
-        # however, kmeans is the only clustering function in sklearn that has 
+        # NOTE: TODO: fit_predict is different than predict, so this code is WRONG
+        # however, kmeans is the only clustering function in sklearn that has
         # a predict function defined so we're doing this for now
 
-        results_dict = {'x_lbls' : x_lbls}
+        results_dict = {'x_lbls': x_lbls}
         return results_dict
 
-
     ############ SAVE/LOAD FUNCTIONS (required by block.py) ###################
+
     def save_block(self, file_path):
         ''' Save both cluster models to specified path.
             Arguments:
@@ -256,4 +255,4 @@ class CauseClusterer(Block):
             raise ValueError('file_path does not exist.')
 
         self.model = model_dict['model']
-        self.trained = True 
+        self.trained = True

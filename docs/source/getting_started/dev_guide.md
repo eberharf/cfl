@@ -3,7 +3,8 @@
 Contributions to `cfl` are welcomed and encouraged! Here are some ways to 
 contribute.
 
-### Submit a bug report or feature request. Please include:
+### Submit a bug report or feature request
+Please include:
 - a short code snippet that reproduces the issue
 - any error tracebacks
 - operating system type and version number, python version number, and 

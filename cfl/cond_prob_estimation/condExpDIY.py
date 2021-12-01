@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 from cfl.cond_prob_estimation.condExpBase import CondExpBase
 
+
 class CondExpDIY(CondExpBase):
     ''' 
     A child class of CondExpBase that takes in model specifications from
@@ -14,6 +15,7 @@ class CondExpDIY(CondExpBase):
     See CondExpBase documentation for more details.
     # TODO: method/attribute summary
     '''
+
     def __init__(self, data_info, params):
         ''' 
         Initialize model and define network.
@@ -45,27 +47,26 @@ class CondExpDIY(CondExpBase):
             ])
             return model
 
-        return {'batch_size'        : 32,
-                'n_epochs'          : 20,
-                'optimizer'         : 'adam',
-                'opt_config'        : {},
-                'verbose'           : 1,
-                'weights_path'      : None,
-                'loss'              : 'mean_squared_error',
-                'show_plot'         : True,
-                'best'              : True,
-                'tb_path'           : None,
-                'optuna_callback'   : None,
-                'optuna_trial'      : None,
-                'early_stopping'    : False,
-                'build_model'       : build_model
-            }
-
+        return {'batch_size': 32,
+                'n_epochs': 20,
+                'optimizer': 'adam',
+                'opt_config': {},
+                'verbose': 1,
+                'weights_path': None,
+                'loss': 'mean_squared_error',
+                'show_plot': True,
+                'best': True,
+                'tb_path': None,
+                'optuna_callback': None,
+                'optuna_trial': None,
+                'early_stopping': False,
+                'build_model': build_model
+                }
 
     def _check_param_shapes(self):
         '''
         Verify that valid model params were specified in self.params.
-        
+
         Arguments: 
             None
         Returns:
@@ -75,7 +76,6 @@ class CondExpDIY(CondExpBase):
                 is invalid. 
         '''
         pass
-
 
     def _build_model(self):
         ''' 
@@ -90,20 +90,17 @@ class CondExpDIY(CondExpBase):
             tf.keras.models.Model : untrained model specified in self.params.
         '''
 
-        self._check_param_shapes() # here for uniformity, does nothing rn
-        
+        self._check_param_shapes()  # here for uniformity, does nothing rn
+
         # TODO: this should probably be someone else's responsibility to check
-        assert ((self.params['optuna_callback'] is None) and \
+        assert ((self.params['optuna_callback'] is None) and
                 (self.params['optuna_trial'] is None)) or \
-                ((self.params['optuna_callback'] is not None) and \
-                (self.params['optuna_trial'] is not None)), \
-                'optuna_callback and optuna_trial must either both be \
+            ((self.params['optuna_callback'] is not None) and
+             (self.params['optuna_trial'] is not None)), \
+            'optuna_callback and optuna_trial must either both be \
                 specified or not specified.'
-        
+
         if self.params['optuna_trial'] is not None:
             return self.params['build_model'](self.params['optuna_trial'])
         else:
             return self.params['build_model']()
-
-
-

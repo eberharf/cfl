@@ -1,15 +1,15 @@
 from abc import abstractmethod
-import pickle #for saving code
+import pickle  # for saving code
 
 import numpy as np
 from sklearn.cluster import DBSCAN
 
 from cfl.block import Block
 from cfl.dataset import Dataset
-from cfl.clustering.Y_given_Xmacro import sample_Y_dist # calculate 
-                                                             # P(Y|Xmacro)
+from cfl.clustering.Y_given_Xmacro import sample_Y_dist  # calculate
+# P(Y|Xmacro)
 
-#TODO: next step: add very clear documentation about how to add new module. 
+# TODO: next step: add very clear documentation about how to add new module.
 # Include:
 # - demo code?
 # - tests to run with new module to ensure that it works right?
@@ -66,6 +66,7 @@ from cfl.clustering.Y_given_Xmacro import sample_Y_dist # calculate
         results = c.train(data, prev_results)
  """
 
+
 class Clusterer(Block):
 
     def __init__(self, data_info, params):
@@ -90,16 +91,15 @@ class Clusterer(Block):
         Return
             None
         """
-        
-        # parameter checks and self.params assignment done here 
-        super().__init__(data_info=data_info, params=params) 
-        
-        #attributes:
+
+        # parameter checks and self.params assignment done here
+        super().__init__(data_info=data_info, params=params)
+
+        # attributes:
         self.name = 'Clusterer'
         self.Y_type = data_info['Y_type']
         self.xmodel = self.params['x_model']
         self.ymodel = self.params['y_model']
-
 
     def get_params(self):
         ''' Get parameters for this clustering model.
@@ -123,12 +123,11 @@ class Clusterer(Block):
 
         """
 
-        default_params =  {'x_model' : DBSCAN(),
-                           'y_model' : DBSCAN(),
-                           'precompute_distances' : True,
+        default_params = {'x_model': DBSCAN(),
+                          'y_model': DBSCAN(),
+                          'precompute_distances': True,
                           }
         return default_params
-
 
     def train(self, dataset, prev_results):
         """
@@ -145,7 +144,7 @@ class Clusterer(Block):
             y_lbls (np.ndarray): Y macrovariable class assignments for this 
                                  Dataset 
         """
-        
+
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
             'prev_results is not NoneType or dict'
@@ -157,26 +156,26 @@ class Clusterer(Block):
 
         pyx = prev_results['pyx']
 
-        # do x clustering 
+        # do x clustering
         self.xmodel.fit(pyx)
         x_lbls = self.xmodel.labels_
 
-        # if we are also clustering effect data 
-        if self.ymodel is not None: 
+        # if we are also clustering effect data
+        if self.ymodel is not None:
             # sample P(Y|Xclass)
-            y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls, 
-                precompute_distances=self.params['precompute_distances'])
+            y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls,
+                                    precompute_distances=self.params['precompute_distances'])
 
             # do y clustering
             self.ymodel.fit(y_probs)
             y_lbls = self.ymodel.labels_
 
             self.trained = True
-            results_dict = {'x_lbls'  : x_lbls,
-                            'y_lbls'  : y_lbls,
-                            'y_probs' : y_probs}
-        else: 
-            results_dict = {'x_lbls'  : x_lbls}
+            results_dict = {'x_lbls': x_lbls,
+                            'y_lbls': y_lbls,
+                            'y_probs': y_probs}
+        else:
+            results_dict = {'x_lbls': x_lbls}
 
         return results_dict
 
@@ -202,7 +201,7 @@ class Clusterer(Block):
                                  Dataset 
             y_lbls (np.ndarray) : Y macrovariable class assignments for this 
                                   Dataset 
-                     
+
         """
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
@@ -216,22 +215,22 @@ class Clusterer(Block):
 
         x_lbls = self.xmodel.fit_predict(pyx)
 
-        # if we are also clustering effect data 
-        if self.ymodel is not None: 
+        # if we are also clustering effect data
+        if self.ymodel is not None:
             # sample P(Y|Xclass)
             y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
 
             # do y clustering
             y_lbls = self.ymodel.fit_predict(y_probs)
 
-            results_dict = {'x_lbls' : x_lbls,
-                            'y_lbls' : y_lbls}
-        else: 
-            results_dict = {'x_lbls' : x_lbls}
+            results_dict = {'x_lbls': x_lbls,
+                            'y_lbls': y_lbls}
+        else:
+            results_dict = {'x_lbls': x_lbls}
         return results_dict
 
-
     ############ SAVE/LOAD FUNCTIONS (required by block.py) ###################
+
     def save_block(self, file_path):
         ''' Save both cluster models to specified path.
             Arguments:
@@ -269,4 +268,4 @@ class Clusterer(Block):
 
         self.xmodel = model_dict['x_model']
         self.ymodel = model_dict['y_model']
-        self.trained = True 
+        self.trained = True

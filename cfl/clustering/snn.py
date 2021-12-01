@@ -57,6 +57,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.neighbors import kneighbors_graph
 from scipy.sparse import csr_matrix
 
+
 def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     """Perform Shared Nearest Neighbor (SNN) clustering algorithm clustering.
 
@@ -77,7 +78,8 @@ def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     # the knn_graph is a sparse binary matrix showing the connectivity of the nearest neighbors
     # knn_graph has the shape (n_samples, n_samples), where knn_graph[i][j] = 1 if j is
     # a k-nearest neighbor of i and 0 otherwise
-    knn_graph = kneighbors_graph(X, n_neighbors=neighbor_num, include_self=False)
+    knn_graph = kneighbors_graph(
+        X, n_neighbors=neighbor_num, include_self=False)
     knn_array = knn_graph.toarray()
 
     # similarity(p, q) = size(NN(p) intersect NN(q))
@@ -89,7 +91,8 @@ def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     # SNN distance metric, which is defined for two points in X as
     # dist(x0, x1) = 1 - len(kNN(x0).intersect(knn(x1))) / k
 
-    normalization_factor = np.sum(knn_array, axis=1) #NOTE: as far as I can tell, normalization_factor should be equal to k in all
+    # NOTE: as far as I can tell, normalization_factor should be equal to k in all
+    normalization_factor = np.sum(knn_array, axis=1)
     # cases, but the original code had the normalization as a function of the SNN
     # similarity, and I'm scared to change it in case my understanding is wrong
 
@@ -97,9 +100,11 @@ def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     snn_distance_matrix = 1 - normalized_snn
 
     # perform DBSCAN with the shared-neighbor distance criteria for density estimation
-    dbscan = DBSCAN(eps=eps, min_samples=min_shared_neighbor_num, metric="precomputed")
+    dbscan = DBSCAN(eps=eps, min_samples=min_shared_neighbor_num,
+                    metric="precomputed")
     dbscan = dbscan.fit(snn_distance_matrix)
     return dbscan.core_sample_indices_, dbscan.labels_
+
 
 class SNN(BaseEstimator, ClusterMixin):
     """Class for performing the Shared Nearest Neighbor (SNN) clustering algorithm.
@@ -124,11 +129,11 @@ class SNN(BaseEstimator, ClusterMixin):
         """Constructor"""
 
         self.neighbor_num = neighbor_num
-        self.min_shared_neighbor_num = round(neighbor_num * min_shared_neighbor_proportion)
+        self.min_shared_neighbor_num = round(
+            neighbor_num * min_shared_neighbor_proportion)
         self.eps = eps
 
     def fit(self, X):
-
         """Perform SNN clustering from features or distance matrix.
 
         Parameters:
@@ -138,7 +143,8 @@ class SNN(BaseEstimator, ClusterMixin):
             self: the SNN model with self.labels_, self.core_sample_indices_, self.components_ assigned
         """
 
-        clusters = snn(X, neighbor_num=self.neighbor_num, min_shared_neighbor_num=self.min_shared_neighbor_num, eps=self.eps)
+        clusters = snn(X, neighbor_num=self.neighbor_num,
+                       min_shared_neighbor_num=self.min_shared_neighbor_num, eps=self.eps)
 
         self.core_sample_indices_, self.labels_ = clusters
         if len(self.core_sample_indices_):

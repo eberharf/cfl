@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 from cfl.cond_prob_estimation.condExpBase import CondExpBase
 
+
 class CondExpMod(CondExpBase):
     ''' 
     A child class of CondExpBase that takes in model specifications from
@@ -14,6 +15,7 @@ class CondExpMod(CondExpBase):
     See CondExpBase documentation for more details.
     # TODO: method/attribute summary
     '''
+
     def __init__(self, data_info, params):
         ''' 
         Initialize model and define network.
@@ -37,29 +39,28 @@ class CondExpMod(CondExpBase):
         Returns:
             dict : dictionary of default parameters
         '''
-        return {'batch_size'  : 32,
-                'n_epochs'    : 20,
-                'optimizer'   : 'adam',
-                'opt_config'  : {},
-                'verbose'     : 1,
-                'dense_units' : [50, self.data_info['Y_dims'][1]],
-                'activations' : ['relu', 'linear'],
-                'dropouts'    : [0, 0],
+        return {'batch_size': 32,
+                'n_epochs': 20,
+                'optimizer': 'adam',
+                'opt_config': {},
+                'verbose': 1,
+                'dense_units': [50, self.data_info['Y_dims'][1]],
+                'activations': ['relu', 'linear'],
+                'dropouts': [0, 0],
                 'weights_path': None,
-                'loss'        : 'mean_squared_error',
-                'show_plot'   : True,
-                'best'        : True,
-                'tb_path'     : None,
-                'optuna_callback'   : None,
-                'optuna_trial'      : None,
-                'early_stopping'    : False,
-            }
-
+                'loss': 'mean_squared_error',
+                'show_plot': True,
+                'best': True,
+                'tb_path': None,
+                'optuna_callback': None,
+                'optuna_trial': None,
+                'early_stopping': False,
+                }
 
     def _check_param_shapes(self):
         '''
         Verify that valid model params were specified in self.params.
-        
+
         Arguments: 
             None
         Returns:
@@ -76,21 +77,20 @@ class CondExpMod(CondExpBase):
         assert self.params['dropouts'] is not {}, "Please specify layer sizes \
             in params['dropouts']."
         assert self.params['dense_units'][-1] == self.data_info['Y_dims'][1], \
-                "The output layer size (last entry in params['dense_units'] \
+            "The output layer size (last entry in params['dense_units'] \
                 should be equal to the number of Y features but instead is \
                 {}".format(self.params['dense_units'][-1])
 
         assert len(self.params['dense_units']) == \
             len(self.params['activations']), "params['dense_units'] and \
             params['activation'] should be the same length but instead are \
-            {} and {}.".format(self.params['dense_units'], \
-            self.params['activations'])
+            {} and {}.".format(self.params['dense_units'],
+                               self.params['activations'])
         assert len(self.params['dense_units']) == len(self.params['dropouts']),\
             "params['dense_units'] and params['dropouts'] should be the same \
-            length but instead are {} and {}.".format(\
+            length but instead are {} and {}.".format(
             self.params['dense_units'], self.params['dropouts'])
         return
-
 
     def _build_model(self):
         ''' 
@@ -109,16 +109,14 @@ class CondExpMod(CondExpBase):
 
         # input layer
         arch = [tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],))]
-        
+
         # intermediate layers
-        for units,act,dropout in zip(self.params['dense_units'], 
-                                     self.params['activations'], 
-                                     self.params['dropouts']):
+        for units, act, dropout in zip(self.params['dense_units'],
+                                       self.params['activations'],
+                                       self.params['dropouts']):
             arch.append(tf.keras.layers.Dense(units=units, activation=act))
             arch.append(tf.keras.layers.Dropout(dropout))
 
         model = tf.keras.models.Sequential(arch)
 
         return model
-
-

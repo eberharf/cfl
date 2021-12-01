@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+
 class Block(metaclass=ABCMeta):
     '''A Block is an object that can:
         1) be trained on a Dataset
@@ -8,7 +9,6 @@ class Block(metaclass=ABCMeta):
     For example, if the graph Block_A->Block_B is constructed in an Experiment,
     the output of Block_A will provide input to Block_B.
     '''
-
 
     def __init__(self, data_info, params):
         '''
@@ -86,7 +86,7 @@ class Block(metaclass=ABCMeta):
         '''
         ...
 
-    # TODO: how to document that an object that inherits from block must have a name attribute 
+    # TODO: how to document that an object that inherits from block must have a name attribute
     def get_name(self):
         '''
         Return name of model.
@@ -109,11 +109,10 @@ class Block(metaclass=ABCMeta):
         '''
         return self.trained
 
-
     @abstractmethod
     def _get_default_params(self):
         ''' Get the default parameters for the Block.
-            
+
             Arguments: 
                 None
             Returns: 
@@ -157,7 +156,8 @@ class Block(metaclass=ABCMeta):
                 if param not in default_params.keys():
                     paramsToRemove.append(param)
                     if verbose > 0:
-                        print(f'{param} specified but not used by this block type')
+                        print(
+                            f'{param} specified but not used by this block type')
 
             # remove unnecessary parameters after we're done iterating
             # to not cause problems
@@ -169,20 +169,21 @@ class Block(metaclass=ABCMeta):
         for param in default_params:
             if param not in input_params.keys():
                 if verbose > 0:
-                    print('{} not specified in input, defaulting to {}'.format(param, default_params[param]))
+                    print('{} not specified in input, defaulting to {}'.format(
+                        param, default_params[param]))
                 input_params[param] = default_params[param]
 
         # input_params['name'] = self.name #TODO: remove?
 
         return input_params
 
-    def get_params(self): 
+    def get_params(self):
         return self.params
 
 
 def validate_data_info(data_info):
     ''' Make sure all information about data is correctly specified.
-    
+
     Parameters: 
         data_info (dict): a dictionary of information about the data
             CFL expects the following entries in data_info:
@@ -196,11 +197,13 @@ def validate_data_info(data_info):
         'data_info must specify values for the following set of keys \
         exactly: {}'.format(correct_keys)
 
-    assert isinstance(data_info['X_dims'],tuple), 'X_dims should specify a 2-tuple.'
-    assert isinstance(data_info['Y_dims'],tuple), 'Y_dims should specify a 2-tuple.'
-    assert len(data_info['X_dims'])>=2, 'X_dims should specify a 2-tuple.' 
-    assert len(data_info['Y_dims'])>=2, 'Y_dims should specify a 2-tuple.'
-    assert data_info['X_dims'][0]==data_info['Y_dims'][0], \
+    assert isinstance(data_info['X_dims'],
+                      tuple), 'X_dims should specify a 2-tuple.'
+    assert isinstance(data_info['Y_dims'],
+                      tuple), 'Y_dims should specify a 2-tuple.'
+    assert len(data_info['X_dims']) >= 2, 'X_dims should specify a 2-tuple.'
+    assert len(data_info['Y_dims']) >= 2, 'Y_dims should specify a 2-tuple.'
+    assert data_info['X_dims'][0] == data_info['Y_dims'][0], \
         'X and Y should have same number of samples'
     assert all(data_info['X_dims']) > 0, 'All X_dims should be greater than 0'
     assert all(data_info['Y_dims']) > 0, 'All Y_dims should be greater than 0'

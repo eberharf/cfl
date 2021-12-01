@@ -4,18 +4,18 @@ import shutil
 # TODO: add GPU support
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-import datetime #for creating ID 
+import datetime  # for creating ID
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-from cfl.cond_prob_estimation.cpe_interface import Block #base class
+from cfl.cond_prob_estimation.cpe_interface import Block  # base class
 from cfl.dataset import Dataset
 
-# Things that descend from this class should have a self.name attribute but 
-# this class doesn't since CondExpBase objects are not supposed to be created 
-# by the user 
+# Things that descend from this class should have a self.name attribute but
+# this class doesn't since CondExpBase objects are not supposed to be created
+# by the user
 
 
 class CondExpBase(Block):
@@ -116,7 +116,7 @@ class CondExpBase(Block):
     def save_block(self, path):
         ''' 
         Save trained model to specified path.
-        
+
         Arguments:
             path (str) : path to save to.
         Returns: 
@@ -141,27 +141,27 @@ class CondExpBase(Block):
                 contain `pyx`, the predicted conditional probabilites for the 
                 training dataset. 
         '''
-        #TODO: do a more formalized checking that actual dimensions match 
+        # TODO: do a more formalized checking that actual dimensions match
         # expected
-        #TODO: say what expected vs actual are
+        # TODO: say what expected vs actual are
 
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
             'prev_results is not NoneType or dict'
         if self.trained:
-            print('Model has already been trained, will return predictions ' + \
-                'on training data.')
-            return {'pyx' : self.model.predict(dataset.X)}
+            print('Model has already been trained, will return predictions ' +
+                  'on training data.')
+            return {'pyx': self.model.predict(dataset.X)}
 
         # train-test split
         if dataset.get_in_sample_idx() is None:
             Xtr, Xva, Ytr, Yva, in_sample_idx, out_sample_idx = \
-                train_test_split(dataset.X, dataset.Y, \
-                                 range(dataset.X.shape[0]), shuffle=True, \
+                train_test_split(dataset.X, dataset.Y,
+                                 range(dataset.X.shape[0]), shuffle=True,
                                  train_size=0.75)
             dataset.set_in_sample_idx(in_sample_idx)
             dataset.set_out_sample_idx(out_sample_idx)
-            
+
         else:
             Xtr = dataset.X[dataset.get_in_sample_idx()]
             Ytr = dataset.Y[dataset.get_in_sample_idx()]
@@ -170,15 +170,15 @@ class CondExpBase(Block):
 
         # build optimizer
         optimizer = tf.keras.optimizers.get(
-            { 'class_name' : self.params['optimizer'],
-              'config' : self.params['opt_config']})
+            {'class_name': self.params['optimizer'],
+             'config': self.params['opt_config']})
 
         # compile model
         self.model.compile(
             loss=self.params['loss'],
             optimizer=optimizer,
         )
-        
+
         # log GPU device if available
         device_name = tf.test.gpu_device_name()
         if self.params['verbose'] > 0:
@@ -186,8 +186,8 @@ class CondExpBase(Block):
                 print('Using GPU device: ', device_name)
             else:
                 print('No GPU device detected.')
-            
-        try: 
+
+        try:
             # specify checkpoint save callback
             callbacks = []
 
@@ -198,14 +198,15 @@ class CondExpBase(Block):
                 # give the checkpoints path a unique ID (so that it doesn't get
                 # confused with other CFL runs)
                 now = datetime.datetime.now()
-                dt_id = now.strftime("%d%m%Y%H%M%S") #this creates a string based on the current date and time up to the second (NOTE: if you create a bunch of CFLs all at once maybe you'd need a more precise ID)
+                # this creates a string based on the current date and time up to the second (NOTE: if you create a bunch of CFLs all at once maybe you'd need a more precise ID)
+                dt_id = now.strftime("%d%m%Y%H%M%S")
                 checkpoint_path = 'tmp_checkpoints'+dt_id
                 os.mkdir(checkpoint_path)
 
-                # ModelCheckpoint saves model checkpoints to specified path during training 
+                # ModelCheckpoint saves model checkpoints to specified path during training
                 best_path = os.path.join(checkpoint_path, 'best_weights')
                 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-                    filepath= best_path,  
+                    filepath=best_path,
                     save_weights_only=True,
                     monitor='val_loss',
                     mode='min',
@@ -214,16 +215,16 @@ class CondExpBase(Block):
 
             if self.params['tb_path'] is not None:
                 tb_callback = tf.keras.callbacks.TensorBoard(
-                                log_dir=self.params['tb_path'])
+                    log_dir=self.params['tb_path'])
                 callbacks = [tb_callback] + callbacks
-            
+
             if self.params['optuna_callback'] is not None:
                 callbacks = [self.params['optuna_callback']] + callbacks
-            
+
             if self.params['early_stopping']:
                 es_callback = tf.keras.callbacks.EarlyStopping(
-                                    monitor="val_loss",
-                                    patience=20 )
+                    monitor="val_loss",
+                    patience=20)
                 callbacks = [es_callback] + callbacks
 
             # train model
@@ -231,7 +232,7 @@ class CondExpBase(Block):
                 Xtr, Ytr,
                 batch_size=self.params['batch_size'],
                 epochs=self.params['n_epochs'],
-                validation_data=(Xva,Yva),
+                validation_data=(Xva, Yva),
                 callbacks=callbacks,
                 verbose=self.params['verbose']
             )
@@ -239,20 +240,20 @@ class CondExpBase(Block):
             # handle results
             train_loss = history.history['loss']
             val_loss = history.history['val_loss']
-            fig = self._graph_results(train_loss, val_loss, 
-                show=self.params['show_plot'])
+            fig = self._graph_results(train_loss, val_loss,
+                                      show=self.params['show_plot'])
             pyx = self.model.predict(dataset.X)
 
             # load in best weights if specified
             if self.params['best']:
-                self.load_model(best_path) #TODO: this is where the error is jenna
+                # TODO: this is where the error is jenna
+                self.load_model(best_path)
 
-            results_dict = {'train_loss' : train_loss,
-                            'val_loss' : val_loss,
-                            'loss_plot' : fig,
-                            'model_weights' : self.model.get_weights(),
-                            'pyx' : pyx}
-
+            results_dict = {'train_loss': train_loss,
+                            'val_loss': val_loss,
+                            'loss_plot': fig,
+                            'model_weights': self.model.get_weights(),
+                            'pyx': pyx}
 
             self.trained = True
 
@@ -261,7 +262,6 @@ class CondExpBase(Block):
             if self.params['best']:
                 shutil.rmtree(checkpoint_path)
         return results_dict
-
 
     def _graph_results(self, train_loss, val_loss, show=True):
         '''
@@ -276,7 +276,7 @@ class CondExpBase(Block):
         Returns:
             plt.figure : figure object.
         '''
-        fig,ax = plt.subplots()
+        fig, ax = plt.subplots()
         ax.plot(range(len(train_loss)), train_loss, label='train_loss')
         ax.plot(range(len(val_loss)), val_loss, label='val_loss')
         ax.set_xlabel('Epochs')
@@ -303,7 +303,7 @@ class CondExpBase(Block):
                 contain `pyx`, the predicted conditional probabilites for the 
                 given Dataset. 
         '''
-        
+
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
             'prev_results is not NoneType or dict'
@@ -311,7 +311,7 @@ class CondExpBase(Block):
         assert self.trained, "Remember to train the model before prediction."
         pyx = self.model.predict(dataset.X)
 
-        results_dict = {'pyx' : pyx}
+        results_dict = {'pyx': pyx}
         return results_dict
 
     def evaluate(self, dataset):
@@ -333,7 +333,6 @@ class CondExpBase(Block):
         cost = loss_fxn(dataset.Y, Y_hat)
         return tf.reduce_mean(cost)
 
-
     def load_model(self, file_path):
         ''' 
         Load model weights from saved checkpoint into current model.
@@ -346,14 +345,15 @@ class CondExpBase(Block):
 
         assert hasattr(self, 'model'), 'Build model before loading parameters.'
 
-        if self.params['verbose']>0:
+        if self.params['verbose'] > 0:
             print("Loading parameters from ", file_path)
         try:
-            self.model.load_weights(file_path) #TODO: this is where an error is happening 
+            # TODO: this is where an error is happening
+            self.model.load_weights(file_path)
         except:
             raise ValueError('path does not exist.')
 
-        #TODO: does tensorflow keep track of if model is trained? 
+        # TODO: does tensorflow keep track of if model is trained?
         self.trained = True
 
     def save_model(self, file_path):
@@ -365,9 +365,9 @@ class CondExpBase(Block):
         Returns: 
             None
         '''
-        # TODO : add check to only save trained models? (bc of load model 
+        # TODO : add check to only save trained models? (bc of load model
         # setting train to true )
-        if self.params['verbose']>0:
+        if self.params['verbose'] > 0:
             print("Saving parameters to ", file_path)
         try:
             self.model.save_weights(file_path)

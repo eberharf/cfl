@@ -2,11 +2,12 @@ import numpy as np
 import pickle
 import os
 
+
 def load_macrolbls(exp, dataset_name='dataset_train', cause_or_effect='cause'):
-    if cause_or_effect=='cause':
+    if cause_or_effect == 'cause':
         pf = 'CauseClusterer'
         field = 'x_lbls'
-    elif cause_or_effect=='effect':
+    elif cause_or_effect == 'effect':
         pf = 'EffectClusterer'
         field = 'y_lbls'
     else:
@@ -26,7 +27,8 @@ def load_macrolbls(exp, dataset_name='dataset_train', cause_or_effect='cause'):
 def load_pyx(exp, dataset_name='dataset_train'):
 
     if isinstance(exp, str):
-        fp = os.path.join(exp, dataset_name, 'CondProbEstimator_results.pickle')
+        fp = os.path.join(exp, dataset_name,
+                          'CondProbEstimator_results.pickle')
         with open(fp, 'rb') as f:
             lbls = pickle.load(f)['pyx']
     else:

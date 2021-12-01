@@ -27,6 +27,7 @@ Usage of this function:
 
 import numpy as np
 
+
 def convert_lbls_to_sankey_nodes(x_lbls_L):
     '''convert cluster labels into source, target, and value information
 
@@ -57,12 +58,11 @@ def convert_lbls_to_sankey_nodes(x_lbls_L):
     target = []
     value = []
 
-
     source_Ls = x_lbls_L[:-1]
     target_Ls = x_lbls_L[1:]
     aindex = 0
     # iterate through each pair of source and target lists of cluster labels
-    for ci,(cA,cB) in enumerate(zip(source_Ls, target_Ls)):
+    for ci, (cA, cB) in enumerate(zip(source_Ls, target_Ls)):
         n1 = names[ci+1]
         bindex = len(label)
 
@@ -70,20 +70,20 @@ def convert_lbls_to_sankey_nodes(x_lbls_L):
 
         # iterating over each source, target pair in the list ...
         for a in range(len(np.unique(cA))):
-          for b in range(len(np.unique(cB))):
+            for b in range(len(np.unique(cB))):
 
-            # add clusters to source and target list
-              source.append(a + aindex)
-              target.append(b + bindex)
-              # source.append(float(str(a) +"."+ str(aindex)))
-              # target.append(float(str(b) +"."+ str(bindex)))
+              # add clusters to source and target list
+                source.append(a + aindex)
+                target.append(b + bindex)
+                # source.append(float(str(a) +"."+ str(aindex)))
+                # target.append(float(str(b) +"."+ str(bindex)))
 
-              #calculate amount of flow between source and target
-              # as the number of samples that are part of both this source and target node
+                # calculate amount of flow between source and target
+                # as the number of samples that are part of both this source and target node
 
-              value.append(np.sum((cA==a) & (cB==b)))
+                value.append(np.sum((cA == a) & (cB == b)))
         aindex = bindex
 
         # put results into a dict bc that's what Sankey wants
-        link = dict(source = source, target = target, value = value)
+        link = dict(source=source, target=target, value=value)
     return link, label

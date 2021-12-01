@@ -15,14 +15,15 @@ from joblib import Parallel, delayed
 from cfl.util.find_xlbl_locations import rows_where_each_x_class_occurs
 from cfl.util.data_processing import one_hot_decode
 
+
 def sample_Y_dist(Y_type, dataset, x_lbls, precompute_distances=True):
-    #TODO: is name good? I think it's decent
+    # TODO: is name good? I think it's decent
     """
     Finds (a proxy of) P(Y=y | Xclass) for all Y=y
 
     uses the data type of the variable(s) in Y to select the correct method for 
     samping P(Y=y |X=Xclass)
-    
+
     This function is used by the Clusterer for training and predicting on the Y 
     (effect) data
 
@@ -39,7 +40,7 @@ def sample_Y_dist(Y_type, dataset, x_lbls, precompute_distances=True):
         y_probs = _continuous_Y(Y, x_lbls, precompute_distances)
     elif Y_type == 'categorical':
         y_probs = _categorical_Y(Y, x_lbls, precompute_distances)
-    else: 
+    else:
         raise TypeError('Invalid Y-type')
     return y_probs
 
@@ -72,10 +73,10 @@ def _categorical_Y(Y_data, x_lbls, precompute_distances=True):
 
     # convert to standard categorical representation if one-hot-encoded
     # TODO: check for one-hot-encoding through data_info instead of inferring it
-    if all(np.sum(Y_data,axis=1)==1):
+    if all(np.sum(Y_data, axis=1) == 1):
         Y_data = one_hot_decode(Y_data)
 
-    #TODO: check that this function does the right thing
+    # TODO: check that this function does the right thing
     Y_values = np.unique(Y_data)
 
     # x_lbl_indices is a list of np arrays, where each array pertains to a
@@ -83,7 +84,7 @@ def _categorical_Y(Y_data, x_lbls, precompute_distances=True):
     # where that class occurs
     x_lbl_indices = rows_where_each_x_class_occurs(x_lbls)
 
-    #ys_in_each_x_class is an analagous list, which contains the actual y values
+    # ys_in_each_x_class is an analagous list, which contains the actual y values
     # instead of the associated indices
     ys_in_each_x_class = [Y_data[i] for i in x_lbl_indices]
 
@@ -98,8 +99,8 @@ def _categorical_Y(Y_data, x_lbls, precompute_distances=True):
     for row, y in enumerate(Y_data):
         for col, cluster_vals in enumerate(ys_in_each_x_class):
             cond_Y_prob[row][col] = \
-                np.sum(cluster_vals==y) / cluster_vals.shape[0]
-                
+                np.sum(cluster_vals == y) / cluster_vals.shape[0]
+
         # normalize so that sum of distances is 1
         cond_Y_prob[row] = cond_Y_prob[row] / np.sum(cond_Y_prob[row])
     return cond_Y_prob
@@ -116,7 +117,7 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
     density of points around `y_1`, as determined by the average distance
     between the k nearest neighbors. (Small distance=high density, large
     distance=low density) as a proxy.
-    
+
     Pseudocode:
       - use sklearn's euclidean_distances function to precompute distances
         between all pairs of points in Y_data
@@ -160,17 +161,16 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
 
     assert Y_data.shape[0] == x_lbls.shape[0], "The Y data and x_lbls arrays \
         passed through continuous_Y should have the same length. Actual \
-        shapes: {},{}".format(Y_data.shape[0],x_lbls.shape[0])
+        shapes: {},{}".format(Y_data.shape[0], x_lbls.shape[0])
 
-    # format x_lbls that come in as shape (n_samples,1) to be of shape 
+    # format x_lbls that come in as shape (n_samples,1) to be of shape
     # (n_samples,)
     x_lbls = np.squeeze(x_lbls)
-    k_neighbors = 4 #4 nearest neighbors is hard-coded in because that is what the El Nino paper, which introduced this method, used
+    k_neighbors = 4  # 4 nearest neighbors is hard-coded in because that is what the El Nino paper, which introduced this method, used
     class_labels = np.unique(x_lbls)
     n_x_classes = len(class_labels)
-    
 
-    # now we can compute nearest neighbors averages for each 
+    # now we can compute nearest neighbors averages for each
     # Y_data point and X class combination
     cond_Y_prob = np.zeros((Y_data.shape[0], n_x_classes))
 
@@ -183,30 +183,31 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
         #   - axis 0 corresponds to X classes
         #   - axis 1 corresponds to Y_data samples
         #   - axis 2 corresponds to nearest neighbors, sorted
-        xclass_dist_matrix = -1 * np.ones((n_x_classes, Y_data.shape[0], 
-                                        k_neighbors))
-                                        
-        for xi,xlbl in enumerate(class_labels):
-            # take first through fifth closest distances (offset by one to 
+        xclass_dist_matrix = -1 * np.ones((n_x_classes, Y_data.shape[0],
+                                           k_neighbors))
+
+        for xi, xlbl in enumerate(class_labels):
+            # take first through fifth closest distances (offset by one to
             # leave out distance to self)
-            nn = np.sort(dist_matrix[:,x_lbls==xlbl],axis=1)[:,1:k_neighbors+1]
+            nn = np.sort(dist_matrix[:, x_lbls == xlbl], axis=1)[
+                :, 1:k_neighbors+1]
             # if we have less than k_neighbors neighbors, pad with -1
-            padded_nn = np.pad(nn, ((0,0),(0,k_neighbors-nn.shape[1])), 
-                'constant', constant_values=-1) 
-            xclass_dist_matrix[xi,:,:] = padded_nn
-    
+            padded_nn = np.pad(nn, ((0, 0), (0, k_neighbors-nn.shape[1])),
+                               'constant', constant_values=-1)
+            xclass_dist_matrix[xi, :, :] = padded_nn
+
         for y_id in tqdm(range(Y_data.shape[0])):
             # compute average distance to nearest neighbors per class
-            for xi,xlbl in enumerate(class_labels):
+            for xi, xlbl in enumerate(class_labels):
 
                 # do not include -1 entries in mean
-                valid = xclass_dist_matrix[xi,y_id,:] >= 0
-                cond_Y_prob[y_id,xi] = \
-                    np.mean(xclass_dist_matrix[xi,y_id,valid])
+                valid = xclass_dist_matrix[xi, y_id, :] >= 0
+                cond_Y_prob[y_id, xi] = \
+                    np.mean(xclass_dist_matrix[xi, y_id, valid])
 
             # normalize so that sum of distances is 1
             # note: not only is it unecessary to normalize when we only have once
-            # class (as the only element in the row equals the sum of the row), 
+            # class (as the only element in the row equals the sum of the row),
             # but it can also cause an error when we have duplicate points. For
             # example, if we have five duplicate points and they are all in the
             # same (and only) class, the four nearest neighbors to one of these
@@ -214,31 +215,32 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
             # divide by zero error. We will avoid dividing in the case all together
             # since it's not needed anyways.
             if n_x_classes > 1:
-                cond_Y_prob[y_id,:] /= np.sum(cond_Y_prob[y_id,:])
-    
+                cond_Y_prob[y_id, :] /= np.sum(cond_Y_prob[y_id, :])
+
     else:
         def parallel_job1(y_id, xi, xlbl):
-            # compute distances from sample y_id to all other samples in 
+            # compute distances from sample y_id to all other samples in
             # class xi
-            y_id_dists = np.squeeze(euclidean_distances(np.expand_dims(Y_data[y_id,:],0), Y_data[x_lbls==xlbl,:]))
-            
+            y_id_dists = np.squeeze(euclidean_distances(
+                np.expand_dims(Y_data[y_id, :], 0), Y_data[x_lbls == xlbl, :]))
+
             # take average of closest neighbors in class xi
-            cond_Y_prob[y_id,xi] = \
+            cond_Y_prob[y_id, xi] = \
                 np.mean(np.sort(y_id_dists)[1:k_neighbors+1])
-            
-        loop1 = [delayed(parallel_job1)(y_id, xi, xlbl) for xi,xlbl in enumerate(class_labels) for y_id in tqdm(range(Y_data.shape[0]))]
+
+        loop1 = [delayed(parallel_job1)(y_id, xi, xlbl) for xi, xlbl in enumerate(
+            class_labels) for y_id in tqdm(range(Y_data.shape[0]))]
         Parallel(n_jobs=-1, prefer='threads')(loop1)
 
         # normalize so that sum of distances is 1 (see note above)
         if n_x_classes > 1:
             def parallel_job2(y_id):
-                cond_Y_prob[y_id,:] /= np.sum(cond_Y_prob[y_id,:])
-            loop2 = [delayed(parallel_job2)(y_id) for y_id in range(Y_data.shape[0])]
+                cond_Y_prob[y_id, :] /= np.sum(cond_Y_prob[y_id, :])
+            loop2 = [delayed(parallel_job2)(y_id)
+                     for y_id in range(Y_data.shape[0])]
             Parallel(n_jobs=-1, prefer='threads')(loop2)
 
-
     return cond_Y_prob
-
 
 
 # def _continuous_Y_parallelized(Y_data, x_lbls, precompute_distances=True):
@@ -247,30 +249,28 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
 #         passed through continuous_Y should have the same length. Actual \
 #         shapes: {},{}".format(Y_data.shape[0],x_lbls.shape[0])
 
-#     # format x_lbls that come in as shape (n_samples,1) to be of shape 
+#     # format x_lbls that come in as shape (n_samples,1) to be of shape
 #     # (n_samples,)
 #     x_lbls = np.squeeze(x_lbls)
 #     k_neighbors = 4
 #     n_x_classes = len(np.unique(x_lbls))
 
-#     # now we can compute nearest neighbors averages for each 
+#     # now we can compute nearest neighbors averages for each
 #     # Y_data point and X class combination
 #     cond_Y_prob = np.zeros((Y_data.shape[0], n_x_classes))
 
 #     def what_to_parallelize(y_id, xi):
-#         # compute distances from sample y_id to all other samples in 
+#         # compute distances from sample y_id to all other samples in
 #         # class xi
 #         y_id_dists = np.squeeze(euclidean_distances(np.expand_dims(Y_data[y_id,:],0), Y_data[x_lbls==xi,:]))
-        
+
 #         # take average of closest neighbors in class xi
 #         cond_Y_prob[y_id,xi] = \
 #             np.mean(np.sort(y_id_dists)[1:k_neighbors+1])
-        
+
 #     loop = [delayed(what_to_parallelize)(0, xi) for xi in range(n_x_classes) for y_id in range(Y_data.shape[0])]
 #     Parallel(n_jobs=-1, prefer='threads')(loop)
 #     return cond_Y_prob
-
-
 
     # TODO: this version hasn't been implemented for the categorical case yet
 
@@ -285,11 +285,11 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
 
 #     Parameters:
 #         y (np.ndarray): a value from Y_data
-#         other_Ys (np.ndarray): all of the y values that correspond to a given 
+#         other_Ys (np.ndarray): all of the y values that correspond to a given
 #             xClass
-#         y_in_otherYs (boolean): True when y is a member of other_Ys. In this 
-#             case, y is removed from the distance calculation to the nearest 
-#             neighbors (so that the distance between y and itself is not a 
+#         y_in_otherYs (boolean): True when y is a member of other_Ys. In this
+#             case, y is removed from the distance calculation to the nearest
+#             neighbors (so that the distance between y and itself is not a
 #             factored into the calculation)
 #         k_neighbors (int): the number of nearest neighbor distances to average
 #     Returns:
@@ -325,4 +325,3 @@ def _continuous_Y(Y_data, x_lbls, precompute_distances=True):
 
 #     # return the average distance between y and its nearest k neighbors
 #     return sorted_dists[:k_neighbors].mean()
-

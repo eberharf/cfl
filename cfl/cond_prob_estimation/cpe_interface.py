@@ -4,6 +4,7 @@ import os
 
 from cfl.block import Block
 
+
 class CDE(Block):
 
     def __init__(self, data_info, params):

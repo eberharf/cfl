@@ -5,6 +5,7 @@ _NUMERIC_KINDS = set('buifc')
 
 """Dataset Module"""
 
+
 class Dataset():
     """The Dataset class stores the X and Y datasets so that they can be easily 
     passed through steps of CFL and saved consistently"""
@@ -23,7 +24,7 @@ class Dataset():
                        associated with X for visualization. Defaults to None.
                 Yraw (np.ndarray) : (Optional) raw form of Y before preprocessing to remain
                        associated with Y for visualization. Defaults to None. 
-            
+
             Returns: 
                 None
         '''
@@ -35,10 +36,10 @@ class Dataset():
             'Y should be of type np.ndarray. Actual type: {}'.format(type(Y))
         assert isinstance(Xraw, (np.ndarray, type(None))), \
             'Xraw should be of type np.ndarray or NoneType. ' + \
-                'Actual type: {}'.format(type(Xraw))
+            'Actual type: {}'.format(type(Xraw))
         assert isinstance(Yraw, (np.ndarray, type(None))), \
             'Yraw should be of type np.ndarray or NoneType. ' + \
-                'Actual type: {}'.format(type(Yraw))
+            'Actual type: {}'.format(type(Yraw))
         assert isinstance(name, str), 'name should be of type str. ' + \
             'Actual type: {}'.format(type(name))
         assert isinstance(in_sample_idx, (np.ndarray, type(None))), \
@@ -47,15 +48,15 @@ class Dataset():
         assert isinstance(out_sample_idx, (np.ndarray, type(None))), \
             'in_sample_idx should be of type np.ndarray or None. Actual type: \
             {}'.format(type(out_sample_idx))
-        for data,data_name in zip([X,Y,Xraw,Yraw],['X','Y','Xraw','Yraw']):
+        for data, data_name in zip([X, Y, Xraw, Yraw], ['X', 'Y', 'Xraw', 'Yraw']):
             if data is not None:
                 try:
-                    assert np.sum(np.isnan(data))==0, 'np.nan entries not accepted'
+                    assert np.sum(
+                        np.isnan(data)) == 0, 'np.nan entries not accepted'
                 except:
-                    raise TypeError(f'The entries in {data_name} should be of a ' + \
-                    f'numeric data type. Got type {data.dtype} ' + \
-                    'instead')
-
+                    raise TypeError(f'The entries in {data_name} should be of a ' +
+                                    f'numeric data type. Got type {data.dtype} ' +
+                                    'instead')
 
         self.X = X
         self.Y = Y
@@ -69,7 +70,7 @@ class Dataset():
             self.Yraw = self.Y
         else:
             self.Yraw = Yraw
-        
+
         self.in_sample_idx = in_sample_idx
         self.out_sample_idx = out_sample_idx
 
@@ -85,7 +86,7 @@ class Dataset():
                 str : name associated with this Dataset.
         '''
         return self.name
-    
+
     def get_X(self):
         ''' Return X array associated with this Dataset'''
         return self.X
@@ -93,21 +94,21 @@ class Dataset():
     def get_Y(self):
         ''' Return Y array associated with this Dataset'''
         return self.Y
-    
+
     def get_cfl_results(self):
         return self.cfl_results
-    
+
     def set_cfl_results(self, cfl_results):
         self.cfl_results = cfl_results
 
     def get_in_sample_idx(self):
         return self.in_sample_idx
-    
+
     def get_out_sample_idx(self):
         return self.out_sample_idx
 
     def set_in_sample_idx(self, in_sample_idx):
         self.in_sample_idx = in_sample_idx
-    
+
     def set_out_sample_idx(self, out_sample_idx):
         self.out_sample_idx = out_sample_idx
