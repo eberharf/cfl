@@ -1,8 +1,10 @@
 ![Build Status](https://github.com/eberharf/cfl/workflows/AutomatedTests/badge.svg)
 [![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360/)
 
-# Causal Feature Learning (CFL)
-<img src=docs/logo.svg width="400" />
+<p align="center">
+<img src=docs/logo.jpg width="300" />
+</p>
+<h1 align="center">Causal Feature Learning (CFL)</h1>
 
 ## Set-up 
 
