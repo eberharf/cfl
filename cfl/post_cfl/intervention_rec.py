@@ -219,8 +219,8 @@ def _plot_results(pyx, hd_mask, final_mask, cluster_labels, exp_path,
                       c='black', s=3)
         # ax[i].set_title(
         #     f'\n{names[i]}\nNumber of selected points: {np.sum(mask)}')
-        ax[i].set_title('High-yield Interventions by Cluster')
-        ax[i].set_xlabel(feature_names[0])
-        ax[i].set_ylabel(feature_names[1])
+        ax[i].set_title('High-yield Interventions by Cluster', fontweight='bold')
+        ax[i].set_xlabel(feature_names[0], fontweight='bold')
+        ax[i].set_ylabel(feature_names[1], fontweight='bold')
     plt.savefig(os.path.join(exp_path, dataset_name, 'intervention_recs'),
                 bbox_inches='tight')
