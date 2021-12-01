@@ -75,17 +75,17 @@ def make_vis_bar_regression_tests():
                         }
             cause_cluster_params = {'model' : 'KMeans', 'n_clusters' : self.n_xbar, 'random_state' : 42, 'verbose' : 0}
             effect_cluster_params = {'model' : 'KMeans', 'n_clusters' : self.n_ybar, 'random_state' : 42, 'verbose' : 0}
-            block_names = ['CondProbEstimator', 'CauseClusterer', 'EffectClusterer']
+            block_names = ['CondDensityEstimator', 'CauseClusterer', 'EffectClusterer']
             block_params = [cde_params, cause_cluster_params, effect_cluster_params]
             exp = Experiment(X_train=self.x, Y_train=self.y, data_info=data_info, 
                 block_names=block_names, block_params=block_params, blocks=None, 
                 results_path=RESULTS_PATH)
             self.results = exp.train()
-            print(self.results['CondProbEstimator']['pyx'])
+            print(self.results['CondDensityEstimator']['pyx'])
 
 
         def test_result_shapes(self):
-            t.assert_array_equal(self.results['CondProbEstimator']['pyx'].shape, 
+            t.assert_array_equal(self.results['CondDensityEstimator']['pyx'].shape, 
                                 (self.n_samples,self.n_ybar))
             t.assert_array_equal(self.results['CauseClusterer']['x_lbls'].shape, 
                                 (self.n_samples,))
@@ -95,7 +95,7 @@ def make_vis_bar_regression_tests():
                                 (self.n_samples,self.n_xbar))
         
         def test_cde_accuracy(self):
-            pred_mse = mse(self.results['CondProbEstimator']['pyx'], self.y)
+            pred_mse = mse(self.results['CondDensityEstimator']['pyx'], self.y)
             assert pred_mse < 0.2, f'mse: {pred_mse}'
         
         def test_cause_cluster_accuracy(self):

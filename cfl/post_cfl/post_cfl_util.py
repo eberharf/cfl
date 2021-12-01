@@ -28,7 +28,7 @@ def load_pyx(exp, dataset_name='dataset_train'):
 
     if isinstance(exp, str):
         fp = os.path.join(exp, dataset_name,
-                          'CondProbEstimator_results.pickle')
+                          'CondDensityEstimator_results.pickle')
         with open(fp, 'rb') as f:
             lbls = pickle.load(f)['pyx']
     else:

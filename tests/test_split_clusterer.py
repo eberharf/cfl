@@ -12,7 +12,7 @@ def test_full_pipeline():
     data_info = {'X_dims': X.shape, 
                  'Y_dims': Y.shape, 
                  'Y_type': 'continuous'}
-    block_names = ['CondProbEstimator', 'CauseClusterer', 'EffectClusterer']
+    block_names = ['CondDensityEstimator', 'CauseClusterer', 'EffectClusterer']
     block_params = [{'model' : 'CondExpMod', 'show_plot' : False}, {}, {}]
 
     # make CFL Experiment
@@ -36,7 +36,7 @@ def test_param_setting():
                             'n_clusters' : 3}
     effect_cluster_params = {'model' : 'DBSCAN',
                              'eps' : 0.1}
-    block_names = ['CondProbEstimator', 'CauseClusterer', 'EffectClusterer']
+    block_names = ['CondDensityEstimator', 'CauseClusterer', 'EffectClusterer']
     block_params = [{'model' : 'CondExpMod', 'show_plot' : False}, 
                     cause_cluster_params, effect_cluster_params]
 

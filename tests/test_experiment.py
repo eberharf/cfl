@@ -62,7 +62,7 @@ def test_cde_experiment():
                     'standardize': False,
                     'best': True}
 
-    block_names = ['CondProbEstimator']
+    block_names = ['CondDensityEstimator']
     block_params = [condExp_params]
 
     # make new CFL Experiment with CDE only
@@ -75,10 +75,10 @@ def test_cde_experiment():
     print('HERE:::::: ', train_results_cde.keys())
     
     # check output of CDE block
-    assert 'pyx' in train_results_cde['CondProbEstimator'].keys(), \
+    assert 'pyx' in train_results_cde['CondDensityEstimator'].keys(), \
         'CDE train fxn should specify pyx in training results. ' + \
         'Actual keys: {}'.format(train_results_cde.keys())
-    assert 'model_weights' in train_results_cde['CondProbEstimator'].keys(), \
+    assert 'model_weights' in train_results_cde['CondDensityEstimator'].keys(), \
         'CDE train fxn should specify model_weights in training results. ' + \
         'Actual keys: {}'.format(train_results_cde.keys())
 
@@ -89,17 +89,17 @@ def test_cde_experiment():
     ## predict 
     # check that results are the same as with training 
     predict_results_cde = my_exp_cde.predict(dataset_train_cde)
-    assert 'pyx' in predict_results_cde['CondProbEstimator'].keys(), \
+    assert 'pyx' in predict_results_cde['CondDensityEstimator'].keys(), \
         'CDE predict fxn should specify pyx in prediction results'
-    assert np.array_equal(train_results_cde['CondProbEstimator']['pyx'], \
-        predict_results_cde['CondProbEstimator']['pyx'])
+    assert np.array_equal(train_results_cde['CondDensityEstimator']['pyx'], \
+        predict_results_cde['CondDensityEstimator']['pyx'])
 
 
     ## CDE and cluster experiment 
     c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
     e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
 
-    block_names = ['CondProbEstimator', 'CauseClusterer', 'EffectClusterer']
+    block_names = ['CondDensityEstimator', 'CauseClusterer', 'EffectClusterer']
     block_params = [condExp_params, c_cluster_params, e_cluster_params]
 
     my_exp_clust = Experiment(X_train=x, Y_train=y, data_info=data_info, 
@@ -218,7 +218,7 @@ def test_load_past_experiment():
     c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42, 'verbose' : 0}
     e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42, 'verbose' : 0}
 
-    block_names = ['CondProbEstimator', 'CauseClusterer', 'EffectClusterer']
+    block_names = ['CondDensityEstimator', 'CauseClusterer', 'EffectClusterer']
     block_params = [condExp_params, c_cluster_params, e_cluster_params]
 
     # make CFL Experiment

@@ -1,2 +1,2 @@
-model_checkpoint_path: "CondProbEstimator"
-all_model_checkpoint_paths: "CondProbEstimator"
+model_checkpoint_path: "CondDensityEstimator"
+all_model_checkpoint_paths: "CondDensityEstimator"

@@ -11,7 +11,7 @@ import unittest
 
 import numpy as np
 
-import cfl.cond_prob_estimation
+import cfl.cond_density_estimation
 from cfl.dataset import Dataset
 from cdes_for_testing import all_cdes
 import generate_for_cde_regression as gc 

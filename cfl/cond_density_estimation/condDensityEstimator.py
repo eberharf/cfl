@@ -1,16 +1,16 @@
 
 from cfl.block import Block
-import cfl.cond_prob_estimation as c
+import cfl.cond_density_estimation as c
 
 
-class CondProbEstimator(Block):
+class CondDensityEstimator(Block):
 
     def __init__(self, data_info, params):
         # parameter checks and self.params assignment done here
         super().__init__(data_info=data_info, params=params)
 
         # attributes:
-        self.name = 'CondProbEstimator'
+        self.name = 'CondDensityEstimator'
         self.model = self._create_model()
 
     def _create_model(self):

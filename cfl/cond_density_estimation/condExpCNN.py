@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from cfl.cond_prob_estimation.condExpBase import CondExpBase
+from cfl.cond_density_estimation.condExpBase import CondExpBase
 
 
 class CondExpCNN(CondExpBase):

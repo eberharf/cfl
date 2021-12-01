@@ -5,7 +5,7 @@ import os
 import numpy as np
 from cfl.dataset import Dataset
 from cfl.block import Block
-import cfl.cond_prob_estimation as cdem
+import cfl.cond_density_estimation as cdem
 import cfl.clustering as ccm
 
 '''
@@ -27,7 +27,7 @@ Methods in Experiment Class:
 # NOTE: the keys of this dictionary are passed as part of the 'block_names'
 # list. They are different than the names of the attributes in each block's
 # self.name attribute
-BLOCK_KEY = {'CondProbEstimator': cdem.CondProbEstimator,
+BLOCK_KEY = {'CondDensityEstimator': cdem.CondDensityEstimator,
              'CauseClusterer': ccm.CauseClusterer,
              'EffectClusterer': ccm.EffectClusterer}  # TODO: maybe change this so that instead of
 # calling clusterer, 'Kmeans', 'DBSCAN' and 'SNN' are registered as cluster methods

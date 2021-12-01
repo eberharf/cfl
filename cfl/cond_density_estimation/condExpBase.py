@@ -10,7 +10,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-from cfl.cond_prob_estimation.cpe_interface import Block  # base class
+from cfl.cond_density_estimation.cde_interface import Block  # base class
 from cfl.dataset import Dataset
 
 # Things that descend from this class should have a self.name attribute but
