@@ -50,22 +50,7 @@ class CondDensityEstimator(Block):
                 dict: dictionary of parameter names (keys) and values (values)
 
         """
-        return {'model': 'CondExpMod',
-                'batch_size': 32,
-                'n_epochs': 20,
-                'optimizer': 'adam',
-                'opt_config': {},
-                'verbose': 1,
-                'dense_units': [50, self.data_info['Y_dims'][1]],
-                'activations': ['relu', 'linear'],
-                'dropouts': [0, 0],
-                'weights_path': None,
-                'loss': 'mean_squared_error',
-                'show_plot': True,
-                'standardize': False,
-                'best': True,
-                'tb_path': None,
-                }
+        return {'model': 'CondExpMod'}
 
     def train(self, dataset, prev_results):
         """

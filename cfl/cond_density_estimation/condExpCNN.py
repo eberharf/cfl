@@ -107,7 +107,7 @@ class CondExpCNN(CondExpBase):
         '''
 
         default_params = {  # parameters for model creation
-            'filters': [32, 16],
+            'filters': [32, 32],
             'input_shape': self.data_info['X_dims'][1:],
             'kernel_size': [(3, 3)] * 2,
             'pool_size': [(2, 2)] * 2,
