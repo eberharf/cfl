@@ -46,6 +46,9 @@ class CondExpMod(CondExpBase):
                 'verbose': 1,
                 'dense_units': [50, self.data_info['Y_dims'][1]],
                 'activations': ['relu', 'linear'],
+                'activity_regularizers': [None, None],
+                'kernel_regularizers': [None, None],
+                'bias_regularizers': [None, None],
                 'dropouts': [0, 0],
                 'weights_path': None,
                 'loss': 'mean_squared_error',
@@ -76,6 +79,8 @@ class CondExpMod(CondExpBase):
             sizes in params['activations']."
         assert self.params['dropouts'] is not {}, "Please specify layer sizes \
             in params['dropouts']."
+        assert self.params['activity_regularizers'] is not {}, "Please specify \
+            layer sizes in params['activity_regularizers']."
         assert self.params['dense_units'][-1] == self.data_info['Y_dims'][1], \
             "The output layer size (last entry in params['dense_units'] \
                 should be equal to the number of Y features but instead is \
@@ -90,6 +95,11 @@ class CondExpMod(CondExpBase):
             "params['dense_units'] and params['dropouts'] should be the same \
             length but instead are {} and {}.".format(
             self.params['dense_units'], self.params['dropouts'])
+        assert len(self.params['dense_units']) == \
+            len(self.params['activity_regularizers']),\
+            "params['dense_units'] and params['activity_regularizers'] should \
+            be the same length but instead are {} and {}.".format( \
+            self.params['dense_units'], self.params['activity_regularizers'])
         return
 
     def _build_model(self):
@@ -111,10 +121,16 @@ class CondExpMod(CondExpBase):
         arch = [tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],))]
 
         # intermediate layers
-        for units, act, dropout in zip(self.params['dense_units'],
+        for units, act, dropout, act_reg, kernel_reg, bias_reg in zip(self.params['dense_units'],
                                        self.params['activations'],
-                                       self.params['dropouts']):
-            arch.append(tf.keras.layers.Dense(units=units, activation=act))
+                                       self.params['dropouts'],
+                                       self.params['activity_regularizers'],
+                                       self.params['kernel_regularizers'],
+                                       self.params['bias_regularizers']):
+            arch.append(tf.keras.layers.Dense(units=units, activation=act,
+                                              activity_regularizer=act_reg,
+                                              kernel_regularizer=kernel_reg,
+                                              bias_regularizer=bias_reg))
             arch.append(tf.keras.layers.Dropout(dropout))
 
         model = tf.keras.models.Sequential(arch)
