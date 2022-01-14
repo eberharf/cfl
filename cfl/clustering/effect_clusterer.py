@@ -190,7 +190,7 @@ class EffectClusterer(Block):
             tunable_params = self.params.copy()
             for ptr in params_to_remove:
                 tunable_params.pop(ptr)
-            tuned_params = tune(y_probs, tunable_params)
+            tuned_params,tuning_fig = tune(y_probs, tunable_params)
             for k in tuned_params.keys():
                 self.params[k] = tuned_params[k]
             self.model = self._create_model(self.params)
@@ -200,9 +200,14 @@ class EffectClusterer(Block):
         y_lbls = self.model.labels_
 
         self.trained = True
-        results_dict = {'y_lbls': y_lbls,
-                        'y_probs': y_probs}
-
+        if self.params['tune']:
+            results_dict = {'y_lbls': y_lbls,
+                        'y_probs': y_probs,
+                        'tuning_fig' : tuning_fig}
+        else:
+            results_dict = {'y_lbls': y_lbls,
+                        'y_probs': y_probs,}
+                        
         return results_dict
 
     def predict(self, dataset, prev_results):

@@ -46,9 +46,9 @@ class CondExpMod(CondExpBase):
                 'verbose': 1,
                 'dense_units': [50, self.data_info['Y_dims'][1]],
                 'activations': ['relu', 'linear'],
-                'activity_regularizers': [None, None],
-                'kernel_regularizers': [None, None],
-                'bias_regularizers': [None, None],
+                'activity_regularizers': None,
+                'kernel_regularizers': None,
+                'bias_regularizers': None,
                 'dropouts': [0, 0],
                 'weights_path': None,
                 'loss': 'mean_squared_error',
@@ -86,20 +86,20 @@ class CondExpMod(CondExpBase):
                 should be equal to the number of Y features but instead is \
                 {}".format(self.params['dense_units'][-1])
 
-        assert len(self.params['dense_units']) == \
-            len(self.params['activations']), "params['dense_units'] and \
-            params['activation'] should be the same length but instead are \
-            {} and {}.".format(self.params['dense_units'],
-                               self.params['activations'])
-        assert len(self.params['dense_units']) == len(self.params['dropouts']),\
-            "params['dense_units'] and params['dropouts'] should be the same \
-            length but instead are {} and {}.".format(
-            self.params['dense_units'], self.params['dropouts'])
-        assert len(self.params['dense_units']) == \
-            len(self.params['activity_regularizers']),\
-            "params['dense_units'] and params['activity_regularizers'] should \
-            be the same length but instead are {} and {}.".format( \
-            self.params['dense_units'], self.params['activity_regularizers'])
+        for list_param in ['activations', 'dropouts', 'activity_regularizers',
+                           'kernel_regularizers', 'bias_regularizers']:
+
+            # if not specified, make param be a None list of same length
+            if self.params[list_param]==None:
+                self.params[list_param] = [None]*len(self.params['dense_units'])
+
+            # make sure same length
+            assert len(self.params['dense_units']) == \
+                len(self.params[list_param]), f"params['dense_units'] and \
+                params['{list_param}'] should be of equal length but instead are \
+                {len(self.params['dense_units'])} and \
+                {len(self.params[list_param])}."
+
         return
 
     def _build_model(self):
