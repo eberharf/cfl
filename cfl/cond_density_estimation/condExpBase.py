@@ -200,7 +200,7 @@ class CondExpBase(Block):
                 now = datetime.datetime.now()
                 # this creates a string based on the current date and time up to the second (NOTE: if you create a bunch of CFLs all at once maybe you'd need a more precise ID)
                 dt_id = now.strftime("%d%m%Y%H%M%S")
-                checkpoint_path = 'tmp_checkpoints'+dt_id
+                checkpoint_path = self.params['checkpoint_name']+dt_id
                 os.mkdir(checkpoint_path)
 
                 # ModelCheckpoint saves model checkpoints to specified path during training

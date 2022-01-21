@@ -58,6 +58,7 @@ class CondExpMod(CondExpBase):
                 'optuna_callback': None,
                 'optuna_trial': None,
                 'early_stopping': False,
+                'checkpoint_name' : 'tmp_checkpoints'
                 }
 
     def _check_param_shapes(self):

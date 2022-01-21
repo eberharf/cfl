@@ -60,7 +60,8 @@ class CondExpDIY(CondExpBase):
                 'optuna_callback': None,
                 'optuna_trial': None,
                 'early_stopping': False,
-                'build_model': build_model
+                'build_model': build_model,
+                'checkpoint_name' : 'tmp_checkpoints'
                 }
 
     def _check_param_shapes(self):
