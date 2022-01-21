@@ -2,10 +2,10 @@ import pickle  # for saving code
 
 from cfl.block import Block
 from cfl.dataset import Dataset
-import numpy as np
 from cfl.clustering.Y_given_Xmacro import sample_Y_dist  # calculate
 # P(Y|Xmacro)
 from sklearn.cluster import *
+from cfl.clustering.snn import SNN
 from cfl.clustering.cluster_tuning_util import tune
 
 # TODO: next step: add very clear documentation about how to add new module.
