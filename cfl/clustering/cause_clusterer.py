@@ -1,10 +1,9 @@
-from typing import Type
 import pickle  # for saving code
 
 from cfl.block import Block
 from cfl.dataset import Dataset
-import numpy as np
 from sklearn.cluster import *
+from cfl.clustering.snn import SNN
 from cfl.clustering.cluster_tuning_util import tune
 
 # TODO: next step: add very clear documentation about how to add new module.
@@ -173,7 +172,7 @@ class CauseClusterer(Block):
             tunable_params = self.params.copy()
             for ptr in params_to_remove:
                 tunable_params.pop(ptr)
-            tuned_params = tune(pyx, tunable_params)
+            tuned_params,tuning_fig = tune(pyx, tunable_params)
             for k in tuned_params.keys():
                 self.params[k] = tuned_params[k]
             self.model = self._create_model(self.params)
@@ -182,8 +181,11 @@ class CauseClusterer(Block):
         self.model.fit(pyx)
         self.trained = True
         x_lbls = self.model.labels_
-
-        results_dict = {'x_lbls': x_lbls}
+        
+        if self.params['tune']:
+            results_dict = {'x_lbls': x_lbls, 'tuning_fig' : tuning_fig}
+        else:
+            results_dict = {'x_lbls': x_lbls}
         return results_dict
 
     def predict(self, dataset, prev_results):

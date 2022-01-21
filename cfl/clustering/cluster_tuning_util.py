@@ -114,7 +114,8 @@ def visualize_errors(errs, params_list, params_to_tune):
         ax.set_title('Prediction Error (MSE)')
         plt.colorbar(im)
         plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
-        plt.show()
+        # plt.show()
+        return(fig)
 
 
 def suggest_elbow_idx(errs):
@@ -168,8 +169,8 @@ def tune(data_to_cluster, params):
             one_hot_encode(lbls, np.unique(lbls)), data_to_cluster)
 
     # visualize errors and solicit user input
-    visualize_errors(errs, param_combos, params)
+    fig =  visualize_errors(errs, param_combos, params)
     suggested_params = param_combos[suggest_elbow_idx(errs)]
     chosen_params = get_user_params(suggested_params)
 
-    return chosen_params
+    return chosen_params, fig
