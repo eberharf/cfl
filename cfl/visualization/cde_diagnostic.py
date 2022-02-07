@@ -33,9 +33,12 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
         (Fig) - A `matplotlib.pyplot Figure` object that contains the scatter plot
         (Axes) - A `matplotlib.pyplot Axes` object that shows the scatter plot
 '''
-
-    pyx = cfl_experiment.retrieve_results(
-        'dataset_train')['CDE']['pyx']  # get training results
+    try:
+        pyx = cfl_experiment.retrieve_results(
+            'dataset_train')['CondDensityEstimator']['pyx']  # get training results
+    except: # here for backwards compatibility with old results
+        pyx = cfl_experiment.retrieve_results(
+            'dataset_train')['CDE']['pyx']  # get training results
 
     # choose indices for a thousand (or the maximum possible) random samples from the pyx results
     n_samples = min(1000, pyx.shape[0])
