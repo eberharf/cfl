@@ -23,18 +23,19 @@ def compute_predictive_error(Xlr, Ylr, n_iter=100):
     n_samples = Xlr.shape[0]
     errs = np.zeros((n_iter,))
     for ni in range(n_iter):
+        try:
+            # choose samples to withhold
+            in_sample_idx = np.zeros((n_samples,))
+            in_sample_idx[np.random.choice(
+                n_samples, int(n_samples*0.95), replace=False)] = 1
+            in_sample_idx = in_sample_idx.astype(bool)
 
-        # choose samples to withhold
-        in_sample_idx = np.zeros((n_samples,))
-        in_sample_idx[np.random.choice(
-            n_samples, int(n_samples*0.95), replace=False)] = 1
-        in_sample_idx = in_sample_idx.astype(bool)
-
-        # get predictive error
-        reg = LR().fit(Xlr[in_sample_idx], Ylr[in_sample_idx])
-        pred = reg.predict(Xlr[~in_sample_idx])
-        errs[ni] = _score(Ylr[~in_sample_idx], pred)
-
+            # get predictive error
+            reg = LR().fit(Xlr[in_sample_idx], Ylr[in_sample_idx])
+            pred = reg.predict(Xlr[~in_sample_idx])
+            errs[ni] = _score(Ylr[~in_sample_idx], pred)
+        except:
+            errs[ni] = np.nan
     return np.mean(errs)
 
 
