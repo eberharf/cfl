@@ -4,3 +4,7 @@
 __version__ = '1.1.0'
 __author__ = 'Jenna Kahn and Iman Wahle'
 __credits__ = '2021, California Institute of Technology'
+
+from cfl.experiment import Experiment
+from cfl.block import Block
+from cfl.dataset import Dataset
