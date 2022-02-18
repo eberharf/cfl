@@ -31,7 +31,7 @@ class CondExpCNN(CondExpBase):
         '''
         super().__init__(data_info, params)  # Main init stuff happens in block.py
 
-    def _build_model(self):
+    def _build_network(self):
         '''         
         Define the neural network based on specifications in self.params.
 

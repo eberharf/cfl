@@ -70,10 +70,10 @@ class CondDensityEstimator(Block):
         ''' 
         TODO
         '''
-        self.model.save_block(file_path)
+        self.model.save_model(file_path)
 
     def load_block(self, file_path):
         '''
         TODO
         '''
-        self.model.load_block(file_path)
+        self.model.load_model(file_path)

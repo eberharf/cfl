@@ -74,14 +74,6 @@ class CondExpMod(CondExpBase):
                 is invalid. 
         '''
 
-        assert self.params['dense_units'] is not {}, "Please specify layer \
-            sizes in params['dense_units']."
-        assert self.params['activations'] is not {}, "Please specify layer \
-            sizes in params['activations']."
-        assert self.params['dropouts'] is not {}, "Please specify layer sizes \
-            in params['dropouts']."
-        assert self.params['activity_regularizers'] is not {}, "Please specify \
-            layer sizes in params['activity_regularizers']."
         assert self.params['dense_units'][-1] == self.data_info['Y_dims'][1], \
             "The output layer size (last entry in params['dense_units'] \
                 should be equal to the number of Y features but instead is \
@@ -103,7 +95,7 @@ class CondExpMod(CondExpBase):
 
         return
 
-    def _build_model(self):
+    def _build_network(self):
         ''' 
         Define the neural network based on specifications in self.params.
 

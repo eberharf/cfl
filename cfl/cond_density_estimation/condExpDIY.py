@@ -39,7 +39,7 @@ class CondExpDIY(CondExpBase):
         Returns:
             dict : dictionary of default parameters
         '''
-        def build_model():
+        def build_network():
             model = tf.keras.models.Sequential([
                 tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],)),
                 tf.keras.layers.Dense(units=50),
@@ -60,7 +60,7 @@ class CondExpDIY(CondExpBase):
                 'optuna_callback': None,
                 'optuna_trial': None,
                 'early_stopping': False,
-                'build_model': build_model,
+                'build_network': build_network,
                 'checkpoint_name' : 'tmp_checkpoints'
                 }
 
@@ -78,7 +78,7 @@ class CondExpDIY(CondExpBase):
         '''
         pass
 
-    def _build_model(self):
+    def _build_network(self):
         ''' 
         Define the neural network based on specifications in self.params.
 
@@ -102,6 +102,6 @@ class CondExpDIY(CondExpBase):
                 specified or not specified.'
 
         if self.params['optuna_trial'] is not None:
-            return self.params['build_model'](self.params['optuna_trial'])
+            return self.params['build_network'](self.params['optuna_trial'])
         else:
-            return self.params['build_model']()
+            return self.params['build_network']()

@@ -10,15 +10,15 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-from cfl.block import Block  # base class
 from cfl.dataset import Dataset
+from cfl.cond_density_estimation.cde_model import CDEModel
 
 # Things that descend from this class should have a self.name attribute but
 # this class doesn't since CondExpBase objects are not supposed to be created
 # by the user
 
 
-class CondExpBase(Block):
+class CondExpBase(CDEModel):
     # TODO: update Class docstring
     ''' A class to define, train, and perform inference with conditional density
     estimators that fall under the "conditional expectation" umbrella. This
@@ -56,8 +56,8 @@ class CondExpBase(Block):
         predict : once the model is trained, predict for a given Dataset
         evaluate : return the model's prediction loss on a Dataset
         load_model : load tensorflow model weights from a file into
-                          self.model
-        save_model : save the current weights of self.model
+                          self.network
+        save_model : save the current weights of self.network
         build_model : create and return a tensorflow model
         _check_model_params : fill in any parameters that weren't provided in
                              params with the default value, and discard any
@@ -78,17 +78,16 @@ class CondExpBase(Block):
         Returns: 
             None
         '''
-        self.name = 'CDE'
-        super().__init__(data_info=data_info, params=params)
-
-        # self.params = self._check_model_params(params)
+        self.name = 'CondExpBase'
+        self.data_info = data_info
+        self.params = params
 
         # set object attributes
-        self.model = self._build_model()
+        self.network = self._build_network()
 
         # load model weights if specified
         if self.params['weights_path'] is not None:
-            self.load_model(self.params['weights_path'])
+            self.load_network(self.params['weights_path'])
             self.trained = True
 
     def get_params(self):
@@ -100,7 +99,7 @@ class CondExpBase(Block):
 
         return self.params
 
-    def load_block(self, path):
+    def load_model(self, path):
         ''' 
         Load model saved at path into this model.
         Arguments:
@@ -110,10 +109,10 @@ class CondExpBase(Block):
         '''
 
         assert isinstance(path, str), 'path should be a str of path to block.'
-        self.load_model(path)
+        self.load_network(path)
         self.trained = True
 
-    def save_block(self, path):
+    def save_model(self, path):
         ''' 
         Save trained model to specified path.
 
@@ -123,7 +122,7 @@ class CondExpBase(Block):
             None
         '''
         assert isinstance(path, str), 'path should be a str of path to block.'
-        self.save_model(path)
+        self.save_network(path)
 
     def train(self, dataset, prev_results=None):
         ''' 
@@ -151,7 +150,7 @@ class CondExpBase(Block):
         if self.trained:
             print('Model has already been trained, will return predictions ' +
                   'on training data.')
-            return {'pyx': self.model.predict(dataset.X)}
+            return {'pyx': self.network.predict(dataset.X)}
 
         # train-test split
         if dataset.get_in_sample_idx() is None:
@@ -174,7 +173,7 @@ class CondExpBase(Block):
              'config': self.params['opt_config']})
 
         # compile model
-        self.model.compile(
+        self.network.compile(
             loss=self.params['loss'],
             optimizer=optimizer,
         )
@@ -198,20 +197,23 @@ class CondExpBase(Block):
                 # give the checkpoints path a unique ID (so that it doesn't get
                 # confused with other CFL runs)
                 now = datetime.datetime.now()
-                # this creates a string based on the current date and time up to the second (NOTE: if you create a bunch of CFLs all at once maybe you'd need a more precise ID)
+                # this creates a string based on the current date and time up 
+                # to the second (NOTE: if you create a bunch of CFLs all at 
+                # once maybe you'd need a more precise ID)
                 dt_id = now.strftime("%d%m%Y%H%M%S")
                 checkpoint_path = self.params['checkpoint_name']+dt_id
                 os.mkdir(checkpoint_path)
 
-                # ModelCheckpoint saves model checkpoints to specified path during training
+                # ModelCheckpoint saves network checkpoints to specified path 
+                # during training
                 best_path = os.path.join(checkpoint_path, 'best_weights')
-                model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+                network_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
                     filepath=best_path,
                     save_weights_only=True,
                     monitor='val_loss',
                     mode='min',
                     save_best_only=True)
-                callbacks = [model_checkpoint_callback]
+                callbacks = [network_checkpoint_callback]
 
             if self.params['tb_path'] is not None:
                 tb_callback = tf.keras.callbacks.TensorBoard(
@@ -227,8 +229,8 @@ class CondExpBase(Block):
                     patience=20)
                 callbacks = [es_callback] + callbacks
 
-            # train model
-            history = self.model.fit(
+            # train network
+            history = self.network.fit(
                 Xtr, Ytr,
                 batch_size=self.params['batch_size'],
                 epochs=self.params['n_epochs'],
@@ -242,17 +244,17 @@ class CondExpBase(Block):
             val_loss = history.history['val_loss']
             fig = self._graph_results(train_loss, val_loss,
                                       show=self.params['show_plot'])
-            pyx = self.model.predict(dataset.X)
+            pyx = self.network.predict(dataset.X)
 
             # load in best weights if specified
             if self.params['best']:
                 # TODO: this is where the error is jenna
-                self.load_model(best_path)
+                self.load_network(best_path)
 
             results_dict = {'train_loss': train_loss,
                             'val_loss': val_loss,
                             'loss_plot': fig,
-                            'model_weights': self.model.get_weights(),
+                            'network_weights': self.network.get_weights(),
                             'pyx': pyx}
 
             self.trained = True
@@ -308,8 +310,8 @@ class CondExpBase(Block):
         assert isinstance(prev_results, (type(None), dict)),\
             'prev_results is not NoneType or dict'
 
-        assert self.trained, "Remember to train the model before prediction."
-        pyx = self.model.predict(dataset.X)
+        assert self.trained, "Remember to train the network before prediction."
+        pyx = self.network.predict(dataset.X)
 
         results_dict = {'pyx': pyx}
         return results_dict
@@ -317,7 +319,7 @@ class CondExpBase(Block):
     def evaluate(self, dataset):
         ''' 
         Compute the loss specified in self.params['loss] between ground truth 
-        and model prediction.
+        and network prediction.
 
         Arguments:
             dataset (Dataset): Dataset object containing X and Y data for this
@@ -326,16 +328,16 @@ class CondExpBase(Block):
             float : the average loss for this batch
         '''
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
-        assert self.trained, "Remember to train the model before evaluation."
+        assert self.trained, "Remember to train the network before evaluation."
 
         Y_hat = self.predict(dataset)['pyx']
         loss_fxn = tf.keras.losses.get(self.params['loss'])
         cost = loss_fxn(dataset.Y, Y_hat)
         return tf.reduce_mean(cost)
 
-    def load_model(self, file_path):
+    def load_network(self, file_path):
         ''' 
-        Load model weights from saved checkpoint into current model.
+        Load network weights from saved checkpoint into current network.
 
         Arguments:
             file_path (str) : path to checkpoint file
@@ -343,45 +345,45 @@ class CondExpBase(Block):
             None
         '''
 
-        assert hasattr(self, 'model'), 'Build model before loading parameters.'
+        assert hasattr(self, 'network'), 'Build network before loading parameters.'
 
         if self.params['verbose'] > 0:
             print("Loading parameters from ", file_path)
         try:
             # TODO: this is where an error is happening
-            self.model.load_weights(file_path)
+            self.network.load_weights(file_path)
         except:
             raise ValueError('path does not exist.')
 
-        # TODO: does tensorflow keep track of if model is trained?
+        # TODO: does tensorflow keep track of if network is trained?
         self.trained = True
 
-    def save_model(self, file_path):
+    def save_network(self, file_path):
         ''' 
-        Save model weights from current model.
+        Save network weights from current network.
 
         Arguments:
             file_path (str) : path to checkpoint file
         Returns: 
             None
         '''
-        # TODO : add check to only save trained models? (bc of load model
+        # TODO : add check to only save trained networks? (bc of load network
         # setting train to true )
         if self.params['verbose'] > 0:
             print("Saving parameters to ", file_path)
         try:
-            self.model.save_weights(file_path)
+            self.network.save_weights(file_path)
         except:
             raise ValueError('path does not exist.')
 
     @abstractmethod
-    def _build_model(self):
+    def _build_network(self):
         ''' 
         Define the neural network based on specifications in self.params.
 
         Arguments:
             None
         Returns: 
-            tf.keras.models.Model : untrained model specified in self.params.
+            tf.keras.models.Model : untrained network specified in self.params.
         '''
         ...
