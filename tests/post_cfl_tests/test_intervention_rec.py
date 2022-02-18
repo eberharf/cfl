@@ -10,11 +10,6 @@ from visual_bars import generate_visual_bars_data as vbd
 from cfl.util.data_processing import one_hot_encode
 from cfl.post_cfl import intervention_rec as IR
 
-# Note: change if you want results somewhere else (folder will be deleted at 
-#       end of run)
-RESULTS_PATH = 'tests/tmp_cde_results'
-RESOURCE_PATH = 'tests/resources/test_intervention_rec'
-
 # parameters for CDE 
 CDE_PARAMS = {'batch_size': 128,
                 'optimizer': 'adam',
@@ -25,7 +20,7 @@ CDE_PARAMS = {'batch_size': 128,
                 'dense_units': [100, 50, 10, 2],
                 'activations': ['relu', 'relu', 'relu', 'softmax'],
                 'dropouts': [0.2, 0.5, 0.5, 0],
-                'weights_path': os.path.join(RESOURCE_PATH, 
+                'weights_path': os.path.join(RESOURCE_PATH, 'test_intervention_rec',
                                     'experiment0000/trained_blocks/CondExpMod'),
                 'loss': 'mean_squared_error',
                 'standardize': False,
@@ -82,11 +77,11 @@ def test_intervention_recs():
     exp_path = my_exp.get_save_path()
     
     # check if recommended interventions match prior results
-    # np.save(os.path.join(RESOURCE_PATH, 'recs'), 
+    # np.save(os.path.join(RESOURCE_PATH, 'test_intervention_rec', 'recs'), 
     #         my_exp.get_intervention_recs('dataset_train'))
     recs = IR.get_recommendations(exp_path, dataset_name='dataset_train', 
                                cause_or_effect='cause', visualize=False)
-    old_recs = np.load(os.path.join(RESOURCE_PATH, 'recs.npy'))
+    old_recs = np.load(os.path.join(RESOURCE_PATH, 'test_intervention_rec', 'recs.npy'))
 
     assert np.array_equal(recs, old_recs), f'{recs[0]}, {old_recs[0]}'
 

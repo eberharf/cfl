@@ -1,2 +1,0 @@
-model_checkpoint_path: "CondDensityEstimator"
-all_model_checkpoint_paths: "CondDensityEstimator"
