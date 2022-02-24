@@ -11,8 +11,8 @@ from visual_bars import generate_visual_bars_data as vbd
 from cfl.util.data_processing import one_hot_encode
 from sklearn.metrics import adjusted_mutual_info_score as ami
 import visual_bars.visual_bars_vis as vis
+from tests.test_constants import *
 
-RESULTS_PATH = 'tests/tmp_test_results'
 SHOW_PLOTS = False
 
 def generate_vb_data(n_samples):
@@ -20,7 +20,8 @@ def generate_vb_data(n_samples):
     noise_lvl = 0.03
     im_shape = (10, 10)
     random_seed = 143
-    print('Generating a visual bars dataset with {} samples at noise level {}'.format(n_samples, noise_lvl))
+    print('Generating a visual bars dataset with {} samples at noise \
+        level {}'.format(n_samples, noise_lvl))
 
     vb_data = vbd.VisualBarsData(n_samples=n_samples, 
                                  im_shape = im_shape, 
@@ -52,31 +53,47 @@ def make_vis_bar_regression_tests():
             self.n_samples = 10000
             self.n_xbar = 4
             self.n_ybar = 2
-            self.x,self.y,self.xbar,self.ybar = generate_vb_data(n_samples=self.n_samples)
+            self.x,self.y,self.xbar,self.ybar = generate_vb_data(
+                n_samples=self.n_samples)
 
             # setup cfl pipeline
-            data_info = {'X_dims': self.x.shape, 'Y_dims': self.y.shape, 'Y_type': 'categorical'}            
+            data_info = {'X_dims': self.x.shape, 'Y_dims': self.y.shape, 
+                         'Y_type': 'categorical'}            
             cde_params = {  'model' : 'CondExpCNN',
-                            'filters'          : [8],
-                            'input_shape'      : data_info['X_dims'][1:],
-                            'kernel_size'      : [(4, 4)],
-                            'pool_size'        : [(2, 2)],
-                            'padding'          : ['same'],
-                            'conv_activation'  : ['relu'],
-                            'dense_units'      : 16,
-                            'dense_activation' : 'relu',
-                            'output_activation': None,
-                            'batch_size'  : 84,
-                            'n_epochs'    : 20,
-                            'optimizer'   : 'adam',
-                            'loss'        : 'mean_squared_error',
-                            'best'        : True,
-                            'show_plot' : SHOW_PLOTS
+                            'model_params' : {
+                                'filters'          : [8],
+                                'input_shape'      : data_info['X_dims'][1:],
+                                'kernel_size'      : [(4, 4)],
+                                'pool_size'        : [(2, 2)],
+                                'padding'          : ['same'],
+                                'conv_activation'  : ['relu'],
+                                'dense_units'      : 16,
+                                'dense_activation' : 'relu',
+                                'output_activation': None,
+                                'batch_size'  : 84,
+                                'n_epochs'    : 20,
+                                'optimizer'   : 'adam',
+                                'loss'        : 'mean_squared_error',
+                                'best'        : True,
+                                'show_plot' : SHOW_PLOTS
+                            }
                         }
-            cause_cluster_params = {'model' : 'KMeans', 'n_clusters' : self.n_xbar, 'random_state' : 42, 'verbose' : 0}
-            effect_cluster_params = {'model' : 'KMeans', 'n_clusters' : self.n_ybar, 'random_state' : 42, 'verbose' : 0}
-            block_names = ['CondDensityEstimator', 'CauseClusterer', 'EffectClusterer']
-            block_params = [cde_params, cause_cluster_params, effect_cluster_params]
+            cause_cluster_params = {'model' : 'KMeans', 
+                                    'model_params' : {
+                                        'n_clusters' : self.n_xbar, 
+                                        'random_state' : 42, 
+                                        'verbose' : 0}
+                                    }
+            effect_cluster_params = {'model' : 'KMeans', 
+                                     'model_params' : {
+                                         'n_clusters' : self.n_ybar, 
+                                         'random_state' : 42, 
+                                         'verbose' : 0}
+                                    }
+            block_names = ['CondDensityEstimator', 'CauseClusterer', 
+                           'EffectClusterer']
+            block_params = [cde_params, cause_cluster_params, 
+                            effect_cluster_params]
             exp = Experiment(X_train=self.x, Y_train=self.y, data_info=data_info, 
                 block_names=block_names, block_params=block_params, blocks=None, 
                 results_path=RESULTS_PATH)

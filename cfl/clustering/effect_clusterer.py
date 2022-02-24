@@ -22,7 +22,7 @@ from cfl.clustering.cluster_tuning_util import tune
     assign new datapoints to the clusters found.
 
     Attributes:
-        params (dict): a set of parameters specifying a clusterer. The 'model' 
+        block_params (dict): a set of parameters specifying a clusterer. The 'model' 
                        key must be specified and can either be the name of an
                        sklearn.cluster model, or a clusterer model object that
                        follows the scikit-learn interface. If the former,
@@ -41,8 +41,8 @@ from cfl.clustering.cluster_tuning_util import tune
                             specified in cluster_metric()
         cluster_metric : a metric to judge the goodness of clustering (not yet
                          implemented). 
-        check_model_params : fill in any parameters that weren't
-                             provided in params with the default value, and 
+        check_block_params : fill in any parameters that weren't
+                             provided in block_params with the default value, and 
                              discard any unnecessary
                              paramaters that were provided.
     Example: 
@@ -58,13 +58,13 @@ from cfl.clustering.cluster_tuning_util import tune
         # syntax 1
         c = Clusterer(data_info ={'X_dims': X.shape, 'Y_dims': Y.shape, 
                                   'Y_type': 'continuous'}, 
-                      params={'model': 'DBSCAN', 'eps': 0.3, 'min_samples': 10}) 
+                      block_params={'model': 'DBSCAN', 'eps': 0.3, 'min_samples': 10}) 
 
         # syntax 2
         DBSCAN_model = DBSCAN(eps=0.3, min_samples=10)
         c = Clusterer(data_info ={'X_dims': X.shape, 'Y_dims': Y.shape, 
                                   'Y_type': 'continuous'}, 
-                      params={'model': DBSCAN_model})
+                      block_params={'model': DBSCAN_model})
 
         results = c.train(data, prev_results)
  """
@@ -72,13 +72,13 @@ from cfl.clustering.cluster_tuning_util import tune
 
 class EffectClusterer(Block):
 
-    def __init__(self, data_info, params):
+    def __init__(self, data_info, block_params):
         """
         Initialize Clusterer object
 
         Parameters
             data_info (dict): 
-            params (dict) :  a set of parameters specifying a clusterer. The 
+            block_params (dict) :  a set of parameters specifying a clusterer. The 
                              'model' key must be specified and can either be 
                              the name of an sklearn.cluster model, or a 
                              clusterer model object that follows the 
@@ -103,39 +103,32 @@ class EffectClusterer(Block):
             None
         """
 
-        # parameter checks and self.params assignment done here
-        super().__init__(data_info=data_info, params=params)
+        # parameter checks and self.block_params assignment done here
+        super().__init__(data_info=data_info, block_params=block_params)
 
         # attributes:
         self.name = 'EffectClusterer'
         self.Y_type = data_info['Y_type']
-        if not params['tune']:
-            self.model = self._create_model(self.params)
+        if not block_params['tune']:
+            self.model = self._create_model()
 
-    def _create_model(self, params):
-        if isinstance(params['model'], str):
-            # pull dict entries to pass into clusterer object
-            excluded_keys = ['model', 'tune',
-                             'precompute_distances', 'verbose']
-            model_keys = list(set(params.keys()) - set(excluded_keys))
-            model_params = {key: params[key] for key in model_keys}
-
-            # create model
-            model = eval(params['model'])(**model_params)
+    def _create_model(self):
+        if isinstance(self.block_params['model'], str):
+            model = eval(self.block_params['model'])(**self.block_params['model_params'])
         else:
-            model = params['model']
+            model = self.block_params['model']
         return model
 
-    def get_params(self):
+    def get_block_params(self):
         ''' Get parameters for this clustering model.
             Arguments: None
             Returns: 
                 dict: dictionary of parameter names (keys) and values (values)
         '''
 
-        return self.params
+        return self.block_params
 
-    def _get_default_params(self):
+    def _get_default_block_params(self):
         """ Private method that specifies default clustering method parameters.
             Note: clustering method currently defaults to DBSCAN. While DBSCAN
             is a valid starting method, the choice of clustering method is
@@ -148,12 +141,13 @@ class EffectClusterer(Block):
 
         """
 
-        default_params = {'model': DBSCAN(),
-                          'precompute_distances': True,
-                          'tune': False,
-                          'verbose': 1,
+        default_block_params = {'model'                : DBSCAN(),
+                          'model_params'          : {},
+                          'precompute_distances' : True,
+                          'tune'                 : False,
+                          'verbose'              : 1,
                           }
-        return default_params
+        return default_block_params
 
     def train(self, dataset, prev_results):
         """
@@ -182,31 +176,27 @@ class EffectClusterer(Block):
         x_lbls = prev_results['x_lbls']
         # sample P(Y|Xclass)
         y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls,
-                                precompute_distances=self.params['precompute_distances'])
+                                precompute_distances=self.block_params['precompute_distances'])
 
         # tune model hyperparameters if requested
-        if self.params['tune']:
-            params_to_remove = ['tune', 'verbose', 'precompute_distances']
-            tunable_params = self.params.copy()
-            for ptr in params_to_remove:
-                tunable_params.pop(ptr)
-            tuned_params,tuning_fig = tune(y_probs, tunable_params)
-            for k in tuned_params.keys():
-                self.params[k] = tuned_params[k]
-            self.model = self._create_model(self.params)
+        if self.block_params['tune']:
+            tuned_model_params,tuning_fig = tune(y_probs, self.block_params['model_params'])
+            for k in tuned_model_params.keys():
+                self.block_params['model_params'][k] = tuned_model_params[k]
+            self.model = self._create_model()
 
         # do y clustering
         self.model.fit(y_probs)
         y_lbls = self.model.labels_
 
         self.trained = True
-        if self.params['tune']:
+        if self.block_params['tune']:
             results_dict = {'y_lbls': y_lbls,
-                        'y_probs': y_probs,
-                        'tuning_fig' : tuning_fig}
+                            'y_probs': y_probs,
+                            'tuning_fig' : tuning_fig}
         else:
             results_dict = {'y_lbls': y_lbls,
-                        'y_probs': y_probs,}
+                            'y_probs': y_probs,}
                         
         return results_dict
 

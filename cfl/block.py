@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-
+from cfl.util.input_val import check_params
 
 class Block(metaclass=ABCMeta):
     '''A Block is an object that can:
@@ -10,13 +10,13 @@ class Block(metaclass=ABCMeta):
     the output of Block_A will provide input to Block_B.
     '''
 
-    def __init__(self, data_info, params):
+    def __init__(self, data_info, block_params):
         '''
         Instantiate the specified model.
 
         Arguments:
             data_info (dict): dict of information about associated datasets
-            model_params (dict): parameters for this model 
+            block_params (dict): parameters for this model 
 
         Returns: 
             None
@@ -24,15 +24,14 @@ class Block(metaclass=ABCMeta):
 
         # check input argument types
         assert isinstance(data_info, dict), 'data_info should be of type dict.'
-        assert isinstance(params, dict), 'params should be of type dict.'
+        assert isinstance(block_params, dict), 'params should be of type dict.'
 
         # set object attributes
         self.trained = False
         self.data_info = data_info
 
         # validate parameter dictionaries
-        validate_data_info(data_info)
-        self.params = self._check_model_params(params)
+        self.block_params = self._check_block_params(block_params)
 
     @abstractmethod
     def load_block(self, path):
@@ -110,7 +109,7 @@ class Block(metaclass=ABCMeta):
         return self.trained
 
     @abstractmethod
-    def _get_default_params(self):
+    def _get_default_block_params(self):
         ''' Get the default parameters for the Block.
 
             Arguments: 
@@ -120,9 +119,9 @@ class Block(metaclass=ABCMeta):
         '''
         ...
 
-    def _check_model_params(self, input_params, prune=False):
+    def _check_block_params(self, input_params):
         """
-         Check that all expected model parameters have been provided,
+         Check that all expected block parameters have been provided,
             and substitute the default if not. Remove any unused but
             specified parameters.
             Arguments: 
@@ -131,84 +130,9 @@ class Block(metaclass=ABCMeta):
                 dict: Verified parameter dictionary
         """
 
-        # check inputs
-        assert isinstance(input_params, dict), \
-            'input_params should be of type dict.'
-
-        # dictionary of default values for each parameter
-        default_params = self._get_default_params()
-
-        # temporarily set verbosity
-        if 'verbose' in input_params.keys():
-            verbose = input_params['verbose']
-        elif 'verbose' in default_params.keys():
-            verbose = default_params['verbose']
-        else:
-            verbose = 2
-
-        # check for parameters that are provided but not needed
-        # remove if found
-        # TODO: we used to prune by default but now it removes unrecognized
-        # sklearn clustering params - do we ever really need to prune?
-        if prune:
-            paramsToRemove = []
-            for param in input_params:
-                if param not in default_params.keys():
-                    paramsToRemove.append(param)
-                    if verbose > 0:
-                        print(
-                            f'{param} specified but not used by this block type')
-
-            # remove unnecessary parameters after we're done iterating
-            # to not cause problems
-            for param in paramsToRemove:
-                input_params.pop(param)
-
-        # check for needed parameters
-        # add if not found
-        for param in default_params:
-            if param not in input_params.keys():
-                if verbose > 0:
-                    print('{} not specified in input, defaulting to {}'.format(
-                        param, default_params[param]))
-                input_params[param] = default_params[param]
-
-        # input_params['name'] = self.name #TODO: remove?
-
-        return input_params
-
+        checked_params = check_params(input_params, 
+                                      self._get_default_block_params())
+        return checked_params
+        
     def get_params(self):
-        return self.params
-
-
-def validate_data_info(data_info):
-    ''' Make sure all information about data is correctly specified.
-
-    Parameters: 
-        data_info (dict): a dictionary of information about the data
-            CFL expects the following entries in data_info:
-            - X_dims: (n_examples X, n_features X)
-            - Y_dims: (n_examples Y, n_featuers Y)
-            - Y_type: 'continuous' or 'categorical'
-    '''
-
-    correct_keys = ['X_dims', 'Y_dims', 'Y_type']
-    assert set(correct_keys) == set(data_info.keys()), \
-        'data_info must specify values for the following set of keys \
-        exactly: {}'.format(correct_keys)
-
-    assert isinstance(data_info['X_dims'],
-                      tuple), 'X_dims should specify a 2-tuple.'
-    assert isinstance(data_info['Y_dims'],
-                      tuple), 'Y_dims should specify a 2-tuple.'
-    assert len(data_info['X_dims']) >= 2, 'X_dims should specify a 2-tuple.'
-    assert len(data_info['Y_dims']) >= 2, 'Y_dims should specify a 2-tuple.'
-    assert data_info['X_dims'][0] == data_info['Y_dims'][0], \
-        'X and Y should have same number of samples'
-    assert all(data_info['X_dims']) > 0, 'All X_dims should be greater than 0'
-    assert all(data_info['Y_dims']) > 0, 'All Y_dims should be greater than 0'
-    correct_Y_types = ['continuous', 'categorical']
-    assert data_info['Y_type'] in correct_Y_types, \
-        'Y_type can take the following values: {}'.format(correct_Y_types)
-
-    return True
+        return self.block_params

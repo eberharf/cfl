@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 class CDEModel(metaclass=ABCMeta):
 
     @abstractmethod
-    def __init__(self, data_info, params):
+    def __init__(self, data_info, model_params):
         ...
 
     @abstractmethod
@@ -24,5 +24,5 @@ class CDEModel(metaclass=ABCMeta):
         ...
     
     @abstractmethod
-    def get_params(self):
+    def get_model_params(self):
         ...

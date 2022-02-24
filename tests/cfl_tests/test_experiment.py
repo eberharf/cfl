@@ -8,14 +8,7 @@ from visual_bars import generate_visual_bars_data as vbd
 from cfl.util.data_processing import one_hot_encode
 from cfl.dataset import Dataset
 import shutil
-import random
-
-from sklearn.cluster import DBSCAN
-
-# Note: change if you want results somewhere else (folder will be deleted at end of run)
-# RESULTS_PATH = 'tests/tmp_test_results'
-
-# hypothesis 
+ 
 ############### HELPER FUNCTIONS #################
 def generate_vb_data():
     # create a visual bars data set 
@@ -23,9 +16,12 @@ def generate_vb_data():
     noise_lvl = 0.03
     im_shape = (10, 10)
     random_seed = 143
-    print('Generating a visual bars dataset with {} samples at noise level {}'.format(n_samples, noise_lvl))
+    print('Generating a visual bars dataset with {} samples at noise level \
+        {}'.format(n_samples, noise_lvl))
 
-    vb_data = vbd.VisualBarsData(n_samples=n_samples, im_shape = im_shape, noise_lvl=noise_lvl, set_random_seed=random_seed)
+    vb_data = vbd.VisualBarsData(n_samples=n_samples, im_shape = im_shape, 
+                                 noise_lvl=noise_lvl, 
+                                 set_random_seed=random_seed)
 
     ims = vb_data.getImages()
     y = vb_data.getTarget()
@@ -47,23 +43,25 @@ def test_cde_experiment():
                 'Y_type': 'categorical'}
 
     # parameters for CDE 
-    condExp_params = {'model' : 'CondExpMod',
-                    'batch_size': 128,
-                    'optimizer': 'adam',
-                    'n_epochs': 2,
-                    'opt_config': {'lr': 0.001},
-                    'verbose': 1,
-                    'show_plot': False,
-                    'dense_units': [100, 50, 10, 2],
-                    'activations': ['relu', 'relu', 'relu', 'softmax'],
-                    'dropouts': [0.2, 0.5, 0.5, 0],
-                    'weights_path': None,
-                    'loss': 'mean_squared_error',
-                    'standardize': False,
-                    'best': True}
+    cde_params =    {'model' : 'CondExpMod',
+                     'model_params' : {
+                        'batch_size': 128,
+                        'optimizer': 'adam',
+                        'n_epochs': 2,
+                        'opt_config': {'lr': 0.001},
+                        'verbose': 0,
+                        'show_plot': False,
+                        'dense_units': [100, 50, 10, 2],
+                        'activations': ['relu', 'relu', 'relu', 'softmax'],
+                        'dropouts': [0.2, 0.5, 0.5, 0],
+                        'weights_path': None,
+                        'loss': 'mean_squared_error',
+                        'standardize': False,
+                        'best': True}
+                    } 
 
     block_names = ['CondDensityEstimator']
-    block_params = [condExp_params]
+    block_params = [cde_params]
 
     # make new CFL Experiment with CDE only
     my_exp_cde = Experiment(X_train=x, Y_train=y, data_info=data_info, 
@@ -71,20 +69,21 @@ def test_cde_experiment():
                 results_path=RESULTS_PATH)
 
     dataset_train_cde = Dataset(x,y,name='dataset_train_cde')
-    train_results_cde = my_exp_cde.train(dataset=dataset_train_cde, prev_results=None)
-    print('HERE:::::: ', train_results_cde.keys())
+    train_results_cde = my_exp_cde.train(dataset=dataset_train_cde, 
+                                         prev_results=None)
     
     # check output of CDE block
     assert 'pyx' in train_results_cde['CondDensityEstimator'].keys(), \
         'CDE train fxn should specify pyx in training results. ' + \
         'Actual keys: {}'.format(train_results_cde.keys())
-    assert 'model_weights' in train_results_cde['CondDensityEstimator'].keys(), \
-        'CDE train fxn should specify model_weights in training results. ' + \
+    assert 'network_weights' in train_results_cde['CondDensityEstimator'].keys(), \
+        'CDE train fxn should specify network_weights in training results. ' + \
         'Actual keys: {}'.format(train_results_cde.keys())
 
     # try to train the experiment again --- it should not work 
     with pytest.raises(Exception): 
-        train_again = my_exp_cde.train(dataset=dataset_train_cde, prev_results=None)
+        train_again = my_exp_cde.train(dataset=dataset_train_cde, 
+                                       prev_results=None)
 
     ## predict 
     # check that results are the same as with training 
@@ -96,11 +95,13 @@ def test_cde_experiment():
 
 
     ## CDE and cluster experiment 
-    c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
-    e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
+    c_cluster_params = {'model' : 'KMeans', 
+                        'model_params' : {'n_clusters' : 4, 'random_state': 42}}
+    e_cluster_params = {'model' : 'KMeans', 
+                        'model_params' : {'n_clusters' : 2, 'random_state': 42}}
 
     block_names = ['CondDensityEstimator', 'CauseClusterer', 'EffectClusterer']
-    block_params = [condExp_params, c_cluster_params, e_cluster_params]
+    block_params = [cde_params, c_cluster_params, e_cluster_params]
 
     my_exp_clust = Experiment(X_train=x, Y_train=y, data_info=data_info, 
                 block_names=block_names, block_params=block_params, blocks=None, 
@@ -141,8 +142,10 @@ def test_clusterer_experiment():
                 'Y_dims': y.shape, 
                 'Y_type': 'categorical'}
 
-    c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
-    e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42}
+    c_cluster_params = {'model' : 'KMeans', 
+                        'model_params' : {'n_clusters' : 4, 'random_state': 42}}
+    e_cluster_params = {'model' : 'KMeans', 
+                        'model_params' : {'n_clusters' : 2, 'random_state': 42}}
 
     block_names = ['CauseClusterer', 'EffectClusterer']
     block_params = [c_cluster_params, e_cluster_params]
@@ -153,27 +156,31 @@ def test_clusterer_experiment():
                 results_path=RESULTS_PATH)
     
     # make artificial pyx
-    rng = np.random.default_rng(12345) # create a Random Number Gen to set reproducible random seed
+    rng = np.random.default_rng(12345)
     pyx = rng.random((y.shape[0], y.shape[1]))
     prev_results = {'pyx' : pyx}
     
     # train Experiment with pyx provided
-    dataset_train_cluster = Dataset(x,y, name='dataset_train_cluster', Xraw=None, Yraw=None)
-    train_results_cluster = my_exp_cluster.train(dataset=dataset_train_cluster, prev_results=prev_results)
+    dataset_train_cluster = Dataset(x,y, name='dataset_train_cluster', 
+                                    Xraw=None, Yraw=None)
+    train_results_cluster = my_exp_cluster.train(dataset=dataset_train_cluster, 
+                                                 prev_results=prev_results)
     
-    # # tmp save
-    # np.save('tests/resources/test_experiment/x_lbls.npy', train_results_cluster['Clusterer']['x_lbls'])
-    # np.save('tests/resources/test_experiment/y_lbls.npy', train_results_cluster['Clusterer']['y_lbls'])
+    # save benchmarks
+    # np.save('tests/resources/test_experiment/x_lbls.npy', 
+    #         train_results_cluster['CauseClusterer']['x_lbls'])
+    # np.save('tests/resources/test_experiment/y_lbls.npy', 
+    #         train_results_cluster['EffectClusterer']['y_lbls'])
     
-    # # load in correct labels
-    # x_lbls_expected = np.load('tests/resources/test_experiment/x_lbls.npy')
-    # y_lbls_expected = np.load('tests/resources/test_experiment/y_lbls.npy')
+    # load in correct labels
+    x_lbls_expected = np.load('tests/resources/test_experiment/x_lbls.npy')
+    y_lbls_expected = np.load('tests/resources/test_experiment/y_lbls.npy')
 
-    # # check clustering values
-    # assert np.array_equal(train_results_cluster['Kmeans']['x_lbls'], x_lbls_expected), \
-    #     'x_lbls do not match expected values.'
-    # assert np.array_equal(train_results_cluster['Kmeans']['y_lbls'] == y_lbls_expected), \
-    #     'y_lbls do not match expected values.'
+    # check clustering values
+    assert np.array_equal(train_results_cluster['CauseClusterer']['x_lbls'], \
+        x_lbls_expected), 'x_lbls do not match expected values.'
+    assert np.array_equal(train_results_cluster['EffectClusterer']['y_lbls'], \
+        y_lbls_expected), 'y_lbls do not match expected values.'
 
 
 
@@ -182,9 +189,8 @@ def test_clusterer_experiment():
             block_names=block_names, block_params=block_params, blocks=None, 
             results_path=RESULTS_PATH)
     with pytest.raises(Exception): 
-        cluster_bad = my_exp_cluster2.train(dataset=dataset_train_cluster, prev_results=None)
-
-
+        cluster_bad = my_exp_cluster2.train(dataset=dataset_train_cluster, 
+                                            prev_results=None)
 
 
 def test_load_past_experiment():
@@ -200,26 +206,30 @@ def test_load_past_experiment():
                 'Y_type': 'categorical'}
 
     # parameters for CDE 
-    condExp_params = {'model' : 'CondExpMod', 
-                    'batch_size': 128,
-                    'optimizer': 'adam',
-                    'n_epochs': 2,
-                    'opt_config': {'lr': 0.001},
-                    'verbose': 1,
-                    'show_plot': False,
-                    'dense_units': [100, 50, 10, 2],
-                    'activations': ['relu', 'relu', 'relu', 'softmax'],
-                    'dropouts': [0.2, 0.5, 0.5, 0],
-                    'weights_path': None,
-                    'loss': 'mean_squared_error',
-                    'standardize': False,
-                    'best': True}
+    cde_params =    {'model' : 'CondExpMod', 
+                     'model_params' : {
+                        'batch_size': 128,
+                        'optimizer': 'adam',
+                        'n_epochs': 2,
+                        'opt_config': {'lr': 0.001},
+                        'verbose': 1,
+                        'show_plot': False,
+                        'dense_units': [100, 50, 10, 2],
+                        'activations': ['relu', 'relu', 'relu', 'softmax'],
+                        'dropouts': [0.2, 0.5, 0.5, 0],
+                        'weights_path': None,
+                        'loss': 'mean_squared_error',
+                        'standardize': False,
+                        'best': True}
+                    }
 
-    c_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42, 'verbose' : 0}
-    e_cluster_params = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42, 'verbose' : 0}
+    c_cluster_params = {'model' : 'KMeans', 
+                        'model_params' : {'n_clusters' : 4, 'random_state': 42}}
+    e_cluster_params = {'model' : 'KMeans', 
+                        'model_params' : {'n_clusters' : 2, 'random_state': 42}}
 
     block_names = ['CondDensityEstimator', 'CauseClusterer', 'EffectClusterer']
-    block_params = [condExp_params, c_cluster_params, e_cluster_params]
+    block_params = [cde_params, c_cluster_params, e_cluster_params]
 
     # make CFL Experiment
     old_exp = Experiment(X_train=x, Y_train=y, data_info=data_info, 

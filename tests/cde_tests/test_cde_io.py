@@ -34,61 +34,56 @@ def make_cde_io_tests(cond_exp_class):
             params = 'these are not params'
             self.assertRaises(AssertionError, cond_exp_class, data_info, params)
 
-        def test_init_wrong_data_info_keys(self):
-            data_info = {}
-            params = {}
-            self.assertRaises(AssertionError, cond_exp_class, data_info, 
-                                    params)
+        # these should be tested in Experiment now
 
-        def test_init_wrong_data_info_value_types(self):
-            data_info = {'X_dims' : None, 'Y_dims' : None, 'Y_type' : None}
-            params = {}
-            self.assertRaises(AssertionError, cond_exp_class, data_info, 
-                                    params)
+        # def test_init_wrong_data_info_keys(self):
+        #     data_info = {}
+        #     params = {}
+        #     self.assertRaises(AssertionError, cond_exp_class, data_info, 
+        #                             params)
 
-        def test_init_wrong_data_info_values(self):
-            data_info = {   'X_dims' : (0,0), 
-                            'Y_dims' : (0,0), 
-                            'Y_type' : 'continuous'}
-            params = {}
-            self.assertRaises(AssertionError, cond_exp_class, data_info, 
-                                    params)
-            
-            data_info = {   'X_dims' : (10,3), 
-                            'Y_dims' : (12,2), 
-                            'Y_type' : 'continuous'}
-            params = {}
-            self.assertRaises(AssertionError, cond_exp_class, data_info, 
-                                    params)
+        # def test_init_wrong_data_info_value_types(self):
+        #     data_info = {'X_dims' : None, 'Y_dims' : None, 'Y_type' : None}
+        #     params = {}
+        #     self.assertRaises(AssertionError, cond_exp_class, data_info, 
+        #                             params)
+        #
+        # def test_init_wrong_data_info_values(self):
+        #     data_info = {   'X_dims' : (0,0), 
+        #                     'Y_dims' : (0,0), 
+        #                     'Y_type' : 'continuous'}
+        #     params = {}
+        #     self.assertRaises(AssertionError, cond_exp_class, data_info, 
+        #                             params)
 
-        def test_init_correct_inputs(self):
-            data_info = {'X_dims' : (10,3), 
-                         'Y_dims' : (10,2), 
-                         'Y_type' : 'continuous'}
-            params = {}
-            ceb = cond_exp_class(data_info, params)
+        # def test_init_correct_inputs(self):
+        #     data_info = {'X_dims' : (10,3), 
+        #                  'Y_dims' : (10,2), 
+        #                  'Y_type' : 'continuous'}
+        #     params = {}
+        #     ceb = cond_exp_class(data_info, params)
 
-        ## SAVE_BLOCK #########################################################
-        def test_save_block_wrong_input_type(self):
+        ## SAVE_MODEL #########################################################
+        def test_save_model_wrong_input_type(self):
             path = 123
-            self.assertRaises(AssertionError, self.ceb.save_block, path)
+            self.assertRaises(AssertionError, self.ceb.save_model, path)
 
-        def test_save_block_correct_input_type(self):
+        def test_save_model_correct_input_type(self):
             path = 'not/a/real/path'
-            self.ceb.save_block(path)
+            self.ceb.save_model(path)
             shutil.rmtree('not')
 
-        ## LOAD_BLOCK #########################################################
-        def test_load_block_wrong_input_type(self):
+        ## LOAD_MODEL #########################################################
+        def test_load_model_wrong_input_type(self):
             path = 123
-            self.assertRaises(AssertionError, self.ceb.load_block, path)
+            self.assertRaises(AssertionError, self.ceb.load_model, path)
 
-        def test_load_block_correct_input_type(self):
-            # should only be run after test_save_block_correct_input_type so 
+        def test_load_model_correct_input_type(self):
+            # should only be run after test_save_model_correct_input_type so 
             # there is something to load
             path = 'not/a/real/path'
-            self.ceb.save_block(path)
-            self.ceb.load_block(path)
+            self.ceb.save_model(path)
+            self.ceb.load_model(path)
             shutil.rmtree('not')
             # check and reset state
             assert self.ceb.trained, 'CDE should be trained after loading'
@@ -107,7 +102,7 @@ def make_cde_io_tests(cond_exp_class):
                               Y=np.zeros(self.data_info['Y_dims']))
 
             # what we expect from train outputs
-            tkeys = ['train_loss','val_loss','loss_plot','model_weights','pyx']
+            tkeys = ['train_loss','val_loss','loss_plot','network_weights','pyx']
             tshapes = {'train_loss' : (self.params['n_epochs'],),
                         'val_loss'  : (self.params['n_epochs'],),
                         'pyx'       : (self.data_info['Y_dims'])
@@ -139,7 +134,7 @@ def make_cde_io_tests(cond_exp_class):
             self.ceb.trained = False
 
             # what we expect from train outputs first time
-            tkeys = ['train_loss','val_loss','loss_plot','model_weights','pyx']
+            tkeys = ['train_loss','val_loss','loss_plot','network_weights','pyx']
             
             train_results = self.ceb.train(dataset, prev_results)
 
@@ -186,30 +181,10 @@ def make_cde_io_tests(cond_exp_class):
                     f"expected {self.data_info['Y_dims']} but got \
                     {pred_results['pyx'].shape}"
         
-        ### EVALUATE #########################################################
-        def test_evaluate_wrong_input_type(self):
-            # artifically set CDE trained = True
-            self.ceb.trained = True
-            
-            dataset = 'this is not a Dataset'
-            prev_results = 'this is not a dict'
-            self.assertRaises(AssertionError, self.ceb.evaluate, dataset)
-
-        def test_evaluate_correct_input_type(self):
-
-            dataset = Dataset(X=np.ones(self.data_info['X_dims']), 
-                              Y=np.zeros(self.data_info['Y_dims']))
-            prev_results = None
-
-            self.ceb.train(dataset, prev_results)
-            score = self.ceb.evaluate(dataset)
-            assert score.shape==()
-            assert score.dtype==np.float32
-
         ### BUILD_MODEL ######################################################
 
         def test_build_model(self):
-            assert isinstance(self.ceb._build_model(), tf.keras.Sequential)
+            assert isinstance(self.ceb._build_network(), tf.keras.Sequential)
 
 
     return CondExpIOTests

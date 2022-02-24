@@ -7,6 +7,7 @@ from cfl.dataset import Dataset
 from cfl.block import Block
 import cfl.cond_density_estimation as cdem
 import cfl.clustering as ccm
+from cfl.util.input_val import validate_data_info
 
 '''
 Methods in Experiment Class: 
@@ -119,6 +120,7 @@ class Experiment():
         # Note: explicitly stating one dataset for training as an Experiment
         # attribute enforces the definition that an Experiment is a unique
         # configuration of a trained CFL.
+        validate_data_info(data_info)
         self.data_info = data_info
         self.datasets = {}
         self.dataset_train = self.add_dataset(X=X_train, Y=Y_train,
@@ -530,7 +532,7 @@ class Experiment():
             'this is a temporary system until we set up Block registration.'
 
         return BLOCK_KEY[block_name](data_info=self.data_info,
-                                     params=block_param)
+                                     block_params=block_param)
 
     def __save_results(self, results, dataset, block):
         ''' Save results for a given dataset and block. 

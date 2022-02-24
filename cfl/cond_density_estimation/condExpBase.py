@@ -38,15 +38,13 @@ class CondExpBase(CDEModel):
         data_info : dict with information about the dataset shape (dict)
         default_params : default parameters to fill in if user doesn't provide
                          a given entry (dict)
-        params : parameters for the CDE that are passed in by the user and
+        model_params : parameters for the CDE that are passed in by the user and
                  corrected by check_save_model_params (dict)
         trained : whether or not the modeled has been trained yet. This can
                   either happen by defining by instantiating the class and
                   calling train, or by passing in a path to saved weights from
-                  a previous training session through params['weights_path'].
+                  a previous training session through model_params['weights_path'].
                   (bool)
-        weights_loaded : whether or not weights were loaded from
-                         params['weights_path]. (bool)
         model : tensorflow model for this CDE (tf.keras.Model.Sequential)
 
 
@@ -60,11 +58,11 @@ class CondExpBase(CDEModel):
         save_model : save the current weights of self.network
         build_model : create and return a tensorflow model
         _check_model_params : fill in any parameters that weren't provided in
-                             params with the default value, and discard any
+                             model_params with the default value, and discard any
                              unnecessary paramaters that were provided.
     '''
 
-    def __init__(self, data_info, params):
+    def __init__(self, data_info, model_params):
         ''' 
         Initialize model and define network.
 
@@ -72,7 +70,7 @@ class CondExpBase(CDEModel):
             data_info (dict) : a dictionary containing information about the 
                 data that will be passed in. Should contain 'X_dims',
                 'Y_dims', and 'Y_type' as keys.
-            params (dict) : dictionary containing parameters for the model.
+            model_params (dict) : dictionary containing parameters for the model.
             model (str) : name of the model so that the model type can be
                 recovered from saved parameters.
         Returns: 
@@ -80,24 +78,25 @@ class CondExpBase(CDEModel):
         '''
         self.name = 'CondExpBase'
         self.data_info = data_info
-        self.params = params
+        self.model_params = model_params
 
         # set object attributes
         self.network = self._build_network()
-
+        self.trained = False
+        
         # load model weights if specified
-        if self.params['weights_path'] is not None:
-            self.load_network(self.params['weights_path'])
+        if self.model_params['weights_path'] is not None:
+            self.load_network(self.model_params['weights_path'])
             self.trained = True
 
-    def get_params(self):
+    def get_model_params(self):
         ''' Get parameters for this CDE model.
             Arguments: None
             Returns: 
                 dict: dictionary of parameter names (keys) and values (values)
         '''
 
-        return self.params
+        return self.model_params
 
     def load_model(self, path):
         ''' 
@@ -169,18 +168,18 @@ class CondExpBase(CDEModel):
 
         # build optimizer
         optimizer = tf.keras.optimizers.get(
-            {'class_name': self.params['optimizer'],
-             'config': self.params['opt_config']})
+            {'class_name': self.model_params['optimizer'],
+             'config': self.model_params['opt_config']})
 
         # compile model
         self.network.compile(
-            loss=self.params['loss'],
+            loss=self.model_params['loss'],
             optimizer=optimizer,
         )
 
         # log GPU device if available
         device_name = tf.test.gpu_device_name()
-        if self.params['verbose'] > 0:
+        if self.model_params['verbose'] > 0:
             if device_name is not '':
                 print('Using GPU device: ', device_name)
             else:
@@ -192,7 +191,7 @@ class CondExpBase(CDEModel):
 
             # if we want to return the best weights (rather than the weights at the
             # end of training)
-            if self.params['best']:
+            if self.model_params['best']:
 
                 # give the checkpoints path a unique ID (so that it doesn't get
                 # confused with other CFL runs)
@@ -201,7 +200,7 @@ class CondExpBase(CDEModel):
                 # to the second (NOTE: if you create a bunch of CFLs all at 
                 # once maybe you'd need a more precise ID)
                 dt_id = now.strftime("%d%m%Y%H%M%S")
-                checkpoint_path = self.params['checkpoint_name']+dt_id
+                checkpoint_path = self.model_params['checkpoint_name']+dt_id
                 os.mkdir(checkpoint_path)
 
                 # ModelCheckpoint saves network checkpoints to specified path 
@@ -215,15 +214,15 @@ class CondExpBase(CDEModel):
                     save_best_only=True)
                 callbacks = [network_checkpoint_callback]
 
-            if self.params['tb_path'] is not None:
+            if self.model_params['tb_path'] is not None:
                 tb_callback = tf.keras.callbacks.TensorBoard(
-                    log_dir=self.params['tb_path'])
+                    log_dir=self.model_params['tb_path'])
                 callbacks = [tb_callback] + callbacks
 
-            if self.params['optuna_callback'] is not None:
-                callbacks = [self.params['optuna_callback']] + callbacks
+            if self.model_params['optuna_callback'] is not None:
+                callbacks = [self.model_params['optuna_callback']] + callbacks
 
-            if self.params['early_stopping']:
+            if self.model_params['early_stopping']:
                 es_callback = tf.keras.callbacks.EarlyStopping(
                     monitor="val_loss",
                     patience=20)
@@ -232,22 +231,22 @@ class CondExpBase(CDEModel):
             # train network
             history = self.network.fit(
                 Xtr, Ytr,
-                batch_size=self.params['batch_size'],
-                epochs=self.params['n_epochs'],
+                batch_size=self.model_params['batch_size'],
+                epochs=self.model_params['n_epochs'],
                 validation_data=(Xva, Yva),
                 callbacks=callbacks,
-                verbose=self.params['verbose']
+                verbose=self.model_params['verbose']
             )
 
             # handle results
             train_loss = history.history['loss']
             val_loss = history.history['val_loss']
             fig = self._graph_results(train_loss, val_loss,
-                                      show=self.params['show_plot'])
+                                      show=self.model_params['show_plot'])
             pyx = self.network.predict(dataset.X)
 
             # load in best weights if specified
-            if self.params['best']:
+            if self.model_params['best']:
                 # TODO: this is where the error is jenna
                 self.load_network(best_path)
 
@@ -259,9 +258,10 @@ class CondExpBase(CDEModel):
 
             self.trained = True
 
-        # we want to delete the checkpoints directory at the end, even if something messed up during training
+        # we want to delete the checkpoints directory at the end, even if 
+        # something messed up during training
         finally:
-            if self.params['best']:
+            if self.model_params['best']:
                 shutil.rmtree(checkpoint_path)
         return results_dict
 
@@ -282,7 +282,7 @@ class CondExpBase(CDEModel):
         ax.plot(range(len(train_loss)), train_loss, label='train_loss')
         ax.plot(range(len(val_loss)), val_loss, label='val_loss')
         ax.set_xlabel('Epochs')
-        ax.set_ylabel(self.params['loss'])
+        ax.set_ylabel(self.model_params['loss'])
         ax.set_title('Training and Test Loss')
         plt.legend(loc='upper right')
 
@@ -316,24 +316,6 @@ class CondExpBase(CDEModel):
         results_dict = {'pyx': pyx}
         return results_dict
 
-    def evaluate(self, dataset):
-        ''' 
-        Compute the loss specified in self.params['loss] between ground truth 
-        and network prediction.
-
-        Arguments:
-            dataset (Dataset): Dataset object containing X and Y data for this
-                        training run
-        Returns: 
-            float : the average loss for this batch
-        '''
-        assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
-        assert self.trained, "Remember to train the network before evaluation."
-
-        Y_hat = self.predict(dataset)['pyx']
-        loss_fxn = tf.keras.losses.get(self.params['loss'])
-        cost = loss_fxn(dataset.Y, Y_hat)
-        return tf.reduce_mean(cost)
 
     def load_network(self, file_path):
         ''' 
@@ -347,11 +329,16 @@ class CondExpBase(CDEModel):
 
         assert hasattr(self, 'network'), 'Build network before loading parameters.'
 
-        if self.params['verbose'] > 0:
+        if self.model_params['verbose'] > 0:
             print("Loading parameters from ", file_path)
         try:
-            # TODO: this is where an error is happening
-            self.network.load_weights(file_path)
+            # specify "expect_partial()" to let tf know that we won't be using
+            # all vars that were saved from training bc we are just doing
+            # prediction now. Alternative is to not save the extra params in 
+            # the first place, but will currently avoid that to encourage
+            # reproducibility. 
+            # https://stackoverflow.com/questions/58289342/tf2-0-translation-model-error-when-restoring-the-saved-model-unresolved-objec
+            self.network.load_weights(file_path).expect_partial()
         except:
             raise ValueError('path does not exist.')
 
@@ -369,7 +356,7 @@ class CondExpBase(CDEModel):
         '''
         # TODO : add check to only save trained networks? (bc of load network
         # setting train to true )
-        if self.params['verbose'] > 0:
+        if self.model_params['verbose'] > 0:
             print("Saving parameters to ", file_path)
         try:
             self.network.save_weights(file_path)
@@ -379,11 +366,28 @@ class CondExpBase(CDEModel):
     @abstractmethod
     def _build_network(self):
         ''' 
-        Define the neural network based on specifications in self.params.
+        Define the neural network based on specifications in self.model_params.
 
         Arguments:
             None
         Returns: 
-            tf.keras.models.Model : untrained network specified in self.params.
+            tf.keras.models.Model : untrained network specified in self.model_params.
+        '''
+        ...
+
+    @abstractmethod
+    def _check_format_model_params(self):
+        '''
+        Make sure all required model_params are specified and of appropriate 
+        dimensionality. Replace any missing model_params with defaults,
+        and resolve any simple dimensionality issues if possible.
+        
+        Arguments:
+            None
+        Returns:
+            None
+        Raises:
+            AssertionError : if params are misspecified and can't be 
+                             automatically fixed.
         '''
         ...

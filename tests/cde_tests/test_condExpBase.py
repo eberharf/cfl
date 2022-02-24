@@ -41,7 +41,7 @@ TS_SPLIT = N_TRAIN - TR_SPLIT
 X_DIM = 100
 Y_DIM = 1
 
-WEIGHTS_PATH = 'tests/test_results/test_condExpBase_resources/experiment0000/dataset0/checkpoints/best_weights'
+WEIGHTS_PATH = 'tests/test_results/test_model'
 
 DATA_INFO = { 'X_dims' : (N_TRAIN,X_DIM),
               'Y_dims' : (N_TRAIN,Y_DIM), 
@@ -64,28 +64,24 @@ CDE_PARAMS_WP['weights_path'] = WEIGHTS_PATH
 X, Y = get_data_helper(N_TRAIN)
 dtrain = Dataset(X, Y, name='dtrain')
 
-ceb_obj = CondExpMod(  data_info=DATA_INFO,
-                        params=CDE_PARAMS                      
+ceb_obj = CondExpMod(   data_info=DATA_INFO,
+                        model_params=CDE_PARAMS                      
                     )
 
 results_dict = ceb_obj.train(dataset=dtrain)
-tr_loss = results_dict['train_loss']
-ts_loss = results_dict['val_loss'] #TODO: same as line 88
-
+ceb_obj.save_model(WEIGHTS_PATH)
 
 dtest = Dataset(X[:N_PRED,:], Y[:N_PRED,:], name='dtest')
-pred = ceb_obj.predict(dtest)
+pred = ceb_obj.predict(dtest)['pyx']
 
 # generate results to test when weights_path is supplied
 dtrain_wp = Dataset(X, Y, name='dtrain_wp')
 
-ceb_obj_wp = CondExpMod(   data_info=DATA_INFO,
-                            params=CDE_PARAMS_WP
+ceb_obj_wp = CondExpMod(    data_info=DATA_INFO,
+                            model_params=CDE_PARAMS_WP
                         )
 
-results_dict = ceb_obj_wp.train(dataset=dtrain_wp)
-tr_loss_wp = results_dict['train_loss']
-ts_loss_wp = results_dict['val_loss'] #TODO: I jenna changed this but i'm not totally sure that test loss is the same as validation loss? 
+results_dict_wp = ceb_obj_wp.train(dataset=dtrain_wp)
 
 dtest_wp = Dataset(X[:N_PRED,:], Y[:N_PRED,:], name='dtest_wp')
 pred_wp = ceb_obj.predict(dtest_wp)['pyx']
@@ -98,11 +94,10 @@ def test_init():
             - since no weights_path was specified, model should be untrained
     '''
     ceb_obj_tmp = CondExpMod(   data_info=DATA_INFO,
-                                params=CDE_PARAMS
+                                model_params=CDE_PARAMS
                             )
 
     assert ceb_obj_tmp.trained==False, "No weights_path was specified, so model shouldn't be trained yet."
-    assert ceb_obj_tmp.weights_loaded==False, "No weights_path was specified, so self.weights_loaded should be false."
 
 def test_init_wp():
     ''' tests the following:
@@ -110,19 +105,9 @@ def test_init_wp():
         - since no weights_path was specified, model should be untrained
     '''
     ceb_obj_tmp = CondExpMod(   data_info=DATA_INFO,
-                                params=CDE_PARAMS_WP
+                                model_params=CDE_PARAMS_WP
                             )
     assert ceb_obj_tmp.trained==True, "Since weights_path was supplied, model is already trained."
-    assert ceb_obj_tmp.weights_loaded==True, "Since weights_path was supplied, weights_loaded should be true."
-
-def test_train_test_split():
-    ''' tests the following:
-        - train-test-split is the right shape
-    '''
-    assert dtrain.split_data[0].shape==(TR_SPLIT, X_DIM), 'Xtr shape is incorrect'
-    assert dtrain.split_data[1].shape==(TS_SPLIT, X_DIM), 'Xts shape is incorrect'
-    assert dtrain.split_data[2].shape==(TR_SPLIT, Y_DIM), 'Ytr shape is incorrect'
-    assert dtrain.split_data[3].shape==(TS_SPLIT, Y_DIM), 'Yts shape is incorrect'
 
 def test_train():
     ''' tests the following:
@@ -131,8 +116,10 @@ def test_train():
         - model.trained is true
     '''
 
-    assert len(tr_loss)==CDE_PARAMS['n_epochs'], 'tr_loss shape is incorrect'
-    assert len(ts_loss)==CDE_PARAMS['n_epochs'], 'ts_loss shape is incorrect'
+    assert len(results_dict['train_loss'])==CDE_PARAMS['n_epochs'], \
+        'tr_loss shape is incorrect'
+    assert len(results_dict['val_loss'])==CDE_PARAMS['n_epochs'], \
+        'val_loss shape is incorrect'
 
     assert ceb_obj.trained, 'weights_path was supplied but model.trained is false.'
 
@@ -140,8 +127,8 @@ def test_train_wp():
     ''' tests the following:
         - whether train() will just return [],[] because model does not require training.
     '''
-    assert tr_loss_wp==[], 'tr_loss was not [] when weights_path was supplied: {}'.format(tr_loss_wp)
-    assert ts_loss_wp==[], 'ts_loss was not [] when weights_path was supplied: {}'.format(ts_loss_wp)
+    assert np.array_equal(list(results_dict_wp.keys()),['pyx']), \
+        'if model was already trained, results_dict should only contain pyx'
 
 def test_predict():
     ''' tests the following:
@@ -155,50 +142,43 @@ def test_predict_wp():
     '''
     assert pred_wp.shape==(N_PRED, Y_DIM), 'Prediction size incorrect'
 
-def test_evaluate():
-    ''' tests the following:
-        - eval function runs
-    '''
-    ceb_obj.evaluate(dtest)
 
-
-def test_load_parameters():
+def test_load_network():
     ''' tests the following:
-        - self.trained is true after loading parameters
+        - self.trained is true after loading network
     '''
 
     ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO,
-                                params=CDE_PARAMS
+                                model_params=CDE_PARAMS
                                     )
 
-    ceb_obj_tmp.load_parameters(WEIGHTS_PATH)
+    ceb_obj_tmp.load_network(WEIGHTS_PATH)
 
-    assert ceb_obj_tmp.trained, 'Parameters loaded but self.trained is false.'
+    assert ceb_obj_tmp.trained, 'network loaded but self.trained is false.'
 
-def test_save_parameters():
+def test_save_network():
     ''' tests the following:
-        - file exists at file_path after saving parameters
+        - file exists at file_path after saving network
     '''
 
     ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO,
-                                params=CDE_PARAMS
+                                model_params=CDE_PARAMS
                             )
 
-    ceb_obj_tmp.load_parameters(WEIGHTS_PATH)
+    ceb_obj_tmp.load_network(WEIGHTS_PATH)
     new_path = 'tests/test_results/tmp_weights.h5'
-    ceb_obj_tmp.save_parameters(new_path)
+    ceb_obj_tmp.save_network(new_path)
 
-    assert os.path.exists(new_path), 'File for saved parameters does not exist.'
+    assert os.path.exists(new_path), 'File for saved network does not exist.'
 
     os.remove(new_path)
 
-def test_check_save_model_params():
+def test_check_format_model_params():
     ''' tests the following:
         - all keys in self.default_params show up in self.params
     '''
-    ceb_obj_tmp = CondExpMod(  data_info=DATA_INFO,
-                            params=CDE_PARAMS
-                        )
+    ceb_obj_tmp = CondExpMod(data_info=DATA_INFO, model_params=CDE_PARAMS)
 
-    assert set(ceb_obj_tmp.default_params.keys())==set(ceb_obj_tmp.params.keys()), \
-        'self.model_params keys do not match self.default_params keys.'
+    assert set(ceb_obj_tmp._get_default_model_params().keys())==\
+           set(ceb_obj_tmp.model_params.keys()), 'self.model_params keys do not \
+           match self._get_default_model_params keys.'

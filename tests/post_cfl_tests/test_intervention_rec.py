@@ -9,25 +9,33 @@ from cfl.experiment import Experiment
 from visual_bars import generate_visual_bars_data as vbd
 from cfl.util.data_processing import one_hot_encode
 from cfl.post_cfl import intervention_rec as IR
+from tests.test_constants import *
 
 # parameters for CDE 
-CDE_PARAMS = {'batch_size': 128,
-                'optimizer': 'adam',
-                'n_epochs': 10,
-                'opt_config': {'lr': 0.001},
-                'verbose': 1,
-                'show_plot': False,
-                'dense_units': [100, 50, 10, 2],
-                'activations': ['relu', 'relu', 'relu', 'softmax'],
-                'dropouts': [0.2, 0.5, 0.5, 0],
-                'weights_path': os.path.join(RESOURCE_PATH, 'test_intervention_rec',
-                                    'experiment0000/trained_blocks/CondExpMod'),
-                'loss': 'mean_squared_error',
-                'standardize': False,
-                'best': True}
+CDE_PARAMS = {  'model' : 'CondExpMod',
+                'model_params' : {
+                    'batch_size': 128,
+                    'optimizer': 'adam',
+                    'n_epochs': 10,
+                    'opt_config': {'lr': 0.001},
+                    'verbose': 1,
+                    'show_plot': False,
+                    'dense_units': [100, 50, 10, 2],
+                    'activations': ['relu', 'relu', 'relu', 'softmax'],
+                    'dropouts': [0.2, 0.5, 0.5, 0],
+                    'weights_path': os.path.join(RESOURCE_PATH, 'test_intervention_rec',
+                                        'experiment0000/trained_blocks/CondExpMod'),
+                    'loss': 'mean_squared_error',
+                    'standardize': False,
+                    'best': True}
+                }
 
-C_CLUSTER_PARAMS = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42, 'verbose' : 0}
-E_CLUSTER_PARAMS = {'model' : 'KMeans', 'n_clusters' : 4, 'random_state' : 42, 'verbose' : 0}
+C_CLUSTER_PARAMS = {'model' : 'KMeans', 
+                    'model_params' : {'n_clusters' : 4, 'random_state' : 42, 
+                                      'verbose' : 0}}
+E_CLUSTER_PARAMS = {'model' : 'KMeans', 
+                    'model_params' : {'n_clusters' : 4, 'random_state' : 42, 
+                                      'verbose' : 0}}
 
 def generate_vb_data():
     # create a visual bars data set 
@@ -81,7 +89,8 @@ def test_intervention_recs():
     #         my_exp.get_intervention_recs('dataset_train'))
     recs = IR.get_recommendations(exp_path, dataset_name='dataset_train', 
                                cause_or_effect='cause', visualize=False)
-    old_recs = np.load(os.path.join(RESOURCE_PATH, 'test_intervention_rec', 'recs.npy'))
+    old_recs = np.load(os.path.join(RESOURCE_PATH, 'test_intervention_rec', 
+        'recs.npy'))
 
     assert np.array_equal(recs, old_recs), f'{recs[0]}, {old_recs[0]}'
 

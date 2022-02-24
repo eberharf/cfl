@@ -4,19 +4,20 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 from cfl.cond_density_estimation.condExpBase import CondExpBase
+from cfl.util.input_val import check_params
 
 
 class CondExpDIY(CondExpBase):
     ''' 
     A child class of CondExpBase that takes in model specifications from
-    self.params to define the model architecture. This class aims to
+    self.model_params to define the model architecture. This class aims to
     simplify the process of tuning a mainstream feed-forward model.
 
     See CondExpBase documentation for more details.
     # TODO: method/attribute summary
     '''
 
-    def __init__(self, data_info, params):
+    def __init__(self, data_info, model_params):
         ''' 
         Initialize model and define network.
 
@@ -24,13 +25,13 @@ class CondExpDIY(CondExpBase):
             data_info (dict) : a dictionary containing information about the 
                 data that will be passed in. Should contain 'X_dims', 
                 'Y_dims', and 'Y_type' as keys.
-            params (dict) : dictionary containing parameters for the model.
+            model_params (dict) : dictionary containing parameters for the model.
         Returns: 
             None
         '''
-        super().__init__(data_info=data_info, params=params)
+        super().__init__(data_info=data_info, model_params=model_params)
 
-    def _get_default_params(self):
+    def _get_default_model_params(self):
         ''' 
         Returns the default parameters specific to this type of Block.
 
@@ -64,44 +65,50 @@ class CondExpDIY(CondExpBase):
                 'checkpoint_name' : 'tmp_checkpoints'
                 }
 
-    def _check_param_shapes(self):
+    def _check_format_model_params(self):
         '''
-        Verify that valid model params were specified in self.params.
+        Verify that valid model params were specified in self.model_params.
 
         Arguments: 
             None
         Returns:
             None
         Raises:
-            AssertionError : if model architecture specified in self.params
+            AssertionError : if model architecture specified in self.model_params
                 is invalid. 
         '''
+        # first make sure all necessary params are specified and delete
+        # any that we don't need
+        self.model_params = check_params(self.model_params,
+                                         self._get_default_model_params())
+        
+        # TODO: model specific checks
         pass
 
     def _build_network(self):
         ''' 
-        Define the neural network based on specifications in self.params.
+        Define the neural network based on specifications in self.model_params.
 
-        This model takes specifications through the self.params dict to define
+        This model takes specifications through the self.model_params dict to define
         it's architecture.
 
         Arguments: 
             None
         Returns: 
-            tf.keras.models.Model : untrained model specified in self.params.
+            tf.keras.models.Model : untrained model specified in self.model_params.
         '''
 
-        self._check_param_shapes()  # here for uniformity, does nothing rn
+        self._check_format_model_params()
 
         # TODO: this should probably be someone else's responsibility to check
-        assert ((self.params['optuna_callback'] is None) and
-                (self.params['optuna_trial'] is None)) or \
-            ((self.params['optuna_callback'] is not None) and
-             (self.params['optuna_trial'] is not None)), \
+        assert ((self.model_params['optuna_callback'] is None) and
+                (self.model_params['optuna_trial'] is None)) or \
+            ((self.model_params['optuna_callback'] is not None) and
+             (self.model_params['optuna_trial'] is not None)), \
             'optuna_callback and optuna_trial must either both be \
                 specified or not specified.'
 
-        if self.params['optuna_trial'] is not None:
-            return self.params['build_network'](self.params['optuna_trial'])
+        if self.model_params['optuna_trial'] is not None:
+            return self.model_params['build_network'](self.model_params['optuna_trial'])
         else:
-            return self.params['build_network']()
+            return self.model_params['build_network']()
