@@ -169,7 +169,7 @@ class CauseClusterer(Block):
                                             self.block_params['model_params'])
             for k in tuned_model_params.keys():
                 self.block_params['model_params'][k] = tuned_model_params[k]
-            self.model = self._create_model(self.block_params['model_params'])
+            self.model = self._create_model()
 
         # do clustering
         self.model.fit(pyx)
