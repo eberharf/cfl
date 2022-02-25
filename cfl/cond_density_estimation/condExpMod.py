@@ -49,6 +49,8 @@ class CondExpMod(CondExpBase):
                 'activity_regularizers': None,
                 'kernel_regularizers': None,
                 'bias_regularizers': None,
+                'kernel_initializers' : None,
+                'bias_initializers' : None,
                 'dropouts': [0, 0],
                 'weights_path': None,
                 'loss': 'mean_squared_error',
@@ -89,7 +91,8 @@ class CondExpMod(CondExpBase):
 
         # make sure all layer-wise specs are of same dim as 'dense_units'
         for list_param in ['activations', 'dropouts', 'activity_regularizers',
-                           'kernel_regularizers', 'bias_regularizers']:
+                           'kernel_regularizers', 'bias_regularizers',
+                           'kernel_initializers', 'bias_initializers']:
 
             # if not specified, make param be a None list of same length
             if self.model_params[list_param]==None:
@@ -123,17 +126,21 @@ class CondExpMod(CondExpBase):
         arch = [tf.keras.layers.Input(shape=(self.data_info['X_dims'][1],))]
 
         # intermediate layers
-        for units, act, dropout, act_reg, kernel_reg, bias_reg in zip(
-                                    self.model_params['dense_units'],
-                                    self.model_params['activations'],
-                                    self.model_params['dropouts'],
-                                    self.model_params['activity_regularizers'],
-                                    self.model_params['kernel_regularizers'],
-                                    self.model_params['bias_regularizers']):
+        for units, act, dropout, act_reg, kernel_reg, bias_reg, kernel_init, \
+            bias_init in zip(   self.model_params['dense_units'],
+                                self.model_params['activations'],
+                                self.model_params['dropouts'],
+                                self.model_params['activity_regularizers'],
+                                self.model_params['kernel_regularizers'],
+                                self.model_params['bias_regularizers'],
+                                self.model_params['kernel_initializers'],
+                                self.model_params['bias_initializers']):
             arch.append(tf.keras.layers.Dense(units=units, activation=act,
                                               activity_regularizer=act_reg,
                                               kernel_regularizer=kernel_reg,
-                                              bias_regularizer=bias_reg))
+                                              bias_regularizer=bias_reg,
+                                              kernel_initializer=kernel_init,
+                                              bias_initializer=bias_init))
             arch.append(tf.keras.layers.Dropout(dropout))
 
         model = tf.keras.models.Sequential(arch)
