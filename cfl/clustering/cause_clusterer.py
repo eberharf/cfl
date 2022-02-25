@@ -131,9 +131,9 @@ class CauseClusterer(Block):
         """
 
         default_block_params = {'model'       : 'DBSCAN',
-                          'model_params' : {},
-                          'tune'        : False,
-                          'verbose'     : 1 }
+                                'model_params' : {},
+                                'tune'        : False,
+                                'verbose'     : 1 }
         return default_block_params
 
     def train(self, dataset, prev_results):
@@ -163,7 +163,10 @@ class CauseClusterer(Block):
 
         # tune model hyperparameters if requested
         if self.block_params['tune']:
-            tuned_model_params,tuning_fig = tune(pyx, self.block_params['model_params'])
+            tuned_model_params,tuning_fig = tune(
+                                            pyx, 
+                                            self.block_params['model'], 
+                                            self.block_params['model_params'])
             for k in tuned_model_params.keys():
                 self.block_params['model_params'][k] = tuned_model_params[k]
             self.model = self._create_model(self.block_params['model_params'])

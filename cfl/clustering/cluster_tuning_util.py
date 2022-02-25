@@ -146,18 +146,16 @@ def get_user_params(suggested_params):
     return chosen_params
 
 
-def tune(data_to_cluster, params):
+def tune(data_to_cluster, model_name, model_params):
     ''' TODO '''
 
     # get list of parameter combos to optimize over
-    param_combos = get_parameter_combinations(params)
+    param_combos = get_parameter_combinations(model_params)
     errs = np.zeros((len(param_combos),))
     print('Beginning clusterer tuning')
     for ci, cur_params in tqdm(enumerate(param_combos.copy())):
         # create model with given params
-        model_params = cur_params.copy()
-        model_name = model_params.pop('model')
-        tmp_model = eval(model_name)(**model_params)
+        tmp_model = eval(model_name)(**cur_params)
 
         # do clustering
         tmp_model.fit(data_to_cluster)
@@ -169,7 +167,7 @@ def tune(data_to_cluster, params):
             one_hot_encode(lbls, np.unique(lbls)), data_to_cluster)
 
     # visualize errors and solicit user input
-    fig =  visualize_errors(errs, param_combos, params)
+    fig =  visualize_errors(errs, param_combos, model_params)
     suggested_params = param_combos[suggest_elbow_idx(errs)]
     chosen_params = get_user_params(suggested_params)
 
