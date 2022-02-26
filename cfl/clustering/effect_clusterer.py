@@ -145,6 +145,7 @@ class EffectClusterer(Block):
                           'model_params'          : {},
                           'precompute_distances' : True,
                           'tune'                 : False,
+                          'user_input'           : True, # not used unless 'tune' is True
                           'verbose'              : 1,
                           }
         return default_block_params
@@ -183,7 +184,8 @@ class EffectClusterer(Block):
             tuned_model_params ,tuning_fig, tuning_errs, param_combos = tune(
                 y_probs, 
                 self.block_params['model'], 
-                self.block_params['model_params'])
+                self.block_params['model_params'],
+                self.block_params['user_input'])
             for k in tuned_model_params.keys():
                 self.block_params['model_params'][k] = tuned_model_params[k]
             self.model = self._create_model()

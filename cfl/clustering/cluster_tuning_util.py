@@ -146,7 +146,7 @@ def get_user_params(suggested_params):
     return chosen_params
 
 
-def tune(data_to_cluster, model_name, model_params):
+def tune(data_to_cluster, model_name, model_params, user_input):
     ''' TODO '''
 
     # get list of parameter combos to optimize over
@@ -169,6 +169,9 @@ def tune(data_to_cluster, model_name, model_params):
     # visualize errors and solicit user input
     fig = visualize_errors(errs, param_combos, model_params)
     suggested_params = param_combos[suggest_elbow_idx(errs)]
-    chosen_params = get_user_params(suggested_params)
+    if user_input:
+        chosen_params = get_user_params(suggested_params)
+    else:
+        chosen_params = suggested_params
 
     return chosen_params, fig, errs, param_combos
