@@ -180,7 +180,10 @@ class EffectClusterer(Block):
 
         # tune model hyperparameters if requested
         if self.block_params['tune']:
-            tuned_model_params,tuning_fig = tune(y_probs, self.block_params['model'], self.block_params['model_params'])
+            tuned_model_params ,tuning_fig, tuning_errs, param_combos = tune(
+                y_probs, 
+                self.block_params['model'], 
+                self.block_params['model_params'])
             for k in tuned_model_params.keys():
                 self.block_params['model_params'][k] = tuned_model_params[k]
             self.model = self._create_model()
@@ -193,7 +196,9 @@ class EffectClusterer(Block):
         if self.block_params['tune']:
             results_dict = {'y_lbls': y_lbls,
                             'y_probs': y_probs,
-                            'tuning_fig' : tuning_fig}
+                            'tuning_fig' : tuning_fig,
+                            'tuning_errs' : tuning_errs, 
+                            'param_combos' : param_combos}
         else:
             results_dict = {'y_lbls': y_lbls,
                             'y_probs': y_probs,}

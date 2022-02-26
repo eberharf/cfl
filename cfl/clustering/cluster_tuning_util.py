@@ -167,8 +167,8 @@ def tune(data_to_cluster, model_name, model_params):
             one_hot_encode(lbls, np.unique(lbls)), data_to_cluster)
 
     # visualize errors and solicit user input
-    fig =  visualize_errors(errs, param_combos, model_params)
+    fig = visualize_errors(errs, param_combos, model_params)
     suggested_params = param_combos[suggest_elbow_idx(errs)]
     chosen_params = get_user_params(suggested_params)
 
-    return chosen_params, fig
+    return chosen_params, fig, errs, param_combos

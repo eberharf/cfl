@@ -163,10 +163,10 @@ class CauseClusterer(Block):
 
         # tune model hyperparameters if requested
         if self.block_params['tune']:
-            tuned_model_params,tuning_fig = tune(
-                                            pyx, 
-                                            self.block_params['model'], 
-                                            self.block_params['model_params'])
+            tuned_model_params,tuning_fig, tuning_errs, param_combos = tune(
+                pyx, 
+                self.block_params['model'], 
+                self.block_params['model_params'])
             for k in tuned_model_params.keys():
                 self.block_params['model_params'][k] = tuned_model_params[k]
             self.model = self._create_model()
@@ -177,7 +177,10 @@ class CauseClusterer(Block):
         x_lbls = self.model.labels_
         
         if self.block_params['tune']:
-            results_dict = {'x_lbls': x_lbls, 'tuning_fig' : tuning_fig}
+            results_dict = {'x_lbls': x_lbls, 
+                            'tuning_fig' : tuning_fig,
+                            'tuning_errs' : tuning_errs, 
+                            'param_combos' : param_combos}
         else:
             results_dict = {'x_lbls': x_lbls}
         return results_dict
