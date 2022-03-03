@@ -131,17 +131,17 @@ def get_user_params(suggested_params):
     print('Please choose your final clustering parameters.')
     print('(Press enter for default value in brackets)')
     for param_name in suggested_params.keys():
-        v = input(
-            f'Final {param_name} value [{suggested_params[param_name]}]:')
-        if v == '':
-            pass
-        else:
-            v_type = type(suggested_params[param_name])
-            try:
-                v = v_type(v)
-                chosen_params[param_name] = v
-            except:
-                raise TypeError(f'{param_name} should be of type {v_type}')
+        # v = input(f'Final {param_name} value [{suggested_params[param_name]}]:')
+        v = input(f'Final {param_name} value:')
+        # if v == '':
+        #     pass
+        # else:
+        v_type = type(suggested_params[param_name])
+        try:
+            v = v_type(v)
+            chosen_params[param_name] = v
+        except:
+            raise TypeError(f'{param_name} should be of type {v_type}')
     print('Final parameters: ', chosen_params)
     return chosen_params
 
