@@ -117,7 +117,7 @@ def visualize_errors(errs, params_list, params_to_tune):
         ax.set_title('Prediction Error (MSE)')
         plt.colorbar(im)
         plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
-        # plt.show()
+        plt.show()
         return(fig)
 
 
