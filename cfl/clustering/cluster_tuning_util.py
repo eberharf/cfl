@@ -6,7 +6,7 @@ from cfl.dataset import Dataset
 from cfl.util.data_processing import one_hot_encode
 from sklearn.cluster import *
 from tqdm import tqdm
-
+import copy
 
 def _score(true, pred):
     return np.mean(np.power(true-pred, 2))
@@ -66,7 +66,9 @@ def visualize_errors(errs, params_list, params_to_tune):
         # exclude any outliers
         shaped_errs[shaped_errs > np.median(shaped_errs)*10] = np.nan
         shaped_errs = np.ma.masked_invalid(shaped_errs)
-        plt.get_cmap().set_bad(color='w', alpha=1.)
+        # plt.get_cmap().set_bad(color='w', alpha=1.)
+        copy.copy(plt.get_cmap()).set_bad(color='w', alpha=1.)
+
 
         # 1D line plot
         fig, ax = plt.subplots(1,2, figsize=(12,4)) # (5*len(params_to_tune[k0])//20, 3))
