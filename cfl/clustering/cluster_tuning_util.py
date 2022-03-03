@@ -80,7 +80,7 @@ def visualize_errors(errs, params_list, params_to_tune):
         ax[0].set_xlabel(k0)
         ax[0].set_ylabel('Error')
         ax[0].set_title('Prediction Error (MSE)')
-        ax[1].plot(params_to_tune[k0][:-1], shaped_errs[1:]-shaped_errs[:-1])
+        ax[1].plot(params_to_tune[k0][1:], shaped_errs[1:]-shaped_errs[:-1])
         ax[1].set_xticks(params_to_tune[k0][:-1])
         ax[1].set_xticklabels(params_to_tune[k0][:-1])
         ax[1].set_xlabel(k0)
