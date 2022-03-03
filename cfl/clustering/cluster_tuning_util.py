@@ -132,7 +132,7 @@ def suggest_elbow_idx(errs):
 def get_user_params(suggested_params):
     chosen_params = suggested_params
     print('Please choose your final clustering parameters.')
-    print('(Press enter for default value in brackets)')
+    # print('(Press enter for default value in brackets)')
     for param_name in suggested_params.keys():
         # v = input(f'Final {param_name} value [{suggested_params[param_name]}]:')
         v = input(f'Final {param_name} value:')
