@@ -67,12 +67,12 @@ def visualize_errors(errs, params_list, params_to_tune):
         shaped_errs[shaped_errs > np.median(shaped_errs)*10] = np.nan
         shaped_errs = np.ma.masked_invalid(shaped_errs)
         # plt.get_cmap().set_bad(color='w', alpha=1.)
-        copy.copy(plt.get_cmap()).set_bad(color='w', alpha=1.)
+        cmap = copy.copy(plt.get_cmap()).set_bad(color='w', alpha=1.)
 
 
         # 1D line plot
         fig, ax = plt.subplots(1,2, figsize=(12,4)) # (5*len(params_to_tune[k0])//20, 3))
-        ax[0].plot(params_to_tune[k0], shaped_errs)
+        ax[0].plot(params_to_tune[k0], shaped_errs, cmap=cmap)
         ax[0].set_xticks(params_to_tune[k0])
         ax[0].set_xticklabels(params_to_tune[k0])
         ax[0].set_xlabel(k0)
@@ -102,11 +102,12 @@ def visualize_errors(errs, params_list, params_to_tune):
         # exclude any outliers
         shaped_errs[shaped_errs > np.median(shaped_errs)*10] = np.nan
         shaped_errs = np.ma.masked_invalid(shaped_errs)
-        plt.get_cmap().set_bad(color='w', alpha=1.)
+        # plt.get_cmap().set_bad(color='w', alpha=1.)
+        cmap = copy.copy(plt.get_cmap()).set_bad(color='w', alpha=1.)
 
         # 2D heatmap
         fig, ax = plt.subplots()
-        im = ax.imshow(shaped_errs)
+        im = ax.imshow(shaped_errs, cmap=cmap)
         ax.set_xlabel(k1)
         ax.set_ylabel(k0)
         ax.set_xticks(range(len(params_to_tune[k1])))
