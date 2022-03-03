@@ -63,16 +63,18 @@ def visualize_errors(errs, params_list, params_to_tune):
             idx = np.where(k0_vals == k_ord)
             shaped_errs[k_ord_i] = errs[idx[0]]
 
-        # exclude any outliers
-        shaped_errs[shaped_errs > np.median(shaped_errs)*10] = np.nan
-        shaped_errs = np.ma.masked_invalid(shaped_errs)
+        # mask any outliers
+        shaped_errs = np.ma.masked_where(
+            shaped_errs > np.median(shaped_errs)*10, shaped_errs)
+        # shaped_errs[shaped_errs > np.median(shaped_errs)*10] = np.nan
+        # shaped_errs = np.ma.masked_invalid(shaped_errs)
         # plt.get_cmap().set_bad(color='w', alpha=1.)
-        cmap = copy.copy(plt.get_cmap()).set_bad(color='w', alpha=1.)
+        # cmap = copy.copy(plt.get_cmap()).set_bad(color='w', alpha=1.)
 
 
         # 1D line plot
         fig, ax = plt.subplots(1,2, figsize=(12,4)) # (5*len(params_to_tune[k0])//20, 3))
-        ax[0].plot(params_to_tune[k0], shaped_errs, cmap=cmap)
+        ax[0].plot(params_to_tune[k0], shaped_errs)
         ax[0].set_xticks(params_to_tune[k0])
         ax[0].set_xticklabels(params_to_tune[k0])
         ax[0].set_xlabel(k0)
