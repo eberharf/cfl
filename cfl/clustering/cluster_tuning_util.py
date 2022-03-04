@@ -88,6 +88,7 @@ def visualize_errors(errs, params_list, params_to_tune):
         ax[1].set_title('Change in Prediction Error (MSE)')
         plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
         plt.show()
+        return fig
 
     else:
         k0, k1 = tuned_k[0], tuned_k[1]
