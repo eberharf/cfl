@@ -2,11 +2,17 @@ import numpy as np
 from sklearn.linear_model import LinearRegression as LR
 from sklearn.model_selection import ParameterGrid
 import matplotlib.pyplot as plt
+
 from cfl.dataset import Dataset
 from cfl.util.data_processing import one_hot_encode
 from sklearn.cluster import *
 from tqdm import tqdm
 import copy
+
+# set font size for all plots
+font = {'size'   : 22}
+import matplotlib
+matplotlib.rc('font', **font)
 
 def _score(true, pred):
     return np.mean(np.power(true-pred, 2))
@@ -86,7 +92,7 @@ def visualize_errors(errs, params_list, params_to_tune):
         ax[1].set_xlabel(k0)
         ax[1].set_ylabel('Change in Error')
         ax[1].set_title('Change in Prediction Error (MSE)')
-        plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
+        # plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
         plt.show()
         return fig
 
@@ -119,7 +125,7 @@ def visualize_errors(errs, params_list, params_to_tune):
         ax.set_yticklabels(np.round(params_to_tune[k0], 5))
         ax.set_title('Prediction Error (MSE)')
         plt.colorbar(im)
-        plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
+        # plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
         plt.show()
         return(fig)
 
