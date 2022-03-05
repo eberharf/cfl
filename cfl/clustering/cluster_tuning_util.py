@@ -79,7 +79,7 @@ def visualize_errors(errs, params_list, params_to_tune):
 
 
         # 1D line plot
-        fig, ax = plt.subplots(1,2, figsize=(12,4)) # (5*len(params_to_tune[k0])//20, 3))
+        fig, ax = plt.subplots(1,2, figsize=(14,4))
         ax[0].plot(params_to_tune[k0], shaped_errs)
         ax[0].set_xticks(params_to_tune[k0])
         ax[0].set_xticklabels(params_to_tune[k0])
