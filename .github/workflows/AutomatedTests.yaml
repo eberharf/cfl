@@ -20,31 +20,37 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: what's going on
-      run: echo $GITHUB_WORKSPACE
+      with:
+        fetch-depth: ‘2’
       
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-
     - name: append cfl to pythonpath
       run:  |
         %CD%
         echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-
-#     - name: test import cfl
-#       run: |
-#         python testing/import_check.py
-      
     - uses: conda-incubator/setup-miniconda@v2
       with:
           activate-environment: cfl-env
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
           environment-file: requirements.yml
-          auto-activate-base: false
-          
+          auto-activate-base: false        
+    - name: Test with coverage, pytest
+      run: |
+        conda env list
+        ls
+        pip install coverage
+        coverage run -m unittest
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+
+
+
+
 
 # #     - name: Set up Python 3.8
 # #       uses: actions/setup-python@v2
@@ -63,8 +69,3 @@ jobs:
 # #         echo "D:\a\cfl\cfl" >> $GITHUB_PATH
 # #         echo "cfl" >> $GITHUB_ENV
 # #         echo "cfl" >> $GITHUB_PATH
-    - name: Test with pytest
-      run: |
-        conda env list
-        ls
-        pytest -s
