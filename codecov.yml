@@ -1,0 +1,5 @@
+ignore:
+  - "tests/*"
+  - "data/*"
+  - "docs/*"
+  - "visual_bars/*"
