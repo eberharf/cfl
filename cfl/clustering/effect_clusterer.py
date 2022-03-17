@@ -191,8 +191,7 @@ class EffectClusterer(Block):
             self.model = self._create_model()
 
         # do y clustering
-        self.model.fit(y_probs)
-        y_lbls = self.model.labels_
+        y_lbls = self.model.fit_predict(y_probs)
 
         self.trained = True
         if self.block_params['tune']:

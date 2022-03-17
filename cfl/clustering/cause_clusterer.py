@@ -174,9 +174,8 @@ class CauseClusterer(Block):
             self.model = self._create_model()
 
         # do clustering
-        self.model.fit(pyx)
+        x_lbls = self.model.fit_predict(pyx)
         self.trained = True
-        x_lbls = self.model.labels_
         
         if self.block_params['tune']:
             results_dict = {'x_lbls': x_lbls, 
