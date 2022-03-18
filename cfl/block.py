@@ -131,7 +131,8 @@ class Block(metaclass=ABCMeta):
         """
 
         checked_params = check_params(input_params, 
-                                      self._get_default_block_params())
+                                      self._get_default_block_params(),
+                                      tag='Block')
         return checked_params
         
     def get_params(self):

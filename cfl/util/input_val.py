@@ -1,4 +1,4 @@
-def check_params(input_params, default_params, verbose=True):
+def check_params(input_params, default_params, tag, verbose=True):
     """
         Check that all expected parameters have been provided,
         and substitute the default if not. Remove any unused but
@@ -33,7 +33,7 @@ def check_params(input_params, default_params, verbose=True):
             params_to_remove.append(param)
             if verbose > 0:
                 print(
-                    f'{param} specified but not used by this block type')
+                    f'{tag}: {param} specified but not used by this block type')
 
     # remove unnecessary parameters after we're done iterating
     # to not change list while iterating
@@ -44,8 +44,8 @@ def check_params(input_params, default_params, verbose=True):
     for param in default_params:
         if param not in input_params.keys():
             if verbose > 0:
-                print('{} not specified in input, defaulting to {}'.format(
-                    param, default_params[param]))
+                print('{}: {} not specified in input, defaulting to {}'.format(
+                    tag, param, default_params[param]))
             input_params[param] = default_params[param]
 
     return input_params

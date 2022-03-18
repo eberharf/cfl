@@ -29,6 +29,7 @@ class CondExpMod(CondExpBase):
             None
         '''
         super().__init__(data_info=data_info, model_params=model_params)
+        self.name = 'CondExpMod'
 
     def _get_default_model_params(self):
         ''' 
@@ -81,7 +82,8 @@ class CondExpMod(CondExpBase):
         # first make sure all necessary params are specified and delete
         # any that we don't need
         self.model_params = check_params(self.model_params,
-                                         self._get_default_model_params())
+                                         self._get_default_model_params(),
+                                         tag=self.name)
 
         # check that network output size matches prediction size
         assert self.model_params['dense_units'][-1] == self.data_info['Y_dims'][1], \

@@ -31,6 +31,7 @@ class CondExpCNN(CondExpBase):
             None
         '''
         super().__init__(data_info, model_params)
+        self.name = 'CondExpCNN'
 
     def _build_network(self):
         '''         
@@ -153,7 +154,8 @@ class CondExpCNN(CondExpBase):
         # first make sure all necessary params are specified and delete
         # any that we don't need
         self.model_params = check_params(self.model_params,
-                                         self._get_default_model_params())
+                                         self._get_default_model_params(),
+                                         tag=self.name)
 
         assert len(self.model_params['input_shape']) == 3, \
             "Input shape should be of the format (im_height, im_width, \

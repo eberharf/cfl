@@ -30,6 +30,7 @@ class CondExpDIY(CondExpBase):
             None
         '''
         super().__init__(data_info=data_info, model_params=model_params)
+        self.name = 'CondExpDIY'
 
     def _get_default_model_params(self):
         ''' 
@@ -80,7 +81,8 @@ class CondExpDIY(CondExpBase):
         # first make sure all necessary params are specified and delete
         # any that we don't need
         self.model_params = check_params(self.model_params,
-                                         self._get_default_model_params())
+                                         self._get_default_model_params(),
+                                         tag=self.name)
         
         # TODO: model specific checks
         pass
