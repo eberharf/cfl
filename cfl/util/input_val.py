@@ -1,4 +1,4 @@
-def check_params(input_params, default_params, tag, verbose=True):
+def check_params(input_params, default_params, tag):
     """
         Check that all expected parameters have been provided,
         and substitute the default if not. Remove any unused but
