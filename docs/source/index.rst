@@ -7,7 +7,9 @@
 Welcome to CFL
 =====================
 
-Causal Feature Learning (CFL) is an unsupervised algorithm designed to construct macro-variables from low-level data, accounting for the causal relationships between these macro-variables. 
+Causal Feature Learning (CFL) is an unsupervised algorithm designed to 
+construct macro-variables from low-level data, preserving the causal 
+relationships present in the data. 
 
 
 .. toctree::
@@ -57,7 +59,7 @@ Contributors
 
 Jenna Kahn and Iman Wahle designed the software and wrote the code in
 this repository. Daniel Israel wrote the MNIST example notebook and 
-constributed feedback to the code. 
+contributed feedback about the code. 
 
 Krzysztof Chalupka, Pietro Perona and Frederick Eberhardt developed the
 original theory for CFL. Krzysztof also wrote the original code upon
