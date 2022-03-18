@@ -33,7 +33,7 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 5
 
    cfl.cluster_methods
    cfl.density_estimation_methods
