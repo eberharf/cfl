@@ -13,7 +13,7 @@ def test_check_model_params():
     params are added, and that the input parameter values are used instead 
     of the defaults'''
     
-    checked_params = check_params(INPUT_PARAMS, DEFAULT_PARAMS, verbose=True)
+    checked_params = check_params(INPUT_PARAMS, DEFAULT_PARAMS, tag='Test')
     # check that 'param1' is overriden by input
     assert checked_params['param1'] == 10, f"'param1' value should be equal \
         to value in input but instead is {checked_params['param1']})"
