@@ -16,3 +16,5 @@ numpy # array manipulation and fast computing
 scikit-learn # used to import clustering methods and other algorithms/metrics
 jupyter # for jupyter notebooks
 optuna # for hyperparameter tuning
+
+markupsafe==2.0.1
