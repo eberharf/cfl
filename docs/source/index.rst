@@ -34,7 +34,7 @@ relationships present in the data.
 
 API Reference 
 *********************************
-:ref:`user-api`
+:ref:`api-index`
 
 .. toctree:: 
    :maxdepth: 1
