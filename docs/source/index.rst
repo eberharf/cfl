@@ -19,6 +19,7 @@ relationships present in the data.
    getting_started/SETUP
    getting_started/cfl_intro.md
    getting_started/quick_start.ipynb
+   getting_started/indepth_start.ipynb   
    getting_started/dev_guide.ipynb
 
 .. toctree:: 
