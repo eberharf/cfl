@@ -26,7 +26,7 @@ channels:
 dependencies:
   - tqdm # progress bar
   - matplotlib=3.3.1  # creates plots (used for visualization)
-  - tensorflow=2 # machine learning
+  - tensorflow=2.7.0 # machine learning
   - numpy=1.19.2 # array manipulation and fast computing
   - joblib=0.16.0 # used to save/load data primarily for el nino example
   - scikit-learn=0.23.2 # used to import clustering methods, other algorithms/metrics
