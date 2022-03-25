@@ -31,8 +31,8 @@ class CauseClusterer(Block):
     Methods:
         _create_model : given self.block_params, build the clustering model
         get_block_params : return self.block_params
-        _get_default_block_params : return values for block_params to defualt to if 
-            unspecified
+        _get_default_block_params : return values for block_params to defualt 
+            to if unspecified
         train : fit a model with P(Y|X=x) found by CDE
         predict : assign new datapoints to clusters found in train
         save_block : save the state of the object

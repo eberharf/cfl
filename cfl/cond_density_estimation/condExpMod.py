@@ -12,8 +12,38 @@ class CondExpMod(CondExpBase):
     self.model_params to define the model architecture. This class aims to
     simplify the process of tuning a mainstream feed-forward model.
 
-    See CondExpBase documentation for more details.
-    # TODO: method/attribute summary
+    See CondExpBase documentation for more details about training.
+
+    Attributes:
+        name (str) : name of the model so that the model type can be recovered 
+            from saved parameters (str)
+        data_info (dict) : dict with information about the dataset shape
+        default_params (dict) : default parameters to fill in if user doesn't 
+            provide a given entry
+        model_params (dict) : parameters for the CDE that are passed in by the 
+            user and corrected by check_save_model_params
+        trained (bool) : whether or not the modeled has been trained yet. This 
+            can either happen by defining by instantiating the class and
+            calling train, or by passing in a path to saved weights from
+            a previous training session through model_params['weights_path'].
+        model (tf.keras.Model.Sequential) : tensorflow model for this CDE
+
+    Methods:
+        get_model_params : return self.model_params
+        load_model : load everything needed for this CondExpMod model
+        save_model : save the current state of this CondExpMod model
+        train : train the neural network on a given Dataset
+        _graph_results : helper function to graph training and validation loss
+        predict : once the model is trained, predict for a given Dataset
+        load_network : load tensorflow network weights from a file into
+            self.network
+        save_network : save the current weights of self.network
+        _build_network : create and return a tensorflow network
+        _check_format_model_params : check dimensionality of provided 
+            parameters and fill in any missing parameters with defaults.   
+        _get_default_model_params() :  return values for block_params to defualt 
+            to if unspecified
+
     '''
 
     def __init__(self, data_info, model_params):
@@ -33,7 +63,7 @@ class CondExpMod(CondExpBase):
 
     def _get_default_model_params(self):
         ''' 
-        Returns the default parameters specific to this type of Block.
+        Returns the default parameters specific to this type of model.
 
         Arguments:
             None
