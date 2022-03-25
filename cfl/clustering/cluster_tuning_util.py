@@ -1,25 +1,59 @@
+'''
+This module helps tune hyperparameters for CauseClusterer and EffectClusterer
+Block types. It iterates over combinations of hyperparameter values and computes
+the error of predicting the values being clustered from the cluster
+assignments found using the given hyperparameters. It then displays these
+predictions to the user and prompts for input as to what set of hyperparameter
+values to move forward with.
+
+Todo:
+    * this module currently only supports tuning Sklearn or built-in clustering
+      models. It needs to be extended to handle user-defined models that 
+      follow the ClustererModel interface.
+'''
+
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression as LR
 from sklearn.model_selection import ParameterGrid
-import matplotlib.pyplot as plt
-
-from cfl.dataset import Dataset
-from cfl.util.data_processing import one_hot_encode
 from sklearn.cluster import *
+
+from cfl.util.data_processing import one_hot_encode
 from tqdm import tqdm
 import copy
 
 # set font size for all plots
-font = {'size'   : 22}
+font = {'size' : 22}
 import matplotlib
 matplotlib.rc('font', **font)
 
 def _score(true, pred):
+    '''
+    Computes the mean squared error between ground truth and prediction.
+    
+    Arguments:
+        true (np.ndarray) : ground truth array of size (n_samples, n_features)
+        pred (np.ndarray) : predicted array of size (n_samples, n_features)
+    Returns:
+        np.float : mean squared error between true and pred
+    '''
     return np.mean(np.power(true-pred, 2))
 
-
 def compute_predictive_error(Xlr, Ylr, n_iter=100):
-
+    ''' 
+    Fits a linear model to a randomly selected subset of data and evalutes
+    this model on the remaining subset of data n_iter times, then returns
+    the average error over these n_iter runs.
+    
+    Arguments:
+        Xlr (np.ndarray) : array of cluster assignments of size (n_samples,)
+        Ylr (np.ndarray) : array of original data points used for clustering,
+            of size (n_samples, n_features)
+        n_iter (int) : number of times to retrain and evaluate model. Defaults
+            to 100. 
+    Returns:
+        np.float : mean error across n_iter runs
+    '''
     # reshape data if necessary
     if Xlr.ndim == 1:
         Xlr = np.expand_dims(Xlr, -1)
@@ -46,11 +80,33 @@ def compute_predictive_error(Xlr, Ylr, n_iter=100):
 
 
 def get_parameter_combinations(param_ranges):
+    '''
+    Given a dictionary of parameter ranges, returns a list of all parameter
+    combinations to evaluate.
+    
+    Arguments:
+        param_ranges (dict) : dictionary of parameters, where values are all 
+            iterable
+    Returns:
+        list : list of dictionaries of all parameter combinations
+    '''
+    
     param_combos = list(ParameterGrid(param_ranges))
     return param_combos
 
 
 def visualize_errors(errs, params_list, params_to_tune):
+    '''
+    Visualizes the errors computed for every parameter combination. 
+
+    Arguments:
+        errs (np.ndarray) : array of error for every parameter combination
+        params_list (list): list of dicts of all parameter combinations as 
+            given by `get_parameter_combinations`
+        params_to_tune (dict) : original dict of parameters to iterate over.
+    Returns:
+        matplotlib.pyplot.figure : figure that is displayed
+    '''
 
     # pick variables to plot
     tuned_k = []
@@ -131,6 +187,16 @@ def visualize_errors(errs, params_list, params_to_tune):
 
 
 def suggest_elbow_idx(errs):
+    '''
+    Uses a heuristic to suggest where an "elbow" occurs in the errors. This
+    currently does not work well and is not used by CFL.
+    
+    Arguments:
+        errs (np.ndarray) : array of error for every parameter combination
+    Returns:
+        int : index of where elbow occurs in errs list
+    '''
+
     # TODO: does this assume monotonically decreasing error?
     deltas = np.array([errs[i]-errs[0] for i in range(len(errs))])
     per_deltas = deltas / (errs[-1] - errs[0])
@@ -139,6 +205,14 @@ def suggest_elbow_idx(errs):
 
 
 def get_user_params(suggested_params):
+    ''' 
+    Queries the user for the final hyperparameters to proceed with.
+    
+    Arguments: 
+        suggested_params (dict) : parameters to suggest as defaults.
+    Returns: 
+        dict : dictionary of hyperparameters specified.
+    '''
     chosen_params = suggested_params
     print('Please choose your final clustering parameters.')
     # print('(Press enter for default value in brackets)')
@@ -157,9 +231,30 @@ def get_user_params(suggested_params):
     print('Final parameters: ', chosen_params)
     return chosen_params
 
-
 def tune(data_to_cluster, model_name, model_params, user_input):
-    ''' TODO '''
+    ''' 
+    Manages the tuning process for clustering hyperparameters. This function
+    loops through all parameter combinations as specified by the user, finds
+    the error for predicting the original data clustered from the cluster
+    assignments, shows the user these errors, queries the user for final
+    hyperparameter values to use, and returns these.
+    
+    Arguments:
+        data_to_cluster (np.ndarray): array of data that is being clustered, of
+            size (n_samples, n_features)
+        model_name (str) : name of model to instantiate
+        model_params (dict) : dictionary of hyperparameter values to try, where 
+            values are all iterable
+        user_input (bool) : whether to solicit user input or proceed with
+            automatically identified optimal hyperparameters. This should
+            always be set to True currently, as the automated hyperparameter
+            selection method currently only returns experimental suggestions.
+    Returns:
+        (dict) : chosen parameters to proceed with
+        (matplotlib.pyplot.Figure) : figure displaying tuning errors
+        (np.ndarray) : array of errors for each hyperparameter combination
+        (param_combos) : list of dictionaries of each hyperparameter combination
+    '''
 
     # get list of parameter combos to optimize over
     param_combos = get_parameter_combinations(model_params)

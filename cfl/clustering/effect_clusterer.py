@@ -1,74 +1,75 @@
-import pickle  # for saving code
+""" 
+This class uses  clustering to form the observational partition that CFL is
+trying to identify over the effect space. It trains a user-defined 
+clustering model, to cluster datapoints based on a proxy for P(Y=y|X) 
+(more information on this proxy can be found in the helper file 
+cfl/clustering/Y_given_Xmacro.py). Once this model is trained, it can then 
+be used to assign new datapoints to the clusters found.
 
-from cfl.block import Block
-from cfl.dataset import Dataset
-from cfl.clustering.Y_given_Xmacro import sample_Y_dist  # calculate
-# P(Y|Xmacro)
-from sklearn.cluster import *
-from cfl.clustering.snn import SNN
-from cfl.clustering.cluster_tuning_util import tune
+Attributes:
+    block_params (dict): a set of parameters specifying a clusterer. The 'model' 
+                    key must be specified and can either be the name of an
+                    sklearn.cluster model, or a clusterer model object that
+                    follows the scikit-learn interface. If the former,
+                    additional keys may be specified as parameters to the
+                    sklearn object.
+    model (sklearn.cluster or cfl.clustering.ClustererModel): clusterer object
+        to partition effect data
+    data_info (dict) : dictionary with the keys 'X_dims', 'Y_dims', and 
+        'Y_type' (whether the y data is categorical or continuous)
+    name : name of the model so that the model type can be recovered from
+        saved parameters (str)
+    trained (bool) : boolean tracking whether self.model has been trained yet
 
-# TODO: next step: add very clear documentation about how to add new module.
-# Include:
-# - demo code?
-# - tests to run with new module to ensure that it works right?
+Methods:
+    _create_model : given self.block_params, build the clustering model
+    get_block_params : return self.block_params
+    _get_default_block_params : return values for block_params to defualt to if 
+        unspecified
+    train : fit a model with P(Y|X=x) found by CDE
+    predict : assign new datapoints to clusters found in train
+    save_block : save the state of the object
+    load_block : load the state of the object from a specified file path
 
+Example: 
+    from cfl.clustering.clusterer import EffectClusterer
+    from cfl.dataset import Dataset
 
-""" This class uses  clustering to form the observational partition that CFL is
-    trying to identify over the effect space. It trains a user-defined 
-    clustering model, to cluster datapoints based on a proxy for P(Y=y|X) 
-    (more information on this proxy can be found in the helper file 
-    Y_given_Xmacro.py). Once this model is trained, it can then be used to 
-    assign new datapoints to the clusters found.
+    X = <cause data>
+    Y = <effect data> 
+    prev_results = <put CDE results here>
+    data = Dataset(X, Y)
 
-    Attributes:
-        block_params (dict): a set of parameters specifying a clusterer. The 'model' 
-                       key must be specified and can either be the name of an
-                       sklearn.cluster model, or a clusterer model object that
-                       follows the scikit-learn interface. If the former,
-                       additional keys may be specified as parameters to the
-                       sklearn object.
-        model: clusterer for effect data
-        data_info (dict) : dictionary with the keys 'X_dims', 'Y_dims', and 
-            'Y_type' (whether the y data is categorical or continuous)
-        name : name of the model so that the model type can be recovered from
-            saved parameters (str) #TODO: remove
+    # syntax 1
+    c = EffectClusterer(data_info ={'X_dims': X.shape, 'Y_dims': Y.shape, 
+                                   'Y_type': 'continuous'}, 
+                       block_params={'model': 'DBSCAN', 
+                                     'model_params' : {'eps': 0.3, 
+                                                       'min_samples': 10}}) 
 
-    Methods:
-        train : fit a model with proxy for P(Y=y|X).
-        predict : assign new datapoints to clusters found in train
-        evaluate_clusters : evaluate the goodness of clustering based on metric
-                            specified in cluster_metric()
-        cluster_metric : a metric to judge the goodness of clustering (not yet
-                         implemented). 
-        check_block_params : fill in any parameters that weren't
-                             provided in block_params with the default value, and 
-                             discard any unnecessary
-                             paramaters that were provided.
-    Example: 
-        from sklearn.cluster import DBSCAN 
-        from cfl.cluster_methods.clusterer import Clusterer
-        from cfl.dataset import Dataset
+    # syntax 2
+    # MyClusterer should inherit cfl.clustering.ClustererModel
+    my_clusterer = MyClusterer(param1=0.1, param2=0.5)
+    c = EffectClusterer(data_info ={'X_dims': X.shape, 'Y_dims': Y.shape, 
+                                   'Y_type': 'continuous'}, 
+                    block_params={'model': my_clusterer})
 
-        X = cause data 
-        y = effect data 
-        prev_results = cause clustering results
-        data = Dataset(X, y)
+    results = c.train(data, prev_results)
 
-        # syntax 1
-        c = Clusterer(data_info ={'X_dims': X.shape, 'Y_dims': Y.shape, 
-                                  'Y_type': 'continuous'}, 
-                      block_params={'model': 'DBSCAN', 'eps': 0.3, 'min_samples': 10}) 
-
-        # syntax 2
-        DBSCAN_model = DBSCAN(eps=0.3, min_samples=10)
-        c = Clusterer(data_info ={'X_dims': X.shape, 'Y_dims': Y.shape, 
-                                  'Y_type': 'continuous'}, 
-                      block_params={'model': DBSCAN_model})
-
-        results = c.train(data, prev_results)
+Todo: 
+    * Most clustering models do not assign new points to clusters established
+      in training - instead, they refit the model on the new data. Need to
+      decide how to reconcile with expected functionality.
  """
 
+
+import pickle
+from sklearn.cluster import *
+from cfl import Block
+from cfl import Dataset
+from cfl.clustering.Y_given_Xmacro import sample_Y_dist  # calculate P(Y|Xmacro)
+from cfl.clustering import * # makes included clustering classes available
+from cfl.clustering.cluster_tuning_util import tune
 
 class EffectClusterer(Block):
 
@@ -76,31 +77,21 @@ class EffectClusterer(Block):
         """
         Initialize Clusterer object
 
-        Parameters
-            data_info (dict): 
-            block_params (dict) :  a set of parameters specifying a clusterer. The 
-                             'model' key must be specified and can either be 
-                             the name of an sklearn.cluster model, or a 
-                             clusterer model object that follows the 
-                             scikit-learn interface. If the former, additional 
-                             keys may be specified as parameters to the
-                             sklearn object.
-                             'precompute_distances' may also be specified. If
-                             true, a pre-caching method will be used that
-                             reduces runtime but is more memory-intensive. If
-                             false, the original compute-on-the-fly method
-                             will be used. (defaults to True)
-
-                            Note: If a clusterer object is passed in as the 
-                            value to for 'model', the clusterer object needs 
-                            to adhere to the Scikit learn `BaseEstimator` (https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html)
-                            and `ClusterMixin` interfaces (https://scikit-learn.org/stable/modules/generated/sklearn.base.ClusterMixin.html)
-                            This means they need to have the method 
-                            `fit_predict(X, y=None)` and assign the results 
-                            as `self.labels_`.
-
-        Return
-            None
+        Arguments:
+            data_info (dict): dict with information about the dataset shape
+            block_params (dict) :  a set of parameters specifying a clusterer. 
+                The 'model' key must be specified and can either be 
+                the name of an sklearn.cluster model, or a 
+                clusterer model object that follows the 
+                cfl.clustering.ClustererModel interface. Hyperparameters for the
+                model may be specified through the 'model_params' dictionary. 
+                'tune' may be set to True if you would like to perform 
+                hyperparameter tuning. 'precompute_distances' may also be 
+                specified. If true, a pre-caching method will be used that
+                reduces runtime but is more memory-intensive. If
+                false, the original compute-on-the-fly method
+                will be used. (defaults to True)
+        Returns: None
         """
 
         # parameter checks and self.block_params assignment done here
@@ -108,11 +99,21 @@ class EffectClusterer(Block):
 
         # attributes:
         self.name = 'EffectClusterer'
-        self.Y_type = data_info['Y_type']
         if not block_params['tune']:
             self.model = self._create_model()
 
     def _create_model(self):
+        '''
+        Return a clustering model given self.block_params. If 
+        self.block_params['model'] is a string, it will try to instantiate the
+        sklearn.cluster model with the same name. Otherwise, it will treat
+        the value of self.block_params['model'] as the instantiated model.
+        
+        Arguments: None
+        Returns:
+            sklearn.cluster model or cfl.clusterer.ClustererModel : the model
+                to partition the cause space with.
+        '''
         if isinstance(self.block_params['model'], str):
             model = eval(self.block_params['model'])(**self.block_params['model_params'])
         else:
@@ -120,12 +121,13 @@ class EffectClusterer(Block):
         return model
 
     def get_block_params(self):
-        ''' Get parameters for this clustering model.
-            Arguments: None
-            Returns: 
-                dict: dictionary of parameter names (keys) and values (values)
+        ''' 
+        Get parameters for this clustering model.
+        
+        Arguments: None
+        Returns: 
+            dict : dictionary of parameter names (keys) and values (values)
         '''
-
         return self.block_params
 
     def _get_default_block_params(self):
@@ -156,13 +158,17 @@ class EffectClusterer(Block):
 
         Arguments:
             dataset (Dataset): Dataset object containing X, Y and pyx data to 
-                               assign parition labels to
+                assign partition labels to (not used, here for consistency)
             prev_results (dict): dictionary that contains a key called 'x_lbls', 
                                  whose value is an array of labels over the
                                  dataset samples.
         Returns: 
-            y_lbls (np.ndarray): Y macrovariable class assignments for this 
-                                 Dataset 
+            dict : dictionary of results, the most important of which is 
+                `y_lbls`, a numpy array of class assignments for each sample
+                in dataset.Y. 'y_probs', the proxy for P(Y=y|X), is also stored
+                (see Y_given_Xmacro.py for computation details).
+                Also includes 'tuning_fig, 'tuning_errs', and 'param_combos' 
+                if self.block_params['tune'] is True.
         """
 
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
@@ -176,7 +182,7 @@ class EffectClusterer(Block):
 
         x_lbls = prev_results['x_lbls']
         # sample P(Y|Xclass)
-        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls,
+        y_probs = sample_Y_dist(self.data_info.Y_type, dataset, x_lbls,
                                 precompute_distances=self.block_params['precompute_distances'])
 
         # tune model hyperparameters if requested
@@ -217,10 +223,9 @@ class EffectClusterer(Block):
                                  whose value is an array of labels over the
                                  dataset samples.
         Returns:
-            x_lbls (np.ndarray): X macrovariable class assignments for this 
-                                 Dataset 
-            y_lbls (np.ndarray) : Y macrovariable class assignments for this 
-                                  Dataset 
+            dict : dictionary of results, containing 'y_lbls', a numpy array of 
+            class assignments for each sample in dataset.Y, as well as 
+            'y_probs', the proxy for P(Y=y|X).
 
         """
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
@@ -238,7 +243,7 @@ class EffectClusterer(Block):
         # a predict function defined so we're doing this for now
 
         # sample P(Y|Xclass)
-        y_probs = sample_Y_dist(self.Y_type, dataset, x_lbls)
+        y_probs = sample_Y_dist(self.data_info.Y_type, dataset, x_lbls)
 
         # do y clustering
         y_lbls = self.model.fit_predict(y_probs)
@@ -248,10 +253,8 @@ class EffectClusterer(Block):
 
         return results_dict
 
-    ############ SAVE/LOAD FUNCTIONS (required by block.py) ###################
-
     def save_block(self, file_path):
-        ''' Save both cluster models to specified path.
+        ''' Save clusterer model to specified path.
             Arguments:
                 file_path (str): path to save to
 
@@ -269,10 +272,10 @@ class EffectClusterer(Block):
             raise ValueError('file_path does not exist.')
 
     def load_block(self, file_path):
-        ''' Load both models from path.
+        ''' Load clusterer model from path.
 
             Arguments:
-                file_path (str): path to load saved models from 
+                file_path (str): path to load saved model from 
             Returns: None
         '''
 

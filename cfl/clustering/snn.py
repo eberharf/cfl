@@ -61,16 +61,19 @@ from scipy.sparse import csr_matrix
 def snn(X, neighbor_num, min_shared_neighbor_num, eps):
     """Perform Shared Nearest Neighbor (SNN) clustering algorithm clustering.
 
-    Parameters:
-        X (array or sparse (CSR) matrix of shape (n_samples, n_features), or array of shape (n_samples, n_samples)):
-            A feature array
-        neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity
-        min_shared_neighbor_num (int): Number of nearest neighbors that need to share two data points to be considered
-            part of the same cluster
-        eps (float [0, 1]): parameter for DBSCAN, radius of the neighborhood. Default is the sklearn default
+    Arguments:
+        X (array or sparse (CSR) matrix of shape (n_samples, n_features), or 
+            array of shape (n_samples, n_samples)): A feature array
+        neighbor_num (int): K number of neighbors to consider for shared 
+            nearest neighbor similarity
+        min_shared_neighbor_num (int): Number of nearest neighbors that need to 
+            share two data points to be considered part of the same cluster
+        eps (float [0, 1]): parameter for DBSCAN, radius of the neighborhood. 
+            Default is the sklearn default
 
     Return:
-        dbscan.core_sample_indices_ : indices of the core points, as determined by DBSCAN
+        dbscan.core_sample_indices_ : indices of the core points, as determined 
+            by DBSCAN
         dbscan.labels_ : array of cluster labels for each point
     """
     n_samples = X.shape[0]
@@ -107,22 +110,29 @@ def snn(X, neighbor_num, min_shared_neighbor_num, eps):
 
 
 class SNN(BaseEstimator, ClusterMixin):
-    """Class for performing the Shared Nearest Neighbor (SNN) clustering algorithm.
+    """
+    Class for performing the Shared Nearest Neighbor (SNN) clustering 
+    algorithm.
 
-    Parameters:
-        neighbor_num (int): K number of neighbors to consider for shared nearest neighbor similarity
-
-        min_shared_neighbor_proportion (float [0, 1]): Proportion of the K nearest neighbors that
-            need to share two data points to be considered part of the same cluster
+    Arguments:
+        neighbor_num (int): K number of neighbors to consider for shared 
+            nearest neighbor similarity
+        min_shared_neighbor_proportion (float [0, 1]): Proportion of the K 
+            nearest neighbors that need to share two data points to be 
+            considered part of the same cluster
 
     Attributes:
-        self.labels_ : [assigned after fitting data]  Cluster labels for each point in the dataset given to
-            fit(). Noisy samples are given the label -1
-        self.core_sample_indices_ : [assigned after fitting data] Indices of core samples
-        self.components_ : [assigned after fitting data] Copy of each core sample found by training
+        self.labels_ : [assigned after fitting data]  Cluster labels for each 
+            point in the dataset given to fit(). Noisy samples are given the 
+            label -1
+        self.core_sample_indices_ : [assigned after fitting data] Indices of 
+            core samples
+        self.components_ : [assigned after fitting data] Copy of each core 
+            sample found by training
 
-    Note: Naming conventions for attributes are based on the analogous ones of DBSCAN. Some documentation
-        copied from the sklearn DBSCAN documentation
+    Note: 
+        Naming conventions for attributes are based on the analogous ones of 
+        DBSCAN. Some documentationcopied from the sklearn DBSCAN documentation
     """
 
     def __init__(self, neighbor_num, min_shared_neighbor_proportion, eps):
@@ -136,11 +146,12 @@ class SNN(BaseEstimator, ClusterMixin):
     def fit(self, X):
         """Perform SNN clustering from features or distance matrix.
 
-        Parameters:
+        Arguments:
             X (array or sparse (CSR) matrix of shape (n_samples, n_features),
                 or array of shape (n_samples, n_samples)): A feature array
         Return:
-            self: the SNN model with self.labels_, self.core_sample_indices_, self.components_ assigned
+            self: the SNN model with self.labels_, self.core_sample_indices_, 
+                self.components_ assigned
         """
 
         clusters = snn(X, neighbor_num=self.neighbor_num,
@@ -158,23 +169,21 @@ class SNN(BaseEstimator, ClusterMixin):
     def fit_predict(self, X, y=None, sample_weight=None):
         """Performs clustering on X and returns cluster labels.
 
-        Parameters
-        ----------
-        X : array or sparse (CSR) matrix of shape (n_samples, n_features), or \
-                array of shape (n_samples, n_samples)
-            A feature array, or array of distances between samples if
-            ``metric='precomputed'``.
-        sample_weight : array, shape (n_samples,), optional
-            Weight of each sample, such that a sample with a weight of at least
-            ``min_samples`` is by itself a core sample; a sample with negative
-            weight may inhibit its eps-neighbor from being core.
-            Note that weights are absolute, and default to 1.
+        Arguments:
+            X : array or sparse (CSR) matrix of shape (n_samples, n_features), 
+                or array of shape (n_samples, n_samples). A feature array, or 
+                array of distances between samples if
+                ``metric='precomputed'``.
+            sample_weight : array, shape (n_samples,), optional
+                Weight of each sample, such that a sample with a weight of at least
+                ``min_samples`` is by itself a core sample; a sample with negative
+                weight may inhibit its eps-neighbor from being core.
+                Note that weights are absolute, and default to 1.
 
-        y : Ignored. Not used, present here for API consistency by convention
+            y : Ignored. Not used, present here for API consistency by convention
 
-        Returns
-        -------
-        y (ndarray, shape (n_samples,)) : cluster labels
+        Returns:
+            y (ndarray, shape (n_samples,)) : cluster labels
         """
         self.fit(X)
         return self.labels_

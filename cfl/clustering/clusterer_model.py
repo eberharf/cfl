@@ -1,18 +1,21 @@
+'''
+This is an abstract class defining the type of model that can be passed
+into a CauseClusterer or EffectClusterer Block. If you build your own 
+clustering model to pass into  CauseClusterer or EffectClusterer, you 
+should inherit ClustererModel to enure that you have specified all required 
+functionality to properly interface with the CFL pipeline. CDEModel 
+specifies the following required methods: __init__, fit_predict
+
+Attributes : None
+
+Methods:
+    fit_predict : fits the clustering model and returns predictions on a set
+        of data.
+'''
 
 from abc import ABCMeta, abstractmethod
 
 class ClustererModel(metaclass=ABCMeta):
-    '''
-    This is an abstract class defining the type of model that can be passed
-    into a CauseClusterer or EffectClusterer Block. If you build your own 
-    clustering model to pass into  CauseClusterer or EffectClusterer, you 
-    should inherit ClustererModel to enure that you have specified all required 
-    functionality to properly interface with the CFL pipeline. CDEModel 
-    specifies the following required methods:
-        __init__
-        fit
-        fit_predict
-    '''
 
     @abstractmethod
     def __init__(self, data_info, model_params):
