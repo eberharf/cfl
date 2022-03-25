@@ -1,66 +1,3 @@
-""" 
-This class uses clustering to form the observational partition that CFL is
-trying to identify over the cause space. It trains a user-defined clustering 
-model to cluster datapoints based on P(Y|X=x) (usually learned by a 
-`CondDensityEstimator`). Once the model is trained,
-it can then be used to assign new datapoints to the clusters found.
-
-Attributes:
-    block_params (dict): a set of parameters specifying a clusterer. The 'model' 
-        key must be specified and can either be the name of an
-        sklearn.cluster model, or a clusterer model object that
-        follows the cfl.clustering.ClustererModel interface. If the former,
-        additional keys may be specified as parameters to the
-        sklearn object.
-    model (sklearn.cluster or cfl.clustering.ClustererModel): clusterer object
-        to partition cause data
-    data_info (dict) : dictionary with the keys 'X_dims', 'Y_dims', and 
-        'Y_type' (whether the y data is categorical or continuous)
-    name : name of the model so that the model type can be recovered from
-        saved parameters (str)
-    trained (bool) : boolean tracking whether self.model has been trained yet
-
-Methods:
-    _create_model : given self.block_params, build the clustering model
-    get_block_params : return self.block_params
-    _get_default_block_params : return values for block_params to defualt to if 
-        unspecified
-    train : fit a model with P(Y|X=x) found by CDE
-    predict : assign new datapoints to clusters found in train
-    save_block : save the state of the object
-    load_block : load the state of the object from a specified file path
-
-Example: 
-    from cfl.clustering.clusterer import CauseClusterer
-    from cfl.dataset import Dataset
-
-    X = <cause data>
-    Y = <effect data>
-    prev_results = <put CDE results here>
-    data = Dataset(X, Y)
-
-    # syntax 1
-    c = CauseClusterer(data_info ={'X_dims': X.shape, 'Y_dims': Y.shape, 
-                                   'Y_type': 'continuous'}, 
-                       block_params={'model': 'DBSCAN', 
-                                     'model_params' : {'eps': 0.3, 
-                                                       'min_samples': 10}}) 
-
-    # syntax 2
-    # MyClusterer should inherit cfl.clustering.ClustererModel
-    my_clusterer = MyClusterer(param1=0.1, param2=0.5)
-    c = CauseClusterer(data_info ={'X_dims': X.shape, 'Y_dims': Y.shape, 
-                                   'Y_type': 'continuous'}, 
-                    block_params={'model': my_clusterer})
-
-    results = c.train(data, prev_results)
-
-Todo: 
-    * Most clustering models do not assign new points to clusters established
-      in training - instead, they refit the model on the new data. Need to
-      decide how to reconcile with expected functionality.
-"""
-
 import pickle
 from sklearn.cluster import *
 from cfl import Block
@@ -69,6 +6,68 @@ from cfl.clustering import * # makes included clustering classes like SNN availa
 from cfl.clustering.cluster_tuning_util import tune
 
 class CauseClusterer(Block):
+    """ 
+    This class uses clustering to form the observational partition that CFL is
+    trying to identify over the cause space. It trains a user-defined clustering 
+    model to cluster datapoints based on P(Y|X=x) (usually learned by a 
+    `CondDensityEstimator`). Once the model is trained,
+    it can then be used to assign new datapoints to the clusters found.
+
+    Attributes:
+        block_params (dict): a set of parameters specifying a clusterer. The 'model' 
+            key must be specified and can either be the name of an
+            sklearn.cluster model, or a clusterer model object that
+            follows the cfl.clustering.ClustererModel interface. If the former,
+            additional keys may be specified as parameters to the
+            sklearn object.
+        model (sklearn.cluster or cfl.clustering.ClustererModel): clusterer object
+            to partition cause data
+        data_info (dict) : dictionary with the keys 'X_dims', 'Y_dims', and 
+            'Y_type' (whether the y data is categorical or continuous)
+        name : name of the model so that the model type can be recovered from
+            saved parameters (str)
+        trained (bool) : boolean tracking whether self.model has been trained yet
+
+    Methods:
+        _create_model : given self.block_params, build the clustering model
+        get_block_params : return self.block_params
+        _get_default_block_params : return values for block_params to defualt to if 
+            unspecified
+        train : fit a model with P(Y|X=x) found by CDE
+        predict : assign new datapoints to clusters found in train
+        save_block : save the state of the object
+        load_block : load the state of the object from a specified file path
+
+    Example: 
+        from cfl.clustering.clusterer import CauseClusterer
+        from cfl.dataset import Dataset
+
+        X = <cause data>
+        Y = <effect data>
+        prev_results = <put CDE results here>
+        data = Dataset(X, Y)
+
+        # syntax 1
+        c = CauseClusterer(data_info ={'X_dims': X.shape, 'Y_dims': Y.shape, 
+                                    'Y_type': 'continuous'}, 
+                        block_params={'model': 'DBSCAN', 
+                                        'model_params' : {'eps': 0.3, 
+                                                        'min_samples': 10}}) 
+
+        # syntax 2
+        # MyClusterer should inherit cfl.clustering.ClustererModel
+        my_clusterer = MyClusterer(param1=0.1, param2=0.5)
+        c = CauseClusterer(data_info ={'X_dims': X.shape, 'Y_dims': Y.shape, 
+                                    'Y_type': 'continuous'}, 
+                        block_params={'model': my_clusterer})
+
+        results = c.train(data, prev_results)
+
+    Todo: 
+        * Most clustering models do not assign new points to clusters established
+        in training - instead, they refit the model on the new data. Need to
+        decide how to reconcile with expected functionality.
+    """
 
     def __init__(self, data_info, block_params):
         """
@@ -149,7 +148,7 @@ class CauseClusterer(Block):
         if specified.
 
         Arguments:
-            dataset (Dataset): Dataset object containing X, Y and pyx data to 
+            dataset (Dataset): Dataset object containing X, Y to 
                 assign partition labels to (not used, here for consistency)
             prev_results (dict): dictionary that contains a key called 'pyx', 
                 whose value is an array of probabilities
