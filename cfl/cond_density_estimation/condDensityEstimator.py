@@ -1,29 +1,29 @@
-
-'''
-This class inherits Block to define a Block subtype for conditional density
-estimation. It takes in specifications for a particular conditional density
-estimation model to use, and manages its instantiation, and serves as an 
-interface between Experiment training/prediction calls and the model itself.
-
-Attributes:
-    data_info : information about the data being trained with / predictd on
-    block_params : parameters to define the model
-    name : name of the Block type
-    model : the conditional density estimation model
-
-Methods:
-    _create_model : 
-    get_block_params : 
-    train : 
-    predict : 
-    save_block : 
-    load_block : 
-
-'''
 from cfl.block import Block
 import cfl.cond_density_estimation as c # for instantiating models by str name
 
 class CondDensityEstimator(Block):
+    '''
+    This class inherits Block to define a Block subtype for conditional density
+    estimation. It takes in specifications for a particular conditional density
+    estimation model to use, and manages its instantiation, and serves as an 
+    interface between Experiment training/prediction calls and the model itself.
+
+    Attributes:
+        data_info : information about the data being trained with / predictd on
+        block_params : parameters to define the model
+        name : name of the Block type
+        model : the conditional density estimation model
+
+    Methods:
+        _create_model : given self.block_params, build the CDE model
+        get_block_params : return self.block_params
+        _get_default_block_params : return values for block_params to defualt to 
+            if unspecified
+        train : train a model to estimate P(Y|X=x) from X,Y
+        predict : predict P(Y|X=x) given a new sample x
+        save_block : save the state of the object
+        load_block : load the state of the object from a specified file path
+    '''
 
     def __init__(self, data_info, block_params):
         '''

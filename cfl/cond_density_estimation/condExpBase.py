@@ -1,9 +1,6 @@
 from abc import abstractmethod
 import os
 import shutil
-# TODO: add GPU support
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-
 import datetime  # for creating ID
 import numpy as np
 import tensorflow as tf
@@ -13,53 +10,48 @@ from sklearn.model_selection import train_test_split
 from cfl.dataset import Dataset
 from cfl.cond_density_estimation.cde_model import CDEModel
 
-# Things that descend from this class should have a self.name attribute but
-# this class doesn't since CondExpBase objects are not supposed to be created
-# by the user
-
-
 class CondExpBase(CDEModel):
-    # TODO: update Class docstring
-    ''' A class to define, train, and perform inference with conditional density
+    ''' 
+    A class to define, train, and perform inference with conditional density
     estimators that fall under the "conditional expectation" umbrella. This
     subset of conditional density estimators (referred to as 'CondExp') learns
     E[P(Y|X)] instead of the full conditional distribution. This base class
-    implements all functions needed for training and predictiion, and supplies
+    implements all functions needed for training and prediction, and supplies
     a model architecture that can be overridden by children of this class. In
     general, if you would like to use a CondExp CDE for your CFL pipeline, it is
-    easiest to either 1) inherit this class and override the build_model
-    function, which defines the architecture, or 2) use the condExpMod child
-    class which allows you to pass in limited architecture specifications
-    through the params attribute.
+    easiest to either 1) use the CondExpDIY child class of CondExpBase that
+    allows you to define your network through a function specified in 
+    `model_params`, 2) use the condExpMod child class which allows you to pass 
+    in limited architecture specifications through the params attribute, or
+    3) inherit this class and override the methods you would like to modify. 
 
     Attributes:
-        name : name of the model so that the model type can be recovered from
-               saved parameters (str)
-        data_info : dict with information about the dataset shape (dict)
-        default_params : default parameters to fill in if user doesn't provide
-                         a given entry (dict)
-        model_params : parameters for the CDE that are passed in by the user and
-                 corrected by check_save_model_params (dict)
-        trained : whether or not the modeled has been trained yet. This can
-                  either happen by defining by instantiating the class and
-                  calling train, or by passing in a path to saved weights from
-                  a previous training session through model_params['weights_path'].
-                  (bool)
-        model : tensorflow model for this CDE (tf.keras.Model.Sequential)
-
+        name (str) : name of the model so that the model type can be recovered 
+            from saved parameters (str)
+        data_info (dict) : dict with information about the dataset shape
+        default_params (dict) : default parameters to fill in if user doesn't 
+            provide a given entry
+        model_params (dict) : parameters for the CDE that are passed in by the 
+            user and corrected by check_save_model_params
+        trained (bool) : whether or not the modeled has been trained yet. This 
+            can either happen by defining by instantiating the class and
+            calling train, or by passing in a path to saved weights from
+            a previous training session through model_params['weights_path'].
+        model (tf.keras.Model.Sequential) : tensorflow model for this CDE
 
     Methods:
+        get_model_params : return self.model_params
+        load_model : load everything needed for this CondExpBase model
+        save_model : save the current state of this CondExpBase model
         train : train the neural network on a given Dataset
-        graph_results : helper function to graph training and validation loss
+        _graph_results : helper function to graph training and validation loss
         predict : once the model is trained, predict for a given Dataset
-        evaluate : return the model's prediction loss on a Dataset
-        load_model : load tensorflow model weights from a file into
-                          self.network
-        save_model : save the current weights of self.network
-        build_model : create and return a tensorflow model
-        _check_model_params : fill in any parameters that weren't provided in
-                             model_params with the default value, and discard any
-                             unnecessary paramaters that were provided.
+        load_network : load tensorflow network weights from a file into
+            self.network
+        save_network : save the current weights of self.network
+        _build_network : create and return a tensorflow network
+        _check_format_model_params : check dimensionality of provided 
+            parameters and fill in any missing parameters with defaults.
     '''
 
     def __init__(self, data_info, model_params):
@@ -132,16 +124,13 @@ class CondExpBase(CDEModel):
         Arguments:
             dataset (Dataset): Dataset object containing X and Y data for this
                 training run.
-            best (bool) : whether to use weights from epoch with best test-loss,
-                or from most recent epoch for future prediction.
+            prev_results (dict): dictionary that contains any results generated
+                in previous Block in Experiment pipeline (usually none for CDE).
         Returns:
             dict : dictionary of CDE training results. Specifically, this will 
                 contain `pyx`, the predicted conditional probabilites for the 
                 training dataset. 
         '''
-        # TODO: do a more formalized checking that actual dimensions match
-        # expected
-        # TODO: say what expected vs actual are
 
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
         assert isinstance(prev_results, (type(None), dict)),\
@@ -267,7 +256,7 @@ class CondExpBase(CDEModel):
 
     def _graph_results(self, train_loss, val_loss, show=True):
         '''
-        Graph training and testing loss across training epochs.
+        Graph training and validation loss across training epochs.
 
         Arguments:
             train_loss (np.ndarray) : (n_epochs,) array of training losses per 
@@ -276,7 +265,7 @@ class CondExpBase(CDEModel):
                 epoch.
             show (bool) : displays figure if show=True. Defaults to True. 
         Returns:
-            plt.figure : figure object.
+            matplotlib.pyplot.figure : figure object.
         '''
         fig, ax = plt.subplots()
         ax.plot(range(len(train_loss)), train_loss, label='train_loss')
@@ -300,10 +289,12 @@ class CondExpBase(CDEModel):
         Arguments:
             dataset (Dataset): Dataset object containing X and Y data to
                 estimate macrovariable states for.
+            prev_results (dict): dictionary that contains any results generated
+                in previous Block in Experiment pipeline (usually none for CDE).
         Returns:
-            dict : dictionary of prediction results. Specifically, this dictionary will
-                contain `pyx`, the predicted conditional probabilites for the 
-                given Dataset. 
+            dict : dictionary of prediction results. Specifically, this 
+                dictionary will contain `pyx`, the predicted conditional 
+                probabilites for the given Dataset. 
         '''
 
         assert isinstance(dataset, Dataset), 'dataset is not a Dataset.'
@@ -389,5 +380,16 @@ class CondExpBase(CDEModel):
         Raises:
             AssertionError : if params are misspecified and can't be 
                              automatically fixed.
+        '''
+        ...
+    
+    @abstractmethod
+    def _get_default_model_params(self):
+        ''' 
+        Returns the default parameters specific to this type of model.
+
+        Arguments: None
+        Returns:
+            dict : dictionary of default parameters
         '''
         ...
