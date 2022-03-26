@@ -259,7 +259,7 @@ def _plot_results(pyx, hd_mask, final_mask, cluster_labels, exp_path,
             assignments
         exp_path (str): path to saved Experiment
         dataset_name (str) : name of dataset to load results for. 
-        feauture_names (list) : optional list of names of each feature to plot.
+        feature_names (list) : optional list of names of each feature to plot.
             defaults to None.
     Returns : None
     '''

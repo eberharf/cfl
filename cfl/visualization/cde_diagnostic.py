@@ -1,18 +1,19 @@
 '''
-contains two main functions: `pyx_scatter()` and `cde_diagnostic()` and helpers for
-those functions. 
+Contains two main functions: `pyx_scatter()` and `cde_diagnostic()` and helpers 
+for those functions. 
 
 These functions can be used to examine the quality of the CDE's learning
 '''
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 def pyx_scatter(cfl_experiment, ground_truth=None):
-    '''creates a scatter plot with a sample of points from the CDE output,
+    '''
+    Creates a scatter plot with a sample of points from the CDE output,
     colored by ground truth (if given). 
 
-    NOTE: 
+    Note: 
         This visualization method is only good for 1D effect data.
 
     Example Usage: 
@@ -22,7 +23,7 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
         plt.show()
     ```
 
-    Params: 
+    Arguments: 
         cfl_experiment (cfl.experiment.Experiment): a trained CFL pipeline 
         ground_truth (np array): (Optional) an array, aligned with the CFL training data 
             that contains the ground truth macrovariable labels for the cause data.
@@ -32,7 +33,7 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
     Returns: 
         (Fig) - A `matplotlib.pyplot Figure` object that contains the scatter plot
         (Axes) - A `matplotlib.pyplot Axes` object that shows the scatter plot
-'''
+    '''
     try:
         pyx = cfl_experiment.retrieve_results(
             'dataset_train')['CondDensityEstimator']['pyx']  # get training results
@@ -62,9 +63,10 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
 
 
 def __pyx_scatter_gt_legend(ax, pyx, ground_truth_labels):
-    '''plots data from each ground_truth_class as a separate series in the
-    scatter plot. 
-    Does this so that each label can be associated with a legend'''
+    '''
+    Plots data from each ground_truth_class as a separate series in the
+    scatter plot. Does this so that each label can be associated with a legend.
+    '''
     # construct a list of all indices in the data
     all_indices = list(range(len(pyx)))
 
@@ -88,7 +90,8 @@ def __pyx_scatter_gt_legend(ax, pyx, ground_truth_labels):
 
 
 def cde_diagnostic(cfl_experiment):
-    '''Creates a figure to help diagnose whether the CDE is predicting the
+    '''
+    Creates a figure to help diagnose whether the CDE is predicting the
     target variable(s) effectively or should be tuned further. 
 
     This function creates a figure with two subplots. The first shows the actual
@@ -107,7 +110,7 @@ def cde_diagnostic(cfl_experiment):
     Note: 
         This function may not work for higher dimensional continuous Ys. 
 
-    Params: 
+    Arguments: 
         cfl_experiment (cfl.experiment.Experiment) - a trained CFL pipeline 
     Returns: 
         (Fig) - A `matplotlib.pyplot Figure` object that contains the diagnostic plot

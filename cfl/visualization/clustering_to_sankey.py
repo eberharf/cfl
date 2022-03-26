@@ -29,16 +29,17 @@ import numpy as np
 
 
 def convert_lbls_to_sankey_nodes(x_lbls_L):
-    '''convert cluster labels into source, target, and value information
+    '''
+    Convert cluster labels into source, target, and value information
 
-    Parameters
-    -----------
-    x_lbls_L: x_lbls_L is a list of x_lbls, the result from multiple kmeans clusterings on the same data
+    Arguments:
+        x_lbls_L: x_lbls_L is a list of x_lbls, the result from multiple kmeans 
+            clusterings on the same data
 
-    Returns
-    ----------
-    link (dict): a representation of nodes and weighted connections between them to make a Sankey diagram
-    labels (list): labels for every node in the sankey diagram
+    Returns:
+        link (dict): a representation of nodes and weighted connections between
+            them to make a Sankey diagram
+        labels (list): labels for every node in the sankey diagram
     '''
 
     # create list of the numbers of clusters used

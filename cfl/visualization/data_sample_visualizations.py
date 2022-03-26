@@ -1,26 +1,26 @@
-'''these two functions are for viewing images'''
+'''
+Two functions are for viewing images
+'''
 
 import random
-
 import matplotlib.pyplot as plt
 import numpy as np
-
 from cfl.util.find_xlbl_locations import rows_where_each_x_class_occurs
 
 
 def view_class_examples(images, im_shape, n_examples, x_lbls):
     """
-    shows images in matplotlib with labels displayed at the top of each image.
+    Shows images in matplotlib with labels displayed at the top of each image.
     Best for viewing a lot of images at once.
 
-    Parameters:
+    Arguments:
         images (2D or 3D np array): Array of images (must be aligned with x_lbls)
             If 2D, axis 0 = samples, axis 1 = flattened image pixels
             If 3D, axis 0 = samples, axis 1 = image rows, axis 2 = image cols
         n_rows (int): Number of rows of images to display.
         x_lbls (1D np array): labels to show at the top of each image.
             Should be aligned with the images input
-
+    Returns: None
     """
 
     assert images.shape[0] == x_lbls.shape[0], "The number of images and \
@@ -64,9 +64,15 @@ def view_class_examples(images, im_shape, n_examples, x_lbls):
 
 
 def view_random_example(image_array, random_state=None):
-    """chooses a random image from the image_array and displays
-    it. Setting random state causes it to be reproducible
-
+    """
+    Chooses a random image from the image_array and displays
+    it. Setting random state causes it to be reproducible.
+    Arguments:
+        image_array (np.ndarray) : array of images of size 
+            (n_samples, image_dim1, img_dim2)
+        random_state (int) : random state to set rng.choice to for selecting
+            random images to display. Default is None.
+    Returns: None
     """
     rng = np.random.default_rng(seed=random_state)
     # choose random img idx

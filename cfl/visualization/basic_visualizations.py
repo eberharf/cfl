@@ -1,21 +1,46 @@
+''' 
+A set of generic functions to visualize data samples by macrostate found by CFL.
+
+Usage:
+    from cfl.visualization_methods import macrostate_vis
+    data = an n_samples x an up to 3D shape for each sample
+    macrostate_vis(data=data, exp_id=0, cause_or_effect='cause', 
+                   subtract_global_mean=True)
+'''
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import os
 
-''' Usage
-from cfl.visualization_methods import macrostate_vis
-data = an n_samples x an up to 3D shape for each sample
-macrostate_vis(data=data, exp_id=0, cause_or_effect='cause', subtract_global_mean=True)
-
-'''
-
-
-def visualize_macrostates(exp_path, data, feature_names,
+def visualize_macrostates(exp_path, data, feature_names=None,
                           data_series='dataset_train', cause_or_effect='cause',
                           subtract_global_mean='True', figsize=None,
                           kwargs={}):
-
+    '''
+    Main fucntion to visualize macrostates. Given a path to an saved
+    Experiment, it loads in the specified macrostate labels and delegates to
+    the _plot helper function.
+    Arguments:
+        exp_path (str) : path to saved Experiment
+        data (np.ndarray) : an (n_samples, ...) array (with up to three
+            additional dimensions after the n_samples dimension) of data points
+            to visualize by macrostate.
+        feature_names (list) : optional nested list of names of each feature to 
+            plot for each dimension. Defaults to None.
+        data_series (str) : name of dataset to load results for. Defaults to
+            'dataset_train'
+        cause_or_effect (str) : load results for cause or effect partition. 
+            Valid values are 'cause', 'effect'. Defaults to 'cause'.
+        subtract_global_mean (bool) : if True, global mean will be subtracted
+            from each macrostate mean displayed. If False, raw macrostate
+            means will be displayed. Defaults to True.
+        figsize (tuple) : size of figure to display. If None, sizing will be
+            done automatically. Defaults to None.         
+        kwargs (dict) : additional arguments to pass to 
+            matplotlib.pyplot.imshow. Defaults to {}.
+    Returns: None
+    '''
     if cause_or_effect == 'cause':
         fn = os.path.join(
             exp_path, f'{data_series}/CauseClusterer_results.pickle')
@@ -32,11 +57,35 @@ def visualize_macrostates(exp_path, data, feature_names,
 
     _plot(data, lbls, feature_names=feature_names,
           subtract_global_mean=subtract_global_mean,
-          fig_path=fig_path, kwargs=kwargs)
+          figsize=figsize, fig_path=fig_path, kwargs=kwargs)
 
 
 def _plot(data, lbls, feature_names=None, dim_names=None,
           subtract_global_mean=True, fig_path=None, figsize=None, kwargs={}):
+
+    '''
+    Visualizes macrostates, determining whether to delegate to _plot_1D, 
+    _plot_2D, or _plot_3D.
+    Arguments:
+        data (np.ndarray) : an (n_samples, ...) array (with up to three
+            additional dimensions after the n_samples dimension) of data points
+            to visualize by macrostate.
+        lbls (np.ndarray) : an (n_samples,) array of macrostate assignments.
+        feature_names (list) : optional nested list of names of each feature to 
+            plot for each dimension. Defaults to None.
+        dim_names (list) : list of str names for each dimension in data after
+            the n_samples dimension.
+        subtract_global_mean (bool) : if True, global mean will be subtracted
+            from each macrostate mean displayed. If False, raw macrostate
+            means will be displayed. Defaults to True.
+        fig_path (str) : path to save figure to. Will not save if value is None.
+            Defaults to None.
+        figsize (tuple) : size of figure to display. If None, sizing will be
+            done automatically. Defaults to None.         
+        kwargs (dict) : additional arguments to pass to 
+            matplotlib.pyplot.imshow. Defaults to {}.
+    Returns: None
+    '''
 
     u_lbls = np.unique(lbls)
     n_lbls = len(u_lbls)
@@ -82,6 +131,28 @@ def _plot(data, lbls, feature_names=None, dim_names=None,
 
 def _plot_1D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names,
              dim_names, figsize=None, kwargs={}):
+    '''
+    Plot samples by macrostate for 1D samples.
+    Arguments:
+        n_lbls (int) : number unique macrostates
+        u_lbls (np.ndarray) : labels for each unique macrostate
+        n_features (list) : list of # of features for each dimension (in this
+            case, only one element in the list).
+        means (np.ndarray) : average sample per macrostate
+        vmin (float) : lower bound color value for matplotlib.pyplot.imshow.
+        vmax (float) : upper bound color value for matplotlib.pyplot.imshow.  
+        cmap (str) : color map to use for imshow, detailed in matplotib.pyplot 
+            documentation.
+        feature_names (list) : nested list of names of each feature to 
+            plot for each dimension.
+        dim_names (list) : list of str names for each dimension in data after
+            the n_samples dimension.
+        figsize (tuple) : size of figure to display. If None, sizing will be
+            done automatically. Defaults to None.         
+        kwargs (dict) : additional arguments to pass to 
+            matplotlib.pyplot.imshow. Defaults to {}.
+    Returns: None
+    '''
     # plot
     if figsize is None:
         figsize = (3*n_lbls, 3*np.ceil(n_features[0]/5))
@@ -115,6 +186,29 @@ def _plot_1D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names,
 
 def _plot_2D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names,
              dim_names, figsize=None, kwargs={}):
+    '''
+    Plot samples by macrostate for 2D samples.
+    Arguments:
+        n_lbls (int) : number unique macrostates
+        u_lbls (np.ndarray) : labels for each unique macrostate
+        n_features (list) : list of # of features for each dimension (in this
+            case, two elements in the list).
+        means (np.ndarray) : average sample per macrostate
+        vmin (float) : lower bound color value for matplotlib.pyplot.imshow.
+        vmax (float) : upper bound color value for matplotlib.pyplot.imshow.  
+        cmap (str) : color map to use for imshow, detailed in matplotib.pyplot 
+            documentation.
+        feature_names (list) : nested list of names of each feature to 
+            plot for each dimension.
+        dim_names (list) : list of str names for each dimension in data after
+            the n_samples dimension.
+        figsize (tuple) : size of figure to display. If None, sizing will be
+            done automatically. Defaults to None.         
+        kwargs (dict) : additional arguments to pass to 
+            matplotlib.pyplot.imshow. Defaults to {}.
+    Returns: None
+    '''
+
     # plot
     if figsize is None:
         figsize = (3*np.ceil(n_features[1]/5)
@@ -150,6 +244,28 @@ def _plot_2D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names,
 
 def _plot_3D(n_lbls, u_lbls, n_features, means, vmin, vmax, cmap, feature_names,
              dim_names, figsize=None, kwargs={}):
+    '''
+    Plot samples by macrostate for 3D samples.
+    Arguments:
+        n_lbls (int) : number unique macrostates
+        u_lbls (np.ndarray) : labels for each unique macrostate
+        n_features (list) : list of # of features for each dimension (in this
+            case, three elments in the list).
+        means (np.ndarray) : average sample per macrostate
+        vmin (float) : lower bound color value for matplotlib.pyplot.imshow.
+        vmax (float) : upper bound color value for matplotlib.pyplot.imshow.  
+        cmap (str) : color map to use for imshow, detailed in matplotib.pyplot 
+            documentation.
+        feature_names (list) : nested list of names of each feature to 
+            plot for each dimension.
+        dim_names (list) : list of str names for each dimension in data after
+            the n_samples dimension.
+        figsize (tuple) : size of figure to display. If None, sizing will be
+            done automatically. Defaults to None.         
+        kwargs (dict) : additional arguments to pass to 
+            matplotlib.pyplot.imshow. Defaults to {}.
+    Returns: None
+    '''
     # plot
     if figsize is None:
         figsize = (3*np.ceil(n_features[1]/5)*n_lbls,
