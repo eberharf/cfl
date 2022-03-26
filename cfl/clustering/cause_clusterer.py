@@ -1,8 +1,8 @@
 import pickle
 from sklearn.cluster import *
-from cfl import Block
-from cfl import Dataset
-from cfl.clustering import * # makes included clustering classes like SNN available
+from cfl.block import Block
+from cfl.dataset import Dataset
+from cfl.clustering.snn import SNN
 from cfl.clustering.cluster_tuning_util import tune
 
 class CauseClusterer(Block):

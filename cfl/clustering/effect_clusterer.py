@@ -1,9 +1,9 @@
 import pickle
 from sklearn.cluster import *
-from cfl import Block
-from cfl import Dataset
+from cfl.block import Block
+from cfl.dataset import Dataset
 from cfl.clustering.Y_given_Xmacro import sample_Y_dist  # calculate P(Y|Xmacro)
-from cfl.clustering import * # makes included clustering classes available
+from cfl.clustering.snn import SNN
 from cfl.clustering.cluster_tuning_util import tune
 
 class EffectClusterer(Block):
@@ -180,7 +180,7 @@ class EffectClusterer(Block):
 
         x_lbls = prev_results['x_lbls']
         # sample P(Y|Xclass)
-        y_probs = sample_Y_dist(self.data_info.Y_type, dataset, x_lbls,
+        y_probs = sample_Y_dist(self.data_info['Y_type'], dataset, x_lbls,
                                 precompute_distances=self.block_params['precompute_distances'])
 
         # tune model hyperparameters if requested
@@ -241,7 +241,7 @@ class EffectClusterer(Block):
         # a predict function defined so we're doing this for now
 
         # sample P(Y|Xclass)
-        y_probs = sample_Y_dist(self.data_info.Y_type, dataset, x_lbls)
+        y_probs = sample_Y_dist(self.data_info['Y_type'], dataset, x_lbls)
 
         # do y clustering
         y_lbls = self.model.fit_predict(y_probs)
