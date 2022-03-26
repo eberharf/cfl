@@ -2,7 +2,8 @@ from abc import ABCMeta, abstractmethod
 from cfl.util.input_val import check_params
 
 class Block(metaclass=ABCMeta):
-    '''A Block is an object that can:
+    '''
+    A Block is an object that can:
         1) be trained on a Dataset
         2) predict some target for a Dataset.
     Blocks are intended to be the components of a graph workflow in an Experiment.
@@ -18,8 +19,7 @@ class Block(metaclass=ABCMeta):
             data_info (dict): dict of information about associated datasets
             block_params (dict): parameters for this model 
 
-        Returns: 
-            None
+        Returns: None
         '''
 
         # check input argument types
@@ -44,8 +44,7 @@ class Block(metaclass=ABCMeta):
         Arguments:
             path : path to load from
 
-        Returns: 
-            None
+        Returns: None
         '''
         ...
 
@@ -58,8 +57,7 @@ class Block(metaclass=ABCMeta):
         Arguments:
             path : path to save at
 
-        Returns: 
-            None
+        Returns: None
         '''
         ...
 
@@ -70,7 +68,11 @@ class Block(metaclass=ABCMeta):
 
         Arguments:
             dataset (Dataset) : dataset to train model with 
-            prev_results (dict): any results needed from previous Block training 
+            prev_results (dict): any results computed by the previous Block
+                during training.
+        Returns:
+            dict : a dictionary of results to be saved and to pass on as the
+                'prev_results' argument to the next Block's train method.
         '''
         ...
 
@@ -81,19 +83,23 @@ class Block(metaclass=ABCMeta):
 
         Arguments:
             dataset (Dataset): dataset for model to predict on 
-            prev_results (dict) : any results needed from previous Block prediction
+            prev_results (dict) : any results computed by the previous Block
+                during prediction.
+        Returns:
+            dict : a dictionary of results to be saved and to pass on as the
+                'prev_results' argument to the next Block's predict method.
         '''
         ...
 
-    # TODO: how to document that an object that inherits from block must have a name attribute
     def get_name(self):
         '''
         Return name of model.
 
-        Arguments:
-            None
+        Arguments: None
         Returns: 
             str: name of the model 
+        Todo:
+            * Enforce specifying a "name" attribute by class descendants.
         '''
         return self.name
 
@@ -104,7 +110,7 @@ class Block(metaclass=ABCMeta):
         Arguments: 
             None
         Returns: 
-            bool: whether the block has been trained 
+            bool : whether the block has been trained 
         '''
         return self.trained
 
@@ -115,7 +121,7 @@ class Block(metaclass=ABCMeta):
             Arguments: 
                 None
             Returns: 
-                dict: dictionary of default parameters.
+                dict : dictionary of default parameters.
         '''
         ...
 
@@ -136,4 +142,9 @@ class Block(metaclass=ABCMeta):
         return checked_params
         
     def get_params(self):
+        ''' Return block params.
+        Arguments: None
+        Returns:
+            dict : parameters specified for this Block.
+        '''
         return self.block_params
