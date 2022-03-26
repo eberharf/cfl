@@ -1,3 +1,14 @@
+'''
+This module provides recommendations for values to intervene to in subsequent
+experimentation to refine the observational partition to a causal partition.
+It 1) identifies values in high-density regions where CFL has more certainty
+about it's macrostate assignments and 2) selects a subset of these points
+that is far from the macrostate boundaries.
+
+Todo: 
+    Improve how users can specify the number samples to be returned. Right
+    now it depends on the number of samples in each cluster. 
+'''
 
 import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
@@ -5,10 +16,31 @@ import matplotlib.pyplot as plt
 from cfl.post_cfl.post_cfl_util import *
 from sklearn.decomposition import PCA
 
-
 def get_recommendations(exp, data=None, dataset_name='dataset_train',
                         cause_or_effect='cause', visualize=True, k_samples=100,
                         eps=0.5):
+    '''
+    Wrapper that will get recommendations by experiment and dataset name.
+    Arguments:
+        exp (str or cfl.Experiment) : path to experiment or Experiment object
+        data (None) : not used here, here for consistency
+        dataset_name (str) : name of dataset to load results for. Defaults to
+            'dataset_train'
+        cause_or_effect (str) : load results for cause or effect partition. 
+            Valid values are 'cause', 'effect'. Defaults to 'cause'.
+        visualize (bool) : whether to visualize samples selected. Defaults
+            to True.
+        k_samples (int) : number of samples to extract *per cluster*. If
+            None, returns all cluster members. If greater than number of 
+            cluster members, returns all cluster members. Defaults to 100.
+        eps (float) : a threshhold for how close to the macrostate boundary
+            a sample can be. Defaults to 0.5.
+    Returns:
+        np.ndarray : mask of shape (n_samples,) where value of 1 means 
+                that a) a point is considered high-density and 
+                b) a point doesn't lie close to a cluster boundary. 
+                0 otherwise.    
+    '''
 
     pyx = load_pyx(exp, dataset_name)
     cluster_labels = load_macrolbls(exp, dataset_name, cause_or_effect)
@@ -22,29 +54,36 @@ def get_recommendations(exp, data=None, dataset_name='dataset_train',
 
 def _get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5,
                          visualize=True, exp_path=None, dataset_name=None):
-    ''' For a set of data points, compute density for each point, extract
-        high density samples, and discard points near cluster boundaries. Plot
-        and return location of resulting subset of points.
+    ''' 
+    For a set of data points, compute density for each point, extract
+    high density samples, and discard points near cluster boundaries. Plot
+    and return location of resulting subset of points.
 
-        Arguments:
-            pyx (np.ndarray) : output of a CDE Block of shape 
-                    (n_samples, n target features) 
-            cluster_labels (np.ndarray) : array of integer cluster labels
-                                aligned with pyx of shape
-                                (n_samples,)
-            k_samples (int) : number of samples to extract *per cluster*. If
-                              None, returns all cluster members. If greater 
-                              than number of cluster members, returns all 
-                              cluster members.
-        Returns:
-            np.ndarray : mask of shape (n_samples,) where value of 1 means 
-                    that a) a point is considered high-density and 
-                    b) a point doesn't lie close to a cluster boundary. 
-                    0 otherwise.
+    Arguments:
+        pyx (np.ndarray) : output of a CDE Block of shape 
+                (n_samples, n target features) 
+        cluster_labels (np.ndarray) : array of integer cluster labels
+                            aligned with pyx of shape
+                            (n_samples,)
+        k_samples (int) : number of samples to extract *per cluster*. If
+            None, returns all cluster members. If greater than number of 
+            cluster members, returns all cluster members. Defaults to 100.
+        eps (float) : a threshhold for how close to the macrostate boundary
+            a sample can be. Defaults to 0.5.
+        visualize (bool) : whether to visualize samples selected. Defaults
+            to True.
+        exp_path (str): path to saved Experiment
+        dataset_name (str) : name of dataset to load results for. Defaults to
+            None
+        
+    Returns:
+        np.ndarray : mask of shape (n_samples,) where value of 1 means 
+                that a) a point is considered high-density and 
+                b) a point doesn't lie close to a cluster boundary. 
+                0 otherwise.
     '''
 
     density = _compute_density(pyx)
-
     hd_mask = _get_high_density_samples(density, cluster_labels,
                                         k_samples=k_samples)
     final_mask = _discard_boundary_samples(
@@ -54,7 +93,6 @@ def _get_recommendations(pyx, cluster_labels, k_samples=100, eps=0.5,
     if visualize:
         _plot_results(pyx, hd_mask, final_mask, cluster_labels, exp_path,
                       dataset_name)
-
     return final_mask
 
 
@@ -63,7 +101,7 @@ def _compute_density(pyx):
 
         Arguments: 
             pyx (np.ndarray) : output of a CDE Block of shape 
-                               (n_samples, n target features) 
+                (n_samples, n target features) 
 
         Returns: 
             np.ndarray : array of density proxys aligned with pyx of shape
@@ -90,16 +128,15 @@ def _get_high_density_samples(density, cluster_labels, k_samples=None):
 
         Arguments:
             density (np.ndarray) : computed density for each sample in pyx, of 
-                                   shape (n_samples,) 
+                shape (n_samples,) 
             cluster_labels (np.ndarray) : array of integer cluster labels
-                                          aligned with pyx of shape (n_samples,)
+                aligned with pyx of shape (n_samples,)
             k_samples (int) : number of samples to extract *per cluster*. If
-                              None, returns all cluster members. If greater 
-                              than number of cluster members, returns all 
-                              cluster members.
-                              Note: if several points have the same density
-                              at the cutoff density value, all will be returned
-                              so more than k_samples examples may be returned.
+                None, returns all cluster members. If greater than number of 
+                cluster members, returns all cluster members. Defaults to None.
+                Note: if several points have the same density
+                at the cutoff density value, all will be returned
+                so more than k_samples examples may be returned.
 
         Returns:
             np.ndarray : mask of shape (n_samples,) where value of 1 means 
@@ -137,24 +174,24 @@ def _get_high_density_samples(density, cluster_labels, k_samples=None):
         mask[cluster_labels == ci] = density[cluster_labels == ci] <= cluster_thresh
     return mask
 
-
 def _discard_boundary_samples(pyx, high_density_mask, cluster_labels, eps=0.5):
     ''' Given points of high density, discard points that lie close to a 
         cluster boundary. 
 
         Arguments: 
             pyx (np.ndarray) : pyx (np.ndarray) : output of a CDE Block of shape 
-                               (n_samples, n target features) 
+                (n_samples, n target features) 
             high_density_mask (np.ndarray) : mask of shape (n_samples,) 
-                                             indicating which samples are 
-                                             considered high-density
+                indicating which samples are considered high-density
             cluster_labels (np.ndarray) : array of integer cluster labels
-                                aligned with pyx of shape (n_samples,)
+                aligned with pyx of shape (n_samples,)
+            eps (float) : a threshhold for how close to the macrostate boundary
+                a sample can be. Defaults to 0.5.
         Returns:
             np.ndarray : mask of shape (n_samples,) where value of 1 means 
-                         that a) a point is considered high-density and 
-                         b) a point doesn't lie close to a cluster boundary. 
-                         0 otherwise.
+                that a) a point is considered high-density and 
+                b) a point doesn't lie close to a cluster boundary. 
+                0 otherwise.
     '''
 
     # compute center of each cluster (average of all points in cluster)
@@ -204,6 +241,29 @@ def _discard_boundary_samples(pyx, high_density_mask, cluster_labels, eps=0.5):
 
 def _plot_results(pyx, hd_mask, final_mask, cluster_labels, exp_path,
                   dataset_name, feature_names=None):
+    '''
+    Plot the original distribution of data overlayed with the points
+    recommended for intervention. Will save the figure to: 
+    [exp_path]/[dataset_name]/intervention_recs.fig
+    
+    Arguments: 
+        pyx (np.ndarray) : output of a CDE Block of shape 
+            (n_samples, n target features) 
+        hd_mask (np.ndarray) : mask of shape (n_samples,) where value of 1 means 
+            that a point is considered high-density. 0 otherwise.
+        final_mask (np.ndarray) : mask of shape (n_samples,) where value of 1 
+            means that a) a point is considered high-density and 
+            b) a point doesn't lie close to a cluster boundary. 
+            0 otherwise.)
+        cluster_lables (np.ndarray) : an (n_samples,) array of macrostate
+            assignments
+        exp_path (str): path to saved Experiment
+        dataset_name (str) : name of dataset to load results for. 
+        feauture_names (list) : optional list of names of each feature to plot.
+            defaults to None.
+    Returns : None
+    '''
+
     if feature_names is None:
         feature_names = ['Feature 1', 'Feature 2']
     if pyx.shape[1] > 2:

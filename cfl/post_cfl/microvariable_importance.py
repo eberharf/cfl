@@ -1,3 +1,8 @@
+'''
+This module provides a measure of the importance of each microvariable
+in distinguishing between any two given macrostates that CFL found.
+'''
+
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -7,9 +12,15 @@ from tqdm import tqdm
 
 
 def _kl_divergence(p, q):
-    ''' Helper function for `discrimination_KL`. Computes the KL divergence
-        in both directions and returns the mean.'''
-
+    ''' 
+    Helper function for `discrimination_KL`. Computes the KL divergence
+    in both directions and returns the mean.
+    Arguments:
+        p (np.ndarray) : first distribution to compare
+        q (np.ndarray) : second distribution to compare
+    Returns :
+        float : kl divergence between p and q    
+    '''
     # TODO: document zeros_like caveat here
     kl_pq = np.sum(
         p * np.log2(np.divide(p, q, out=np.zeros_like(p), where=q != 0)))
@@ -19,7 +30,16 @@ def _kl_divergence(p, q):
 
 
 def discrimination_KL(fi_samples, fj_samples):
-    ''' Compute the KL divergence between two samples.'''
+    ''' 
+    Compute the KL divergence between two samples by estimating the
+    distributions from the two samples and then taking the kl divergence
+    between these two distributions.
+    Arguments:
+        fi_samples (np.ndarray) : samples from distribution 1
+        fj_samples (np.ndarray) : samples from distribution 2
+    Returns:
+        float : kl divergence between p and q
+    '''
 
     # make sure samples lie on 0-1 range for hist binning later
     assert (np.max(fi_samples) <= 1) and (np.min(fi_samples) >= 0)
@@ -37,14 +57,19 @@ def discrimination_KL(fi_samples, fj_samples):
 
 
 def discriminate_clusters(data, lbls, disc_func=discrimination_KL):
-    ''' Compute how well each feature in data discriminates each pairwise
-        class boundary using disc_func.
+    ''' 
+    Compute how well each feature in data discriminates each pairwise class 
+    boundary using disc_func.
 
-        Arguments:
-            data (np.ndarray) : (n_samples, n_features) dataset
-            lbls (np.ndarray) : (n_samples,) partition over `data`
-            disc_func (function) : a function that takes two samples of 1D data
-                                   and returns some distance between them
+    Arguments:
+        data (np.ndarray) : (n_samples, n_features) dataset
+        lbls (np.ndarray) : (n_samples,) partition over `data`
+        disc_func (function) : a function that takes two samples of 1D data
+                                and returns some distance between them
+    Returns:
+        np.ndarray : an (n_clusters, n_clusters, n_features) sized array
+            where element (i,j,k) specifies the distance between the 
+            distribution of feature k in cluster i and cluster j.
     '''
 
     # scale all features between 0-1 for distribution binning purposes
@@ -75,6 +100,15 @@ def discriminate_clusters(data, lbls, disc_func=discrimination_KL):
 
 
 def plot_disc_vals(disc_vals, fig_path=None):
+    '''
+    Visualize the distances between distributions of each feature between
+    each pair of clusters.
+    Arguments:
+        disc_vals (np.ndarray): an (n_clusters, n_clusters, n_features) sized 
+            array where element (i,j,k) specifies the distance between the 
+            distribution of feature k in cluster i and cluster j.)
+        fig_path (str) : path to save figure to, if not None. Defaults to None.
+    '''
 
     n_features = disc_vals.shape[2]
     n_clusters = disc_vals.shape[0]
@@ -99,7 +133,27 @@ def plot_disc_vals(disc_vals, fig_path=None):
 
 def compute_microvariable_importance(exp, data,
                                      dataset_name='dataset_train',
+                                     visualize=True,
                                      cause_or_effect='cause'):
+    '''
+    Wrapper function to compute microvariable importance given an Experiment
+    directory path or object.
+    Arguments:
+        exp (str or cfl.Experiment) : path to experiment or Experiment object
+        data (np.ndarray): an (n_samples,n_features) array of microvariable
+            measurements to evaluate
+        dataset_name (str) : name of dataset to load results for. Defaults to
+            'dataset_train'
+        visualize (bool) : whether to visualize samples selected. If True,
+            will save to [exp_path]/[dataset_name]/microvariable_importance.fig.
+            Defaults to True.
+        cause_or_effect (str) : load results for cause or effect partition. 
+            Valid values are 'cause', 'effect'. Defaults to 'cause'.
+    Returns:
+        np.ndarray : an (n_clusters, n_clusters, n_features) sized array
+            where element (i,j,k) specifies the distance between the 
+            distribution of feature k in cluster i and cluster j.
+    '''
     if isinstance(data, str):
         data = np.load(data)
     macro_lbls = load_macrolbls(exp, dataset_name, cause_or_effect)
@@ -108,6 +162,7 @@ def compute_microvariable_importance(exp, data,
     disc_vals = discriminate_clusters(data, macro_lbls)
     np.save(os.path.join(exp_path, dataset_name, 'microvariable_importance'),
             disc_vals)
-    # plot_disc_vals(disc_vals,fig_path=os.path.join(
-    #     exp_path, dataset_name, 'microvariable_importance'))
+    if visualize:
+        plot_disc_vals(disc_vals,fig_path=os.path.join(
+            exp_path, dataset_name, 'microvariable_importance'))
     return disc_vals
