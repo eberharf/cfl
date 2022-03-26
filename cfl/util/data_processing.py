@@ -1,6 +1,10 @@
+'''
+A set of helper functions that are used often in processing data passed
+through CFL.
+'''
+
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-
 
 # Note: i think this function is not currently in use elsewhere
 def standardize_train_test(data, dtype=np.float32):

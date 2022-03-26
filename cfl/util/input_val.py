@@ -1,3 +1,7 @@
+'''
+A set of functions helpful to validate inputs to CFL.
+'''
+
 def check_params(input_params, default_params, tag):
     """
         Check that all expected parameters have been provided,
