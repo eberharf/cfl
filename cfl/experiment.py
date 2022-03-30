@@ -563,7 +563,12 @@ class Experiment():
                 block_graph.append(block.get_name())
                 fn = os.path.join(self.save_path, 'params', block.get_name())
                 with open(fn, 'wb') as f:
-                    pickle.dump(block.get_params(), f)
+                    try:
+                        pickle.dump(block.get_params(), f)
+                    except:
+                        print('Cannot pickle params when a function is ' + 
+                            'included as a value. Skipping.')
+
 
             fn = os.path.join(self.save_path, 'params', 'block_graph')
             with open(fn, 'wb') as f:
