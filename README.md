@@ -63,15 +63,15 @@ Code development benefitted from regular discussions with Patrick Burauel.
 CFL is released under a BSD-like license for non-commercial use only. If you use CFL in published research work, we encourage you to cite this repository:
 
 ```
-Causal Feature Learning (2021). https://github.com/eberharf/cfl
+Causal Feature Learning (2022). https://github.com/eberharf/cfl
 ```
 
 or use the BibTex reference:
 
 ```
-@misc{cfl2021,
+@misc{cfl2022,
     title     = "Causal Feature Learning",
-    year      = "2021",
+    year      = "2022",
     publisher = "GitHub",
     url       = "https://github.com/eberharf/cfl"}
   }

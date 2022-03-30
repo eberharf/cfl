@@ -3,7 +3,7 @@
 
 __version__ = '1.2.0'
 __author__ = 'Jenna Kahn and Iman Wahle'
-__credits__ = '2021, California Institute of Technology'
+__credits__ = '2022, California Institute of Technology'
 
 from cfl.experiment import Experiment
 from cfl.block import Block

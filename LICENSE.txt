@@ -1,6 +1,6 @@
 This software is licensed under a BSD-like License for non-commercial use.
 
-Copyright © 2020, California Institute of Technology. All rights reserved.
+Copyright © 2022, California Institute of Technology. All rights reserved.
 
 Redistribution and use in source and binary forms for academic and other
 non-commercial purposes, with or without modification, are permitted
