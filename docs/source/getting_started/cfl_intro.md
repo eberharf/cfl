@@ -1,7 +1,11 @@
 ## What is Causal Feature Learning? 
 
 
-Causal Feature Learning (CFL) is a novel algorithm designed to construct macrovariables that preserve the causal relationships between variables. These macrovariables are intended to reduce the complexity of finding causal relationships in data by identifying a small number of relevant macrostates that can be used to test causal hypotheses. 
+Causal Feature Learning (CFL) is a novel algorithm designed to construct
+macrovariables that preserve the causal relationships between variables. These
+macrovariables are intended to reduce the complexity of finding causal
+relationships in data by identifying a small number of relevant macrostates that
+can be used to test causal hypotheses. 
 
 ![Overview of CFL pipeline](../img/CFLpipeline.png "overview of CFL pipeline")
 
@@ -26,27 +30,26 @@ macrovariable")
 CFL is designed to take two micro-level data sets as input: a 'causal' data set
 (`X`) and an 'effect' data set (`Y`). CFL then assigns each data point in `X`
 and `Y` to a macrovariable state: the causal data is partitioned into a set of
-macro-causes (e.g. the temperature of the room) and effect data into a set
-of macro-effects (e.g. whether or not the air conditioner turns on). 
+macro-causes (e.g. the temperature of the room) and effect data into a set of
+macro-effects (e.g. whether or not the air conditioner turns on). 
 
 
 As discussed above, when constructing a macrovariable, a choice must be made
 about what information to preserve and what details to abstract away. In the
-case of CFL, we attempt to preserve the causal
-relationships between microvariables in the cause and effect data sets. 
-In other words, every microvariable configuration assigned to a given
-cause macro-state should produce the same effect on `Y` as any other member of
-that same macro-state. Similarly, each
-microvariable configuration in `Y` that is assigned to the same effect
+case of CFL, we attempt to preserve the causal relationships between
+microvariables in the cause and effect data sets. In other words, every
+microvariable configuration assigned to a given cause macro-state should produce
+the same effect on `Y` as any other member of that same macro-state. Similarly,
+each microvariable configuration in `Y` that is assigned to the same effect
 macro-state should be expected to respond similarly to any cause data.  
 
 
 CFL works in two steps to create these macrovariables: first, CFL estimates a
-conditional probability distribution _P(Y|X)_; second, it clusters the cause
-and effect data based on that distribution. The cluster labels that CFL outputs
+conditional probability distribution _P(Y|X)_; second, it clusters the cause and
+effect data based on that distribution. The cluster labels that CFL outputs
 correspond to the macrovariable state of each data point. 
 
 In addition to these labels, the underlying rules to predict the macrovariable
-state of any new data point are implicitly stored in the parameters of the trained CFL
-pipeline. New data can be passed through the trained pipeline and given
-macrovariable assignments as well. 
+state of any new data point are implicitly stored in the parameters of the
+trained CFL pipeline. New data can be passed through the trained pipeline and
+given macrovariable assignments as well. 

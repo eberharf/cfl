@@ -11,27 +11,37 @@ Causal Feature Learning (CFL) is an unsupervised algorithm designed to
 construct macro-variables from low-level data, preserving the causal 
 relationships present in the data. 
 
-
 .. toctree::
    :maxdepth: 1
    :caption: Getting Started
 
    getting_started/SETUP
    getting_started/cfl_intro.md
-   getting_started/quick_start.ipynb
    getting_started/indepth_start.ipynb   
-   getting_started/dev_guide.ipynb
+   getting_started/quick_start.ipynb
 
 .. toctree:: 
    :maxdepth: 1
-   :caption: Additional Examples 
+   :caption: In-Depth Feature Tutorials 
+
+   examples/train_cde_with_optuna_pruner.ipynb
+   examples/tune_clusterer.ipynb
+   examples/basic_visualizations.ipynb
+   examples/adding_models.ipynb
+
+.. toctree:: 
+   :maxdepth: 1
+   :caption: Dataset Applications
 
    examples/cfl_code_intro.ipynb
    examples/el_nino_example.ipynb
-   examples/mnist.ipynb
-   examples/basic_visualizations.ipynb
-   examples/train_cde_with_optuna_pruner.ipynb
-   examples/adding_blocks.ipynb
+
+
+.. toctree:: 
+   :maxdepth: 1
+   :caption: Contribute to CFL
+
+   getting_started/dev_guide.ipynb
 
 API Reference 
 *********************************
@@ -47,9 +57,8 @@ API Reference
    more_info/dvc_intro
 
 
-
 Contributors
-*****************************************************
+*********************************
 
 -  Jenna Kahn & Iman Wahle [first authors; name order chosen randomly]
 -  Krzysztof Chalupka
@@ -70,7 +79,7 @@ Code development benefitted from regular discussions with Patrick
 Burauel. 
 
 License and Citations
-********************************************
+*********************************
 
 CFL is released under a BSD-like
 license for non-commercial use
@@ -81,15 +90,15 @@ repository:
 
 ::
 
-   Causal Feature Learning (2021). https://github.com/eberharf/cfl
+   Causal Feature Learning (2022). https://github.com/eberharf/cfl
 
 or use the BibTex reference:
 
 ::
 
-   @misc{cfl2021,
+   @misc{cfl2022,
    title = "Causal Feature Learning",
-   year = "2021",
+   year = "2022",
    publisher = "GitHub",
    url = "https://github.com/eberharf/cfl"}
 
