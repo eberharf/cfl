@@ -8,7 +8,7 @@ Status](https://github.com/eberharf/cfl/workflows/AutomatedTests/badge.svg)
 </p>
 <h1 align="center">Causal Feature Learning</h1>
 
-<h3 align="center">[Documentation](https://cfl.readthedocs.io/en/latest/index.html#)</h3>
+<h3 align="center"><a href="https://cfl.readthedocs.io/en/latest/index.html#">Tutorials and Documentation</a></h3>
 
 -- -------------------------------------- --
 
