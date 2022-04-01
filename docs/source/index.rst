@@ -24,24 +24,24 @@ relationships present in the data.
    :maxdepth: 1
    :caption: In-Depth Feature Tutorials 
 
-   examples/train_cde_with_optuna_pruner.ipynb
-   examples/tune_clusterer.ipynb
-   examples/basic_visualizations.ipynb
-   examples/adding_models.ipynb
+   indepth_feature_tutorials/train_cde_with_optuna_pruner.ipynb
+   indepth_feature_tutorials/tune_clusterer.ipynb
+   indepth_feature_tutorials/basic_visualizations.ipynb
+   indepth_feature_tutorials/adding_models.ipynb
 
 .. toctree:: 
    :maxdepth: 1
    :caption: Dataset Applications
 
-   examples/cfl_code_intro.ipynb
-   examples/el_nino_example.ipynb
+   dataset_applications/cfl_code_intro.ipynb
+   dataset_applications/el_nino_example.ipynb
 
 
 .. toctree:: 
    :maxdepth: 1
    :caption: Contribute to CFL
 
-   getting_started/dev_guide.ipynb
+   contribute_to_cfl/dev_guide.ipynb
 
 API Reference 
 *********************************
