@@ -272,7 +272,7 @@ class CondExpBase(CDEModel):
         ax.plot(range(len(val_loss)), val_loss, label='val_loss')
         ax.set_xlabel('Epochs')
         ax.set_ylabel(self.model_params['loss'])
-        ax.set_title('Training and Test Loss')
+        ax.set_title('Training and Validation Loss')
         plt.legend(loc='upper right')
 
         if show:
