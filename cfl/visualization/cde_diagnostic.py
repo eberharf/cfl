@@ -8,7 +8,7 @@ These functions can be used to examine the quality of the CDE's learning
 import matplotlib.pyplot as plt
 import numpy as np
 
-def pyx_scatter(cfl_experiment, ground_truth=None):
+def pyx_scatter(cfl_experiment, ground_truth=None, colored_by=None):
     '''
     Creates a scatter plot with a sample of points from the CDE output,
     colored by ground truth (if given). 
@@ -56,9 +56,10 @@ def pyx_scatter(cfl_experiment, ground_truth=None):
 
     ax.set_ylabel("Expectation of Target")
     ax.set_xlabel("Sample")
-    fig.suptitle(
-        "Sample of predicted P(Y|X) values after CDE training\nColored by ground truth")
-
+    title = "Sample of predicted P(Y|X) values after CDE training"
+    if colored_by is not None:
+        title += f"\nColored by {colored_by}"
+    ax.set_title(title)
     return fig, ax
 
 
