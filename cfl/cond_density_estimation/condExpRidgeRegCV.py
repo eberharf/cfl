@@ -7,10 +7,32 @@ import matplotlib.pyplot as plt
 import pickle
 
 class CondExpRidgeCV(CDEModel):
+    '''
+    A ridge regression implementation of a CDE.
+
+    Attributes:
+        name (str) : name of the model so that the model type can be recovered
+            from saved parameters (str)
+        data_info (dict) : dict with information about the dataset shape
+        model_params (dict) : parameters for the CDE
+        trained (bool) : whether or not the modeled has been trained yet. This
+            can either happen by defining by instantiating the class and
+            calling train, or by passing in a path to saved weights from
+            a previous training session through model_params['weights_path'].
+        model (sklearn.linear_model.Ridge) : sklearn ridge regression model
+        alpha (float) : final value of alpha used for fitting
+        scores (np.ndarray) : array of scores from cross-validation
+
+    Methods:
+        get_model_params : return self.model_params
+        load_model : load everything needed for this CondExpRidgeCV model
+        save_model : save the current state of this CondExpRidgeCV model
+        train : fit the model on a given Dataset
+        predict : once the model is trained, predict for a given Dataset
+    '''
 
     def __init__(self, data_info, model_params):
         ''' 
-        Do any setup required for your model here.
         Arguments:
             data_info (dict) : a dictionary containing information about the 
                 data that will be passed in. Should contain 
@@ -23,8 +45,8 @@ class CondExpRidgeCV(CDEModel):
                 your model.
         Returns: None
         '''
-        pass
-
+        super().__init__(data_info=data_info, model_params=model_params)
+        self.name = 'CondExpRidgeCV'
         self.model_params = model_params
         self.trained = False
 
