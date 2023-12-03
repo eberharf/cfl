@@ -43,8 +43,8 @@ dependencies:
 
 # # the following packages are things that we (Iman and Jenna) have
 # # used for some specific data analyses, but are not needed for examples published on main 
-  - pandas # for formatting data frames (eg used for fear mice data)
-  - nibabel # for reading/writing MRIs
-  - ipywidgets  # for interactive widgets
-  - jupyter_nbextensions_configurator
-  - plotly # for the sankey diagrams
+  # - pandas # for formatting data frames (eg used for fear mice data)
+  # - nibabel # for reading/writing MRIs
+  # - ipywidgets  # for interactive widgets
+  # - jupyter_nbextensions_configurator
+  # - plotly # for the sankey diagrams
