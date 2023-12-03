@@ -2,6 +2,7 @@
 #### contains the packages needed to build the documentation
 recommonmark == 0.7.1
 nbsphinx == 0.8.5 
+sphinx-rtd-theme
 
 # for jupyter notebooks
 ipykernel
