@@ -135,7 +135,7 @@ def visualize_errors(errs, params_list, params_to_tune):
 
 
         # 1D line plot
-        fig, ax = plt.subplots(1,2, figsize=(16,4))
+        fig, ax = plt.subplots(1,2,figsize=(10,4))
         ax[0].plot(params_to_tune[k0], shaped_errs)
         ax[0].set_xticks(params_to_tune[k0])
         ax[0].set_xticklabels(params_to_tune[k0])
@@ -148,8 +148,8 @@ def visualize_errors(errs, params_list, params_to_tune):
         ax[1].set_xlabel(k0)
         ax[1].set_ylabel('Change in Error')
         ax[1].set_title('Change in Prediction Error (MSE)')
-        # plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
-        plt.show()
+        plt.tight_layout()
+        plt.savefig('clusterer_grid_search.png', dpi=300)
         return fig
 
     else:
@@ -214,11 +214,12 @@ def get_user_params(suggested_params):
         dict : dictionary of hyperparameters specified.
     '''
     chosen_params = suggested_params
+    print('Grid search scores saved to clusterer_grid_search.png')
     print('Please choose your final clustering parameters.')
     # print('(Press enter for default value in brackets)')
     for param_name in suggested_params.keys():
         # v = input(f'Final {param_name} value [{suggested_params[param_name]}]:')
-        v = input(f'Final {param_name} value:')
+        v = input(f'Final {param_name} value: ')
         # if v == '':
         #     pass
         # else:
