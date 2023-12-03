@@ -23,7 +23,7 @@ from tqdm import tqdm
 import copy
 
 # set font size for all plots
-font = {'size' : 22}
+font = {'size' : 16}
 import matplotlib
 matplotlib.rc('font', **font)
 
@@ -135,19 +135,13 @@ def visualize_errors(errs, params_list, params_to_tune):
 
 
         # 1D line plot
-        fig, ax = plt.subplots(1,2,figsize=(10,4))
-        ax[0].plot(params_to_tune[k0], shaped_errs)
-        ax[0].set_xticks(params_to_tune[k0])
-        ax[0].set_xticklabels(params_to_tune[k0])
-        ax[0].set_xlabel(k0)
-        ax[0].set_ylabel('Error')
-        ax[0].set_title('Prediction Error (MSE)')
-        ax[1].plot(params_to_tune[k0][1:], shaped_errs[1:]-shaped_errs[:-1])
-        ax[1].set_xticks(params_to_tune[k0][:-1])
-        ax[1].set_xticklabels(params_to_tune[k0][:-1])
-        ax[1].set_xlabel(k0)
-        ax[1].set_ylabel('Change in Error')
-        ax[1].set_title('Change in Prediction Error (MSE)')
+        fig, ax = plt.subplots()
+        ax.plot(params_to_tune[k0], shaped_errs)
+        ax.set_xticks(params_to_tune[k0])
+        ax.set_xticklabels(params_to_tune[k0])
+        ax.set_xlabel(k0)
+        ax.set_ylabel('Error')
+        ax.set_title('Prediction Error (MSE)')
         plt.tight_layout()
         plt.savefig('clusterer_grid_search.png', dpi=300)
         return fig
@@ -181,7 +175,6 @@ def visualize_errors(errs, params_list, params_to_tune):
         ax.set_yticklabels(np.round(params_to_tune[k0], 5))
         ax.set_title('Prediction Error (MSE)')
         plt.colorbar(im)
-        # plt.savefig('tmp_cluster_tuning', bbox_inches='tight')
         plt.show()
         return(fig)
 
