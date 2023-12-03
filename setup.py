@@ -3,7 +3,7 @@ import cfl
 
 VERSION = cfl.__version__
 AUTHORS = cfl.__author__
-CONTACT = 'iwahle@caltech.edu'
+CONTACT = 'imanwahle@gmail.com'
 
 # to create a new distribution for cfl
 # run the commands:
