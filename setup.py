@@ -29,13 +29,13 @@ setup(
     # package main cfl package and visual bars (find_packages() returns a list of any folder with an __init__ file)
     packages=find_packages(),
     # TODO: ^ do we package other stuff too?
-    python_requires=">=3.7",  # TODO: good? it probably works with 3.6 too ...
+    python_requires=">=3.7,<3.13",  # TODO: good? it probably works with 3.6 too ...
     install_requires=[  # TODO: this list contains semi-redundant information with requirements.yml
         'tqdm',
-        'matplotlib',
+        'matplotlib>=3.3.4',
         'tensorflow>=2.4.0',
-        'numpy>=1.19.2',
-        'scikit-learn>=0.23',
+        'numpy>=1.19.5',
+        'scikit-learn>=1.0',
         'jupyter',  # for jupyter notebooks
         'ipykernel',
         'joblib>=0.16.0'
@@ -47,7 +47,6 @@ setup(
         'License :: Free for non-commercial use',
         # 'Operating System  :: MacOS :: MacOS X',
         # 'Operating System :: Microsoft :: Windows :: Windows 10',
-        'Programming Language :: Python :: 3.6',  # TODO: other versions?
         'Programming Language :: Python :: 3.7',  # TODO: other versions?
         # NOt with python 3.9 at the moment bc of Tensorflow
         'Programming Language :: Python :: 3.8',
