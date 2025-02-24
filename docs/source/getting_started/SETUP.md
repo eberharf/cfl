@@ -8,6 +8,13 @@ With Python 3.7-3.8:
 pip install cfl
 ```
 
+## Disclaimer:
+
+The existing implementation of CFL uses methods and functions that are deprecated and 
+only exist in past versions of certain libraries.
+
+To ensure functionality of CFL, follow the long instructions below.
+
 ## Long instructions: 
 
 
@@ -46,6 +53,27 @@ conda activate cfl-env
 If no error messages result from this command, then you have successfully
 activated the new environment.
 
+**Alternative without Anaconda:**
+
+Create the virtual environment with the command:
+
+```
+python -m venv cfl-env
+```
+
+and activate the virtual environment with the following command (depending on OS):
+
+```
+# for MacOS and Linux:
+source cfl-env/bin/activate 
+
+# for Windows:
+cfl-env\Scripts\activate
+```
+
+This will create and activate an environment with the version of Python associated 
+with the `python` terminal command
+
 
 **3. Pip install `cfl`**
 
@@ -58,6 +86,21 @@ pip install cfl
 The installation may take a few minutes, especially if `tensorflow` is not
 already installed. 
 
+**4. Install further dependencies:**
+
+The existing implementation of CFL uses methods and functions that are deprecated and
+only exist in past versions of certain libraries.
+
+To ensure the correct versions of libraries are used and full functionality of CFL,
+run the following commands in the virtual environment:
+
+```
+pip install cfl
+pip install optuna
+pip install tensorflow==2.15.0
+pip install keras==2.15.0
+```
+
 To check that the installation was successful, open a Python interpreter (type
 `python` into the terminal). Then, from within Python, run the command `import
 cfl` and check the version:
@@ -69,7 +112,6 @@ python
 ```
 The version number of `cfl` should print. If this command executes with no
 errors, then you are now ready to use `cfl`!
-
 
 <!-- ### Troubleshooting 
 
