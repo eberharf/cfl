@@ -213,7 +213,7 @@ class CauseClusterer(Block):
         assert self.trained, "Remember to train the model before prediction."
 
         pyx = prev_results['pyx']
-        x_lbls = self.model.fit_predict(pyx)
+        x_lbls = self.model.predict(pyx)
         results_dict = {'x_lbls': x_lbls}
         return results_dict
 
