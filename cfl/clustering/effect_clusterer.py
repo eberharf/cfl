@@ -244,7 +244,7 @@ class EffectClusterer(Block):
         y_probs = sample_Y_dist(self.data_info['Y_type'], dataset, x_lbls)
 
         # do y clustering
-        y_lbls = self.model.fit_predict(y_probs)
+        y_lbls = self.model.predict(y_probs)
 
         results_dict = {'y_lbls': y_lbls,
                         'y_probs': y_probs}
