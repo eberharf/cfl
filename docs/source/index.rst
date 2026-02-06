@@ -35,7 +35,7 @@ relationships present in the data.
 
    dataset_applications/cfl_code_intro.ipynb
    dataset_applications/el_nino_example.ipynb
-
+   dataset_applications/alt_extraction_tutorial.ipynb
 
 .. toctree:: 
    :maxdepth: 1
