@@ -29,7 +29,7 @@ dependencies:
   - tqdm # progress bar
   - matplotlib>=3.3.0  # creates plots (used for visualization)
   - tensorflow>=2.7.0,<3.0.0 # machine learning
-  - numpy>=1.19.2,<2.0.0 # array manipulation and fast computing
+  - numpy>=1.19.2,<1.20.0 # array manipulation and fast computing
   - joblib=0.16.0 # used to save/load data primarily for el nino example
   - scikit-learn=0.23.2 # used to import clustering methods, other algorithms/metrics
   - jupyter # for jupyter notebooks
