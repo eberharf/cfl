@@ -103,6 +103,7 @@ class CondExpRidgeCV(CDEModel):
             plt.tight_layout()
             plt.savefig('ridge_grid_search.png', dpi=300)
             plt.close()
+            np.save('ridge_grid_search.npy', self.scores)
 
             # get user input for alpha
             print('Alpha scores saved to ridge_grid_search.png')
