@@ -43,8 +43,23 @@ jobs:
     - name: Test with coverage, pytest
       run: |
         conda env list
+        echo "---- conda/python diagnostics ----"
+        conda info
+        echo "CONDA_PREFIX=$CONDA_PREFIX"
+        echo "CONDA_DEFAULT_ENV=$CONDA_DEFAULT_ENV"
+        echo "PATH=$PATH"
+        echo "which conda: $(which conda)"
+        echo "which python: $(which python)"
+        python -V
+        python -c "import sys; print('sys.executable=', sys.executable)"
+        echo "which pip: $(which pip)"
+        pip -V || true
+        python -m pip -V
+        echo "---- coverage/pytest diagnostics ----"
+        python -c "import coverage; print('coverage version=', getattr(coverage, '__version__', 'unknown'), 'from', coverage.__file__)" || true
+        python -c "import pytest; print('pytest version=', pytest.__version__, 'from', pytest.__file__)" || true
         ls
-        pip install coverage
+        python -m pip install coverage
         coverage run -m pytest
 
     # coverage report -m
