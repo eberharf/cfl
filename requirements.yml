@@ -21,14 +21,15 @@
 
 name: cfl-env
 channels:
-  - defaults
   - conda-forge
+  - defaults
 dependencies:
+  - python=3.8.12
   - pip
   - tqdm # progress bar
-  - matplotlib=3.3.1  # creates plots (used for visualization)
-  - tensorflow=2.7.0 # machine learning
-  - numpy=1.19.2 # array manipulation and fast computing
+  - matplotlib>=3.3.0  # creates plots (used for visualization)
+  - tensorflow>=2.7.0,<3.0.0 # machine learning
+  - numpy>=1.19.2,<2.0.0 # array manipulation and fast computing
   - joblib=0.16.0 # used to save/load data primarily for el nino example
   - scikit-learn=0.23.2 # used to import clustering methods, other algorithms/metrics
   - jupyter # for jupyter notebooks
@@ -39,7 +40,7 @@ dependencies:
 # # the following packages are not required to use the basic
 # # cfl code, but may be needed to run some of the example notebooks
 # # or testing code.
-  - pytest=6.0.1 # to run regression tests
+  - pytest>=6.0.0,<7.0.0 # to run regression tests
 
 
 # # the following packages are things that we (Iman and Jenna) have
