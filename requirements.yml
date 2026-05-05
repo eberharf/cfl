@@ -24,6 +24,7 @@ channels:
   - defaults
   - conda-forge
 dependencies:
+  - pip
   - tqdm # progress bar
   - matplotlib=3.3.1  # creates plots (used for visualization)
   - tensorflow=2.7.0 # machine learning

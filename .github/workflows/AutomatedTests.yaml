@@ -23,10 +23,9 @@ jobs:
       with:
         fetch-depth: ‘2’
       
-    - name: Set up Python {{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    # NOTE: We rely on the conda environment's Python below.
+    # Using actions/setup-python here can leave a "global" pip on PATH that
+    # is unrelated to the conda env and makes debugging installs confusing.
     - name: append cfl to pythonpath
       run:  |
         %CD%
